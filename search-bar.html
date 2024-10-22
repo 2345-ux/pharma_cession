@@ -1,0 +1,181 @@
+<!-- search-bar.html -->
+<div class="search-section">
+    <form class="search-form" id="searchForm">
+        <div class="search-grid">
+            <div class="search-item">
+                <input type="text" id="searchProduct" placeholder="Rechercher un produit">
+            </div>
+            <div class="search-item">
+                <input type="text" id="searchSupplier" placeholder="Rechercher un fournisseur">
+            </div>
+            <div class="search-item">
+                <input type="date" id="searchDate" placeholder="Date d'ajout">
+            </div>
+            <div class="search-buttons">
+                <button type="submit" class="search-btn">Rechercher</button>
+                <button type="reset" class="search-btn reset">Réinitialiser</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+.search-section {
+    background-color: #fff;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.search-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    align-items: end;
+}
+
+.search-item {
+    position: relative;
+}
+
+.search-item input {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+.search-item input:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+.search-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.search-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    background-color: #4CAF50;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.search-btn:hover {
+    background-color: #45a049;
+}
+
+.search-btn.reset {
+    background-color: #666;
+}
+
+.search-btn.reset:hover {
+    background-color: #555;
+}
+
+@media (max-width: 768px) {
+    .search-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .search-buttons {
+        flex-direction: column;
+    }
+    
+    .search-btn {
+        width: 100%;
+    }
+}
+</style>
+
+<script>
+class SearchComponent {
+    constructor() {
+        this.form = document.getElementById('searchForm');
+        this.productInput = document.getElementById('searchProduct');
+        this.supplierInput = document.getElementById('searchSupplier');
+        this.dateInput = document.getElementById('searchDate');
+        
+        this.initializeEventListeners();
+    }
+
+    initializeEventListeners() {
+        this.form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.performSearch();
+        });
+
+        this.form.addEventListener('reset', (e) => {
+            setTimeout(() => {
+                this.performSearch();
+            }, 0);
+        });
+    }
+
+    performSearch() {
+        const searchCriteria = {
+            product: this.productInput.value.toLowerCase(),
+            supplier: this.supplierInput.value.toLowerCase(),
+            date: this.dateInput.value
+        };
+
+        const filteredProducts = window.produits.filter(produit => {
+            const matchProduct = !searchCriteria.product || 
+                produit.nom.toLowerCase().includes(searchCriteria.product);
+            const matchSupplier = !searchCriteria.supplier || 
+                produit.fournisseur.toLowerCase().includes(searchCriteria.supplier);
+            const matchDate = !searchCriteria.date || 
+                produit.dateAjout === searchCriteria.date;
+
+            return matchProduct && matchSupplier && matchDate;
+        });
+
+        this.updateResults(filteredProducts);
+    }
+
+    updateResults(results) {
+        // Mettre à jour le tableau
+        const tableBody = document.querySelector('tbody');
+        tableBody.innerHTML = '';
+
+        results.forEach((produit, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td data-label="Nom du Produit">${produit.nom}</td>
+                <td data-label="Quantité">${produit.quantite}</td>
+                <td data-label="Prix Unitaire">${produit.prixUnitaire.toFixed(2)} €</td>
+                <td data-label="Date d'Ajout">${produit.dateAjout}</td>
+                <td data-label="Date d'Expiration">${produit.dateExpiration}</td>
+                <td data-label="Fournisseur">${produit.fournisseur}</td>
+                <td data-label="Actions">
+                    <button class="btn btnModifier" data-index="${index}">Modifier</button>
+                    <button class="btn btnSupprimer" data-index="${index}">Supprimer</button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+
+        // Mettre à jour le total
+        const total = results.reduce((sum, produit) => {
+            return sum + (produit.quantite * produit.prixUnitaire);
+        }, 0);
+        
+        const totalElement = document.getElementById('totalStock');
+        if (totalElement) {
+            totalElement.textContent = total.toFixed(2) + ' €';
+        }
+    }
+}
+
+// Initialiser le composant de recherche quand le DOM est chargé
+document.addEventListener('DOMContentLoaded', function() {
+    new SearchComponent();
+});
+</script>

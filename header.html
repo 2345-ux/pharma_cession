@@ -1,0 +1,60 @@
+<header class="header">
+    <nav class="nav-container">
+        <ul class="nav-list">
+            <li><a href="index.html">Accueil</a></li>
+            <li><a href="stock2.html">Stock</a></li>
+            <li><a href="commande.html">Commandes</a></li>
+            <li><a href="sorties.html">Sorties</a></li>
+            <li><a href="produit.html">Produits</a></li>
+            <li><a href="categorie.html">Catégories</a></li>
+            <li><a href="fournisseurs.html">Fournisseurs</a></li>
+        </ul>
+    </nav>
+</header>
+
+<style>
+.nav-container {
+    background-color: #333;
+    padding: 1rem;
+}
+
+.nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.nav-list a {
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    transition: color 0.3s;
+}
+
+.nav-list a:hover {
+    color: #ffd700;
+}
+
+.nav-list a.active {
+    background-color: #555;
+    border-radius: 4px;
+}
+</style>
+
+<script>
+// Script pour ajouter la classe active au lien correspondant à la page actuelle
+document.addEventListener('DOMContentLoaded', function() {
+    const currentPage = window.location.pathname.split('/').pop();
+    const links = document.querySelectorAll('.nav-list a');
+
+    links.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href === currentPage || (currentPage === "" && href === "index.html")) {
+            link.classList.add('active');
+        }
+    });
+});
+</script>

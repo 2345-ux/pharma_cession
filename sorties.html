@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacie de Cession - Sorties de Produits</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        header {
+            background-color: #e74c3c;  /* Changé en rouge pour différencier des entrées */
+            color: white;
+            text-align: center;
+            padding: 1em;
+        }
+
+        header h1 {
+            font-size: clamp(1.2rem, 4vw, 2rem);
+        }
+
+        nav {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            overflow-x: auto;
+        }
+
+        nav ul {
+            list-style-type: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 12px;
+            white-space: nowrap;
+            transition: background-color 0.3s;
+        }
+
+        nav ul li a:hover {
+            background-color: #e74c3c;
+            border-radius: 4px;
+        }
+
+        .content {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+
+        .search-box {
+            margin: 20px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-box input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .btn {
+            background-color: #e74c3c;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #c0392b;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            white-space: nowrap;
+        }
+
+        .total-row {
+            font-weight: bold;
+            background-color: #e6e6e6;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 8px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        form input, 
+        form select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            nav ul {
+                flex-direction: column;
+            }
+
+            nav ul li {
+                width: 100%;
+                text-align: center;
+            }
+
+            nav ul li a {
+                display: block;
+                padding: 10px;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            .btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            td, th {
+                min-width: 120px;
+            }
+
+            .modal-content {
+                margin: 10% auto;
+                padding: 15px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            header h1 {
+                font-size: 1.2rem;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .search-box input {
+                width: 100%;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 5% auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Pharmacie de Cession - Sorties de Produits</h1>
+    </header>
+    <div id="header-placeholder"></div>
+
+<script>
+fetch('header.html')
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('header-placeholder').innerHTML = data;
+
+        // Après l'insertion du header, réexécuter le script pour marquer la page active
+        const currentPage = window.location.pathname.split('/').pop();
+        const links = document.querySelectorAll('.nav-list a');
+
+        links.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href === currentPage || (currentPage === "" && href === "index.html")) {
+                link.classList.add('active');
+            }
+        });
+    })
+    .catch(error => console.error('Erreur lors du chargement du header:', error));
+</script>
+
+    <div class="container">
+        <div class="content">
+            <h2>Sorties de Produits</h2>
+            <button class="btn" id="btnAjouterSortie">Enregistrer une Sortie</button>
+            <button class="btn">Imprimer</button>
+            <div class="search-box">
+                <input type="text" placeholder="Produit">
+                <input type="date" placeholder="Date de début">
+                <input type="date" placeholder="Date de fin">
+                <button class="btn">Rechercher</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nom du Produit</th>
+                        <th>Quantité Sortie</th>
+                        <th>Prix Unitaire</th>
+                        <th>Montant Total</th>
+                        <th>Date de Sortie</th>
+                        <th>Destination</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Produit A</td>
+                        <td>50</td>
+                        <td>12.00 €</td>
+                        <td>600.00 €</td>
+                        <td>2023-06-01</td>
+                        <td>Service Pédiatrie</td>
+                        <td>Distribution Mensuelle</td>
+                        <td>
+                            <button class="btn btnModifier">Modifier</button>
+                            <button class="btn">Supprimer</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Produit B</td>
+                        <td>75</td>
+                        <td>18.00 €</td>
+                        <td>1350.00 €</td>
+                        <td>2023-06-02</td>
+                        <td>Service Urgences</td>
+                        <td>Réapprovisionnement</td>
+                        <td>
+                            <button class="btn btnModifier">Modifier</button>
+                            <button class="btn">Supprimer</button>
+                        </td>
+                    </tr>
+                    <tr class="total-row">
+                        <td colspan="3">Total</td>
+                        <td>1950.00 €</td>
+                        <td colspan="4"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="modalAjouterSortie" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Enregistrer une Sortie</h2>
+            <form id="formAjouterSortie">
+                <select required>
+                    <option value="">Sélectionner un produit</option>
+                    <option value="Produit A">Produit A</option>
+                    <option value="Produit B">Produit B</option>
+                </select>
+                <input type="number" placeholder="Quantité à sortir" required>
+                <input type="number" step="0.01" placeholder="Prix unitaire" required>
+                <input type="date" placeholder="Date de sortie" required>
+                <select required>
+                    <option value="">Sélectionner un service</option>
+                    <option value="Service Pédiatrie">Service Pédiatrie</option>
+                    <option value="Service Urgences">Service Urgences</option>
+                    <option value="Service Maternité">Service Maternité</option>
+                    <option value="Rayon">Rayon</option>
+                </select>
+                <button type="submit" class="btn">Enregistrer</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalModifierSortie" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Modifier une Sortie</h2>
+            <form id="formModifierSortie">
+                <select required>
+                    <option value="">Sélectionner un produit</option>
+                    <option value="Produit A">Produit A</option>
+                    <option value="Produit B">Produit B</option>
+                </select>
+                <input type="number" placeholder="Quantité à sortir" required>
+                <input type="number" step="0.01" placeholder="Prix unitaire" required>
+                <input type="date" placeholder="Date de sortie" required>
+                <select required>
+                    <option value="">Sélectionner un service</option>
+                    <option value="Service Pédiatrie">Service Pédiatrie</option>
+                    <option value="Service Urgences">Service Urgences</option>
+                    <option value="Service Maternité">Service Maternité</option>
+                </select>
+                <input type="text" placeholder="Motif de sortie" required>
+                <button type="submit" class="btn">Modifier</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const modalAjouterSortie = document.getElementById("modalAjouterSortie");
+        const modalModifierSortie = document.getElementById("modalModifierSortie");
+        const btnAjouterSortie = document.getElementById("btnAjouterSortie");
+        const btnsModifier = document.querySelectorAll(".btnModifier");
+        const spans = document.getElementsByClassName("close");
+
+        btnAjouterSortie.onclick = function() {
+            modalAjouterSortie.style.display = "block";
+        }
+
+        btnsModifier.forEach(btn => {
+            btn.onclick = function() {
+                modalModifierSortie.style.display = "block";
+            }
+        });
+
+        for (let span of spans) {
+            span.onclick = function() {
+                modalAjouterSortie.style.display = "none";
+                modalModifierSortie.style.display = "none";
+            }
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modalAjouterSortie) {
+                modalAjouterSortie.style.display = "none";
+            }
+            if (event.target == modalModifierSortie) {
+                modalModifierSortie.style.display = "none";
+            }
+        }
+    </script>
+
+</body>
+</html>
