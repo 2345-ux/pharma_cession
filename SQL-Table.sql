@@ -1,0 +1,1 @@
+CREATE TABLE `phama_cession`.`t_fournisseurs` (`code` VARCHAR(50) NOT NULL , `nom` VARCHAR(50) NOT NULL , `tel` VARCHAR(50) NULL , `adre` VARCHAR(250) NULL , `email` VARCHAR(50) NULL , PRIMARY KEY (`code`)) ENGINE = InnoDB;
