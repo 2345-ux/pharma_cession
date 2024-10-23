@@ -162,7 +162,7 @@
                             <button class="btn">Supprimer</button>
                         </td>
                     </tr>
-                    <tr>
+                    <!--tr>
                         <td>Fournisseur B</td>
                         <td>contact@fournisseurb.com</td>
                         <td>+22796552104</td>
@@ -171,7 +171,7 @@
                             <button class="btn btnModifier">Modifier</button>
                             <button class="btn">Supprimer</button>
                         </td>
-                    </tr>
+                    </tr-->
                 </tbody>
             </table>
         </div>
@@ -181,7 +181,7 @@
     <div id="modalAjouterFournisseur" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Ajouter un Fournisseur</h2>
+            <h2>Ajouter un Fournisseur 1</h2>
             <form id="formAjouterFournisseur">
                 <input type="text" placeholder="Nom du Fournisseur" required>
                 <input type="email" placeholder="Contact (email)" required>
@@ -189,6 +189,7 @@
                 <input type="text" placeholder="Adresse" required>
                 <button type="submit" class="btn">Ajouter</button>
             </form>
+            <div id="message"></div>
         </div>
     </div>
 
@@ -196,7 +197,7 @@
     <div id="modalModifierFournisseur" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Modifier un Fournisseur</h2>
+            <h2>Modifier un Fournisseur 1</h2>
             <form id="formModifierFournisseur">
                 <input type="text" placeholder="Nom du Fournisseur" required>
                 <input type="email" placeholder="Contact (email)" required>
@@ -234,12 +235,51 @@
 
         window.onclick = function(event) {
             if (event.target == modalAjouterFournisseur) {
-                modalAjouterFournisseur.style.display = "none";
+                //modalAjouterFournisseur.style.display = "none";
             }
             if (event.target == modalModifierFournisseur) {
                 modalModifierFournisseur.style.display = "none";
             }
         }
+
+
+
+
+
+
+
+
+
+        //-------- Ajout Founisseur ----------------
+        $('#formAjouterFournisseur').on('submit', function(e) {
+            e.preventDefault();
+            
+            var formData = {
+                code: $('#code').val(),
+                nom: $('#nom').val(),
+                tel: $('#tel').val(),
+                adre: $('#adre').val(),
+                email: $('#email').val()
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: 'add_fournisseur.php',
+                data: formData,
+                dataType: 'json',
+                success: function(response) {
+                    if(response.status === 'success') {
+                        $('#message').html('<p style="color: green;">' + response.message + '</p>');
+                        $('#fournisseurForm')[0].reset();
+                    } else {
+                        $('#message').html('<p style="color: red;">' + response.message + '</p>');
+                    }
+                },
+                error: function() {
+                    $('#message').html('<p style="color: red;">Erreur lors de la communication avec le serveur</p>');
+                }
+            });
+        });
     </script>
 
 </body>
