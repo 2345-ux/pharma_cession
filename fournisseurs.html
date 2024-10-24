@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pharmacie de Cession - Fournisseurs</title>
+    <!--script src="https://code.jquery.com/jquery-3.6.0.min.js"></script-->
+    <script src="js/jquery-3.6.0.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -117,25 +119,6 @@
     </header>
     <div id="header-placeholder"></div>
 
-    <script>
-    fetch('header.html')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('header-placeholder').innerHTML = data;
-    
-            // Après l'insertion du header, réexécuter le script pour marquer la page active
-            const currentPage = window.location.pathname.split('/').pop();
-            const links = document.querySelectorAll('.nav-list a');
-    
-            links.forEach(link => {
-                const href = link.getAttribute('href');
-                if (href === currentPage || (currentPage === "" && href === "index.html")) {
-                    link.classList.add('active');
-                }
-            });
-        })
-        .catch(error => console.error('Erreur lors du chargement du header:', error));
-    </script>
     
     <div class="container">
         <div class="content">
@@ -181,14 +164,16 @@
     <div id="modalAjouterFournisseur" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Ajouter un Fournisseur 1</h2>
+            <h2>Ajouter un Fournisseur</h2>
             <form id="formAjouterFournisseur">
-                <input type="text" placeholder="Nom du Fournisseur" required>
-                <input type="email" placeholder="Contact (email)" required>
-                <input type="tel" placeholder="Téléphone" required>
-                <input type="text" placeholder="Adresse" required>
-                <button type="submit" class="btn">Ajouter</button>
+                <input type="text" placeholder="Code du Fournisseur" id="code" hidden>
+                <input type="text" placeholder="Nom du Fournisseur" id="nom" required>
+                <input type="email" placeholder="Contact (email)" id="email">
+                <input type="tel" placeholder="Téléphone" id="tel">
+                <input type="text" placeholder="Adresse" id="adre">
+                
             </form>
+            <button type="button" class="btn" id="btn_enregitrer_nouveau">Ajouter</button>
             <div id="message"></div>
         </div>
     </div>
@@ -200,15 +185,36 @@
             <h2>Modifier un Fournisseur 1</h2>
             <form id="formModifierFournisseur">
                 <input type="text" placeholder="Nom du Fournisseur" required>
-                <input type="email" placeholder="Contact (email)" required>
-                <input type="tel" placeholder="Téléphone" required>
-                <input type="text" placeholder="Adresse" required>
+                <input type="email" placeholder="Contact (email)" >
+                <input type="tel" placeholder="Téléphone" >
+                <input type="text" placeholder="Adresse">
                 <button type="submit" class="btn">Modifier</button>
             </form>
         </div>
     </div>
 
     <script>
+
+        //----- Script INSertion du menu Haut ------------------
+        fetch('header.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('header-placeholder').innerHTML = data;
+    
+            // Après l'insertion du header, réexécuter le script pour marquer la page active
+            const currentPage = window.location.pathname.split('/').pop();
+            const links = document.querySelectorAll('.nav-list a');
+    
+            links.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPage || (currentPage === "" && href === "index.html")) {
+                    link.classList.add('active');
+                }
+            });
+        })
+        .catch(error => console.error('Erreur lors du chargement du header:', error));
+
+
         // JavaScript pour gérer l'ouverture et la fermeture des modals
         const modalAjouterFournisseur = document.getElementById("modalAjouterFournisseur");
         const modalModifierFournisseur = document.getElementById("modalModifierFournisseur");
@@ -235,7 +241,7 @@
 
         window.onclick = function(event) {
             if (event.target == modalAjouterFournisseur) {
-                //modalAjouterFournisseur.style.display = "none";
+                modalAjouterFournisseur.style.display = "none";
             }
             if (event.target == modalModifierFournisseur) {
                 modalModifierFournisseur.style.display = "none";
@@ -251,8 +257,9 @@
 
 
         //-------- Ajout Founisseur ----------------
-        $('#formAjouterFournisseur').on('submit', function(e) {
-            e.preventDefault();
+        $('#btn_enregitrer_nouveau').on('click', function() {
+           
+           //alert("Ajout");
             
             var formData = {
                 code: $('#code').val(),
@@ -264,22 +271,76 @@
 
             $.ajax({
                 type: 'POST',
-                url: 'add_fournisseur.php',
+                url: 'fournisseurs_ajout_nouveau.php',
                 data: formData,
                 dataType: 'json',
                 success: function(response) {
-                    if(response.status === 'success') {
+                    //--- Ajax a eu une reponse du script PHP ; fournisseurs_ajout_nouveau.php
+                    if(response.status === 'success') { //---- Verification du status de la reponse, soit success ou error
                         $('#message').html('<p style="color: green;">' + response.message + '</p>');
-                        $('#fournisseurForm')[0].reset();
+
+                        //---- Raffraichir la liste des fournisseur apres ajout du nouveau
+                        getListe();
+                        modalAjouterFournisseur.style.display = "none";
+
+                        
                     } else {
                         $('#message').html('<p style="color: red;">' + response.message + '</p>');
                     }
                 },
-                error: function() {
-                    $('#message').html('<p style="color: red;">Erreur lors de la communication avec le serveur</p>');
+                error: function(jqXHR, textStatus, errorThrown) {
+                    // Affichez l'erreur exacte
+                    var errorMessage = jqXHR.responseText + textStatus;
+                    $('#message').html('<p style="color: red;">' + errorMessage + '</p>');
                 }
             });
         });
+
+
+        //---- Creons la fonction qui va remplir la liste des fournisseurs 
+        function getListe() {
+    $.ajax({
+        url: 'fournisseurs_get_liste.php', // Chemin vers le script PHP
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            // Vider le corps de la table avant d'ajouter de nouvelles lignes
+            $('tbody').empty();
+            
+            if (response.donnees.length > 0) {
+                response.donnees.forEach(function(fournisseur) {
+                    var row = '<tr>' +
+            '<td>' + (fournisseur.nom || '') + '</td>' + // Affiche une chaîne vide si fournisseur.nom est null ou vide
+            '<td>' + (fournisseur.email || '') + '</td>' + // Affiche une chaîne vide si fournisseur.email est null ou vide
+            '<td>' + (fournisseur.tel || '') + '</td>' + // Affiche une chaîne vide si fournisseur.tel est null ou vide
+            '<td>' + (fournisseur.adre || '') + '</td>' + // Affiche une chaîne vide si fournisseur.adre est null ou vide
+            '<td>' +
+            '<button class="btn btnModifier">Modifier</button> ' +
+            '<button class="btn btnSupprimer">Supprimer</button>' +
+            '</td>' +
+            '</tr>';
+        $('tbody').append(row); // Ajouter la ligne à la table
+                });
+            } else {
+                $('tbody').append('<tr><td colspan="5">Aucun fournisseur trouvé.</td></tr>');
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            var errorMessage = jqXHR.responseText + textStatus;
+            //console.error("Erreur lors de la récupération des fournisseurs : " + textStatus);
+            $('tbody').append('<tr><td colspan="5" style="color:red;">Erreur lors de la récupération des fournisseurs.'+ errorMessage+'</td></tr>');
+            // Affichez l'erreur exacte
+            
+                   // $('#message').html('<p style="color: red;">' + errorMessage + '</p>');
+        }
+    });
+}
+
+// Appeler la fonction pour charger les fournisseurs au chargement de la page
+$(document).ready(function() {
+    getListe();
+});
+
     </script>
 
 </body>

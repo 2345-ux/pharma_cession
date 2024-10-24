@@ -5,12 +5,13 @@ header('Content-Type: application/json');
 try {
     $pdo = new PDO(
         "mysql:host=localhost;dbname=phama_cession;charset=utf8",
-        "votre_utilisateur",
-        "votre_mot_de_passe",
+        "saw24",
+        "saw24",
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
     );
 
-    $code = $_POST['code'] ?? '';
+    //$code = $_POST['code'] ?? '';
+    $code = generateUniqueCode();
     $nom = $_POST['nom'] ?? '';
     $tel = $_POST['tel'] ?? '';
     $adre = $_POST['adre'] ?? '';
@@ -28,7 +29,7 @@ try {
 
     echo json_encode([
         'status' => 'success',
-        'message' => 'Fournisseur ajouté avec succès'
+        'message' => 'Fournisseur ajouté avec succès !'
     ]);
 } catch (PDOException $e) {
     echo json_encode([
@@ -36,3 +37,21 @@ try {
         'message' => 'Erreur: ' . $e->getMessage()
     ]);
 }
+
+
+
+function generateUniqueCode()
+{
+    // Obtenir la date et l'heure actuelles
+    $date = new DateTime();
+
+    // Formater la date et l'heure selon le format souhaité
+    $uniqueCode = $date->format('YmdHis') . sprintf('%04d', rand(0, 9999));
+
+    // S'assurer que le code est une chaîne de caractères
+    return strval($uniqueCode);
+}
+
+// Exemple d'utilisation
+//$codeUnique = generateUniqueCode();
+//echo $codeUnique;
