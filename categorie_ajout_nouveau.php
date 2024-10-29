@@ -1,5 +1,5 @@
 <?php
-// add_fournisseur.php
+// add_categorie.php
 header('Content-Type: application/json');
 
 try {
@@ -13,23 +13,17 @@ try {
     //$code = $_POST['code'] ?? '';
     $code = generateUniqueCode();
     $nom = $_POST['nom'] ?? '';
-    $tel = $_POST['tel'] ?? '';
-    $adre = $_POST['adre'] ?? '';
-    $email = $_POST['email'] ?? '';
 
-    $stmt = $pdo->prepare("INSERT INTO t_fournisseurs (code, nom, tel, adre, email) VALUES (:code, :nom, :tel, :adre, :email)");
+    $stmt = $pdo->prepare("INSERT INTO t_cotegorie (code, nom) VALUES (:code, :nom)");
 
     $stmt->execute([
         ':code' => $code,
         ':nom' => $nom,
-        ':tel' => $tel,
-        ':adre' => $adre,
-        ':email' => $email
     ]);
 
     echo json_encode([
         'status' => 'success',
-        'message' => 'Fournisseur ajouté avec succès !'
+        'message' => 'Categorie ajouté avec succès !'
     ]);
 } catch (PDOException $e) {
     echo json_encode([

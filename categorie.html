@@ -338,8 +338,8 @@ fetch('header.html')
             <span class="close">&times;</span>
             <h2>Ajouter une Catégorie</h2>
             <form id="formAjouterCategorie">
-                <input type="text" placeholder="Code de la Catégorie" required>
-                <input type="text" placeholder="Nom de la Catégorie" required>
+                <input type="text" placeholder="Code du categorie" id="code" hidden>
+                <input type="text" placeholder="Nom du categorie" id="nom" required>
                 <button type="submit" class="btn">Ajouter</button>
             </form>
         </div>
@@ -395,6 +395,47 @@ fetch('header.html')
                 modalModifierCategorie.style.display = "none";
             }
         }
+
+
+        //---- Creons la fonction qui va remplir la liste des fcategories 
+        function getListe() {
+            $.ajax({
+                url: 'categorie_get_liste.php', // Chemin vers le script PHP
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    // Vider le corps de la table avant d'ajouter de nouvelles lignes
+                    $('tbody').empty();
+                    
+                    if (response.donnees.length > 0) {
+                        response.donnees.forEach(function(categorie) {
+                            var row = '<tr>' +
+                    '<td>' + (fcategorie.nom || '') + '</td>' + // Affiche une chaîne vide si fcategorie.nom est null ou vide
+                    '<button class="btn btnModifier">Modifier</button> ' +
+                    '<button class="btn btnSupprimer">Supprimer</button>' +
+                    '</td>' +
+                    '</tr>';
+                $('tbody').append(row); // Ajouter la ligne à la table
+                        });
+                    } else {
+                        $('tbody').append('<tr><td colspan="5">Aucun fcategorie trouvé.</td></tr>');
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    var errorMessage = jqXHR.responseText + textStatus;
+                    //console.error("Erreur lors de la récupération des fcategories : " + textStatus);
+                    $('tbody').append('<tr><td colspan="5" style="color:red;">Erreur lors de la récupération des fcategories.'+ errorMessage+'</td></tr>');
+                    // Affichez l'erreur exacte
+                    
+                           // $('#message').html('<p style="color: red;">' + errorMessage + '</p>');
+                }
+            });
+        }
+        
+        // Appeler la fonction pour charger les fcategories au chargement de la page
+        $(document).ready(function() {
+            getListe();
+        });
     </script>
  
 </body>

@@ -12,16 +12,16 @@ try {
 
 
 
-    $stmt = $pdo->prepare("SELECT * FROM t_fournisseurs");
+    $stmt = $pdo->prepare("SELECT * FROM t_cotegorie");
 
     $stmt->execute([]);
     // Récupérer les résultats
-    $fournisseurs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $categorie = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode([
         'status' => 'success',
         'message' => 'Liste reccuperée !',
-        'donnees' => $fournisseurs
+        'donnees' => $categorie
     ]);
 } catch (PDOException $e) {
     echo json_encode([
