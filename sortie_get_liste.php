@@ -1,5 +1,5 @@
 <?php
-// add_fournisseur.php
+// get_sorties.php
 header('Content-Type: application/json');
 
 try {
@@ -10,20 +10,22 @@ try {
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
     );
 
+    // Requête pour récupérer toutes les sorties
+    $stmt = $pdo->prepare("SELECT * FROM t_sorties");
+    $stmt->execute();
 
-
-    $stmt = $pdo->prepare("SELECT * FROM t_categories");
-
-    $stmt->execute([]);
     // Récupérer les résultats
-    $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $sorties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    // Renvoyer les données en format JSON
     echo json_encode([
         'status' => 'success',
-        'message' => 'Liste reccuperée !',
-        'donnees' => $categories
+        'message' => 'Liste des sorties récupérée avec succès !',
+        'donnees' => $sorties
     ]);
+
 } catch (PDOException $e) {
+    // Gestion des erreurs
     echo json_encode([
         'status' => 'error',
         'message' => 'Erreur: ' . $e->getMessage()

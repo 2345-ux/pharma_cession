@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pharmacie de Cession -   Produits</title>
+    <title>Pharmacie de Cession - Produits</title>
+    <!--script src="https://code.jquery.com/jquery-3.6.0.min.js"></script-->
+    <script src="js/jquery-3.6.0.min.js"></script>
     <style>
-        * {
+        body {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
@@ -312,7 +314,7 @@ fetch('header.html')
             <table>
                 <thead>
                     <tr>
-                        <th>Code</th>
+                        <th hidden>Code</th>
                         <th>Nom du Produit</th>
                         <th>Catégorie</th>
                         <th>Actions</th>
@@ -346,13 +348,14 @@ fetch('header.html')
     <div id="modalAjouterProduit" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Ajouter un Produit</h2>
-            <form id="formAjouterProduit">
-                <input type="text" placeholder="Code du Produit" required>
-                <input type="text" placeholder="Nom du Produit" required>
-                <input type="text" placeholder="Catégorie" required>
-                <button type="submit" class="btn">Ajouter</button>
+            <h2>Ajouter un produit</h2>
+            <form id="formAjouterCategorie">
+                <input type="text" placeholder="code du produit" id="code" hidden>
+                <input type="text" placeholder="Nom du produit" id="nom" required>
+                <input type="text" placeholder="categorie du produit" id="categorie">
             </form>
+            <button type="submit" class="btn" id="btnNouveauProduit">Ajouter</button>
+            <div id="message"></div>
         </div>
     </div>
 
@@ -407,6 +410,88 @@ fetch('header.html')
                 modalModifierProduit.style.display = "none";
             }
         }
+        //-------- Ajout categories ----------------
+        $('#btnNouveauProduit').on('click', function() {
+           
+            //alert("Ajout");
+             
+             var formData = {
+                 code: $('#code').val(),
+                 nom: $('#nom').val(),
+                 categorie: $('#categorie').val(),
+             };
+ 
+             $.ajax({
+                 type: 'POST',
+                 url: 'produit_ajout_nouveau.php',
+                 data: formData,
+                 dataType: 'json',
+                 success: function(response) {
+                     //--- Ajax a eu une reponse du script PHP ; produit_ajout_nouveau.php
+                     if(response.status === 'success') { //---- Verification du status de la reponse, soit success ou error
+                         $('#message').html('<p style="color: green;">' + response.message + '</p>');
+ 
+                         //---- Raffraichir la liste des produits apres ajout du nouveau
+                         getListe();
+                         modalAjouterProduit.style.display = "none";
+ 
+                         
+                     } else {
+                         $('#message').html('<p style="color: red;">' + response.message + '</p>');
+                     }
+                 },
+                 error: function(jqXHR, textStatus, errorThrown) {
+                     // Affichez l'erreur exacte
+                     var errorMessage = jqXHR.responseText + textStatus;
+                     $('#message').html('<p style="color: red;">' + errorMessage + '</p>');
+                 }
+             });
+         });
+ 
+
+        //---- Creons la fonction qui va remplir la liste des fcategories 
+        function getListe() {
+            $.ajax({
+                url: 'produit_get_liste.php', // Chemin vers le script PHP
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    // Vider le corps de la table avant d'ajouter de nouvelles lignes
+                    $('tbody').empty();
+                    
+                    if (response.donnees.length > 0) {
+                        response.donnees.forEach(function(produit) {
+                            var row = '<tr>' +
+                    '<td>' + (produit.nom || '') + '</td>' + // Affiche une chaîne vide si categorie.nom est null ou vide
+                    '<td>' + (produit.categorie || '') + '</td>' + // Affiche une chaîne vide si categorie.nom est null ou vide
+                    '<button class="btn btnModifier">Modifier</button> ' +
+                    '<button class="btn btnSupprimer">Supprimer</button>' +
+                    '<td>' +
+            '<button class="btn btnModifier">Modifier</button> ' +
+            '<button class="btn btnSupprimer">Supprimer</button>' +
+            '</td>' +
+            '</tr>';
+                $('tbody').append(row); // Ajouter la ligne à la table
+                        });
+                    } else {
+                        $('tbody').append('<tr><td colspan="5">Aucun Produit trouvé.</td></tr>');
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    var errorMessage = jqXHR.responseText + textStatus;
+                    //console.error("Erreur lors de la récupération des produit : " + textStatus);
+                    $('tbody').append('<tr><td colspan="5" style="color:red;">Erreur lors de la récupération des produits.'+ errorMessage+'</td></tr>');
+                    // Affichez l'erreur exacte
+                    
+                           // $('#message').html('<p style="color: red;">' + errorMessage + '</p>');
+                }
+            });
+        }
+        
+        // Appeler la fonction pour charger les fournisseurs au chargement de la page
+        $(document).ready(function() {
+            getListe();
+        });
     </script>
 
 </body>

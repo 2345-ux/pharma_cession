@@ -1,5 +1,5 @@
 <?php
-// add_categorie.php
+// add_categories.php
 header('Content-Type: application/json');
 
 try {
@@ -14,7 +14,7 @@ try {
     $code = generateUniqueCode();
     $nom = $_POST['nom'] ?? '';
 
-    $stmt = $pdo->prepare("INSERT INTO t_cotegorie (code, nom) VALUES (:code, :nom)");
+    $stmt = $pdo->prepare("INSERT INTO t_categories (code, nom) VALUES (:code, :nom)");
 
     $stmt->execute([
         ':code' => $code,
@@ -23,7 +23,7 @@ try {
 
     echo json_encode([
         'status' => 'success',
-        'message' => 'Categorie ajouté avec succès !'
+        'message' => 'catégorie ajouté avec succès !'
     ]);
 } catch (PDOException $e) {
     echo json_encode([

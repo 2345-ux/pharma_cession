@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pharmacie de Cession - categorie</title>
+    <title>Pharmacie de Cession - Categories</title>
+    <!--script src="https://code.jquery.com/jquery-3.6.0.min.js"></script-->
+    <script src="js/jquery-3.6.0.min.js"></script>
     <style>
-        * {
+        body {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
@@ -301,7 +303,7 @@ fetch('header.html')
     <div class="container">
         <div class="content">
             <h2>Liste des Catégories</h2>
-            <button class="btn" id="btnAjouterCategorie">Ajouter une Catégorie</button>
+            <button class="btn" id="btnOuvrirModalAjouterCategorie">Ajouter une Catégorie</button>
             <table>
                 <thead>
                     <tr>
@@ -333,17 +335,20 @@ fetch('header.html')
     </div>
 
     <!-- Modal pour ajouter une catégorie -->
-    <div id="modalAjouterCategorie" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Ajouter une Catégorie</h2>
-            <form id="formAjouterCategorie">
-                <input type="text" placeholder="Code du categorie" id="code" hidden>
-                <input type="text" placeholder="Nom du categorie" id="nom" required>
-                <button type="submit" class="btn">Ajouter</button>
-            </form>
-        </div>
+<div id="modalAjouterCategorie" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Ajouter une Catégorie</h2>
+        <form id="formAjouterCategorie">
+            <input type="text" placeholder="code de la catégorie" id="code" hidden>
+            <input type="text" placeholder="Nom de la catégorie" id="nom" required>
+            <button type="submit" class="btn" id="btnAjouterCategorie">Ajouter</button>
+        </form>
+
+        <div id="message"></div>
     </div>
+</div>
+
 
     <!-- Modal pour modifier une catégorie -->
     <div id="modalModifierCategorie" class="modal">
@@ -351,7 +356,7 @@ fetch('header.html')
             <span class="close">&times;</span>
             <h2>Modifier une Catégorie</h2>
             <form id="formModifierCategorie">
-                <input type="text" placeholder="Code de la Catégorie" required>
+                <input type="text" placeholder="Code de la Catégorie" hidden>
                 <input type="text" placeholder="Nom de la Catégorie" required>
                 <button type="submit" class="btn">Modifier</button>
             </form>
@@ -362,12 +367,12 @@ fetch('header.html')
         // Gestion des modals pour l'ajout et la modification
         const modalAjouterCategorie = document.getElementById("modalAjouterCategorie");
         const modalModifierCategorie = document.getElementById("modalModifierCategorie");
-        const btnAjouterCategorie = document.getElementById("btnAjouterCategorie");
+        const btnOuvrirModalAjouterCategorie = document.getElementById("btnOuvrirModalAjouterCategorie");
         const btnsModifier = document.querySelectorAll(".btnModifier");
         const spans = document.getElementsByClassName("close");
 
         // Ouvrir la modal pour ajouter une catégorie
-        btnAjouterCategorie.onclick = function() {
+        btnOuvrirModalAjouterCategorie.onclick = function() {
             modalAjouterCategorie.style.display = "block";
         }
 
@@ -396,6 +401,43 @@ fetch('header.html')
             }
         }
 
+        //-------- Ajout categories ----------------
+        $('#btnAjouterCategorie').on('click', function() {
+           
+            //alert("Ajout");
+             
+             var formData = {
+                 code: $('#code').val(),
+                 nom: $('#nom').val(),
+             };
+ 
+             $.ajax({
+                 type: 'POST',
+                 url: 'categorie_ajout_nouveau.php',
+                 data: formData,
+                 dataType: 'json',
+                 success: function(response) {
+                     //--- Ajax a eu une reponse du script PHP ; categories_ajout_nouveau.php
+                     if(response.status === 'success') { //---- Verification du status de la reponse, soit success ou error
+                         $('#message').html('<p style="color: green;">' + response.message + '</p>');
+ 
+                         //---- Raffraichir la liste des categories apres ajout du nouveau
+                         getListe();
+                         modalAjouterCategorie.style.display = "none";
+ 
+                         
+                     } else {
+                         $('#message').html('<p style="color: red;">' + response.message + '</p>');
+                     }
+                 },
+                 error: function(jqXHR, textStatus, errorThrown) {
+                     // Affichez l'erreur exacte
+                     var errorMessage = jqXHR.responseText + textStatus;
+                     $('#message').html('<p style="color: red;">' + errorMessage + '</p>');
+                 }
+             });
+         });
+ 
 
         //---- Creons la fonction qui va remplir la liste des fcategories 
         function getListe() {
@@ -410,21 +452,24 @@ fetch('header.html')
                     if (response.donnees.length > 0) {
                         response.donnees.forEach(function(categorie) {
                             var row = '<tr>' +
-                    '<td>' + (fcategorie.nom || '') + '</td>' + // Affiche une chaîne vide si fcategorie.nom est null ou vide
+                    '<td>' + (categorie.nom || '') + '</td>' + // Affiche une chaîne vide si categorie.nom est null ou vide
                     '<button class="btn btnModifier">Modifier</button> ' +
                     '<button class="btn btnSupprimer">Supprimer</button>' +
-                    '</td>' +
-                    '</tr>';
+                    '<td>' +
+            '<button class="btn btnModifier">Modifier</button> ' +
+            '<button class="btn btnSupprimer">Supprimer</button>' +
+            '</td>' +
+            '</tr>';
                 $('tbody').append(row); // Ajouter la ligne à la table
                         });
                     } else {
-                        $('tbody').append('<tr><td colspan="5">Aucun fcategorie trouvé.</td></tr>');
+                        $('tbody').append('<tr><td colspan="5">Aucun categorie trouvé.</td></tr>');
                     }
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     var errorMessage = jqXHR.responseText + textStatus;
-                    //console.error("Erreur lors de la récupération des fcategories : " + textStatus);
-                    $('tbody').append('<tr><td colspan="5" style="color:red;">Erreur lors de la récupération des fcategories.'+ errorMessage+'</td></tr>');
+                    //console.error("Erreur lors de la récupération des fournisseurs : " + textStatus);
+                    $('tbody').append('<tr><td colspan="5" style="color:red;">Erreur lors de la récupération des categories.'+ errorMessage+'</td></tr>');
                     // Affichez l'erreur exacte
                     
                            // $('#message').html('<p style="color: red;">' + errorMessage + '</p>');
@@ -432,7 +477,7 @@ fetch('header.html')
             });
         }
         
-        // Appeler la fonction pour charger les fcategories au chargement de la page
+        // Appeler la fonction pour charger les fournisseurs au chargement de la page
         $(document).ready(function() {
             getListe();
         });
