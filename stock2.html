@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacie de Cession - sortie</title>
+    <script src="js/jquery-3.6.0.min.js"></script>
     <title>Pharmacie de Cession - Stock</title>
     <style>
         * {
@@ -290,6 +292,7 @@
         <div class="content">
             <h2>Fiche de Stock</h2>
             <button class="btn" id="btnAjouterProduit">Ajouter un Produit</button>
+            <button class="btn">Imprimer</button>
             <div id="search-bar-container"></div>
 <script>
     fetch('search-bar.html')
@@ -308,6 +311,7 @@
                             <th>Date d'Ajout</th>
                             <th>Date d'Expiration</th>
                             <th>Fournisseur</th>
+                            <th>categorie</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -315,7 +319,7 @@
                         <tr>
                             <td data-label="Nom du Produit">Paracétamol</td>
                             <td data-label="Quantité">5000</td>
-                            <td data-label="Prix Unitaire">2.50 €</td>
+                            <td data-label="Prix Unitaire">2.50</td>
                             <td data-label="Date d'Ajout">2024-06-01</td>
                             <td data-label="Date d'Expiration">2024-06-01</td>
                             <td data-label="Fournisseur">Fournisseur A</td>
@@ -327,7 +331,7 @@
                         <tr>
                             <td data-label="Nom du Produit">Amoxicilline</td>
                             <td data-label="Quantité">200</td>
-                            <td data-label="Prix Unitaire">5.00 €</td>
+                            <td data-label="Prix Unitaire">5.00</td>
                             <td data-label="Date d'Ajout">2023-12-31</td>
                             <td data-label="Date d'Expiration">2023-12-31</td>
                             <td data-label="Fournisseur">Fournisseur B</td>
@@ -347,161 +351,131 @@
         </div>
     </div>
 
-    <!-- Modal pour ajouter un produit -->
-     
-    <div id="modalAjouterProduit" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2 id="modalTitle">Ajouter un Produit</h2>
-            <form id="produitForm">
-                <input type="hidden" id="indexProduit" value="">
-                <input type="text" id="nomProduit" placeholder="Nom du Produit" required>
-                <input type="number" id="quantiteProduit" placeholder="Quantité" required>
-                <input type="number" step="0.01" id="prixUnitaireProduit" placeholder="Prix Unitaire (€)" required>
-                <input type="date" id="dateAjoutProduit" required>
-                <input type="date" id="dateExpirationProduit" required>
-                <input type="text" id="fournisseurProduit" placeholder="Fournisseur" required>
-                <button type="submit" class="btn" id="btnSave">Enregistrer</button>
-            </form>
-        </div>
+ <!-- Modal pour ajouter un produit -->
+ <div id="modalAjouterProduit" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Ajouter un Produit</h2>
+        <form id="produitForm">
+            <input type="text" name="code" placeholder="Code du Produit" id="code" hidden>
+            <input type="text" name="nom" placeholder="Nom du Produit" id="nom" required>
+            <input type="number" name="quantite" placeholder="Quantité" id="quantite" required>
+            <input type="number" name="prix_unitaire" placeholder="Prix Unitaire" id="prix_unitaire" required>
+            <input type="number" name="prix_total" placeholder="Montant Total" id="prix_total" readonly>
+            <input type="date" name="date_ajout" placeholder="Date d'Ajout" id="date_ajout" required>
+            <input type="date" name="date_expiration" placeholder="Date d'Expiration" id="date_expiration" required>
+            <input type="text" name="fournisseur" placeholder="Fournisseur" id="fournisseur" required>
+            <input type="text" name="categorie" placeholder="Catégorie" id="categorie" required>
+        </form>
+        <button type="button" class="btn" id="btn_enregistrer_produit">Enregistrer</button>
+        <div id="message_produit"></div>
     </div>
+</div>
 
-    <script>
-        // Gestion des produits (ajout/modification)
-        let produits = [
-            {
-                nom: 'Paracétamol',
-                quantite: 500,
-                prixUnitaire: 2.50,
-                dateAjout: '2024-06-01',
-                dateExpiration: '2024-06-01',
-                fournisseur: 'Fournisseur A'
-            },
-            {
-                nom: 'Amoxicilline',
-                quantite: 200,
-                prixUnitaire: 5.00,
-                dateAjout: '2023-12-31',
-                dateExpiration: '2023-12-31',
-                fournisseur: 'Fournisseur B'
-            }
-        ];
+<script>
+    // Variables et fonctions JavaScript ici
 
-        const btnAjouterProduit = document.getElementById('btnAjouterProduit');
-        const modalAjouterProduit = document.getElementById('modalAjouterProduit');
-        const spanClose = document.getElementsByClassName('close')[0];
-        const produitForm = document.getElementById('produitForm');
-        const totalStockElement = document.getElementById('totalStock');
-        const tableBody = document.querySelector('tbody');
-
-        // Fonction pour mettre à jour l'affichage du stock dans le tableau
-        function updateTable() {
-            tableBody.innerHTML = '';
-            produits.forEach((produit, index) => {
-                const row = document.createElement('tr');
-
-                row.innerHTML = `
-                    <td data-label="Nom du Produit">${produit.nom}</td>
-                    <td data-label="Quantité">${produit.quantite}</td>
-                    <td data-label="Prix Unitaire">${produit.prixUnitaire.toFixed(2)} €</td>
-                    <td data-label="Date d'Ajout">${produit.dateAjout}</td>
-                    <td data-label="Date d'Expiration">${produit.dateExpiration}</td>
-                    <td data-label="Fournisseur">${produit.fournisseur}</td>
-                    <td data-label="Actions">
-                        <button class="btn btnModifier" data-index="${index}">Modifier</button>
-                        <button class="btn btnSupprimer" data-index="${index}">Supprimer</button>
-                    </td>
-                `;
-
-                tableBody.appendChild(row);
-            });
-
-            // Mise à jour du montant total du stock
-            updateTotalStock();
-        }
-
-        // Fonction pour calculer le montant total du stock
-        function updateTotalStock() {
-            const total = produits.reduce((sum, produit) => {
-                return sum + (produit.quantite * produit.prixUnitaire);
-            }, 0);
-            totalStockElement.textContent = total.toFixed(2) + ' €';
-        }
-
-        // Ouvrir le modal d'ajout de produit
-        btnAjouterProduit.addEventListener('click', () => {
-            document.getElementById('modalTitle').textContent = 'Ajouter un Produit';
-            produitForm.reset();
-            document.getElementById('indexProduit').value = '';
-            modalAjouterProduit.style.display = 'block';
+    // Vérifiez si toutes les dépendances sont correctement incluses et que tous les identifiants sont uniques.
+    $(document).ready(function() {
+        // Ouvrir le modal pour ajouter un produit
+        $('#btnAjouterProduit').on('click', function() {
+            $('#produitForm')[0].reset();
+            $('#modalAjouterProduit').show();
         });
 
         // Fermer le modal
-        spanClose.addEventListener('click', () => {
-            modalAjouterProduit.style.display = 'none';
+        $('.close').on('click', function() {
+            $('#modalAjouterProduit').hide();
         });
 
-        // Fermer le modal en cliquant à l'extérieur du contenu
-        window.addEventListener('click', (event) => {
-            if (event.target == modalAjouterProduit) {
-                modalAjouterProduit.style.display = 'none';
-            }
+        // Calcul automatique du prix total
+        $('#quantite, #prix_unitaire').on('input', function() {
+            var quantite = parseFloat($('#quantite').val()) || 0;
+            var prix_unitaire = parseFloat($('#prix_unitaire').val()) || 0;
+            $('#prix_total').val((quantite * prix_unitaire).toFixed(2));
         });
 
-        // Gestion de la soumission du formulaire (ajout ou modification)
-        produitForm.addEventListener('submit', (event) => {
-            event.preventDefault();
-
-            const indexProduit = document.getElementById('indexProduit').value;
-            const nouveauProduit = {
-                nom: document.getElementById('nomProduit').value,
-                quantite: parseInt(document.getElementById('quantiteProduit').value),
-                prixUnitaire: parseFloat(document.getElementById('prixUnitaireProduit').value),
-                dateAjout: document.getElementById('dateAjoutProduit').value,
-                dateExpiration: document.getElementById('dateExpirationProduit').value,
-                fournisseur: document.getElementById('fournisseurProduit').value
+        // Soumettre le formulaire
+        $('#btn_enregistrer_produit').on('click', function() {
+            var formData = {
+                nom: $('#nom').val(),
+                quantite: $('#quantite').val(),
+                prix_unitaire: $('#prix_unitaire').val(),
+                date_ajout: $('#date_ajout').val(),
+                date_expiration: $('#date_expiration').val(),
+                fournisseur: $('#fournisseur').val(),
+                categorie: $('#categorie').val()
             };
-
-            if (indexProduit) {
-                // Modification d'un produit existant
-                produits[parseInt(indexProduit)] = nouveauProduit;
-            } else {
-                // Ajout d'un nouveau produit
-                produits.push(nouveauProduit);
-            }
-
-            updateTable();
-            modalAjouterProduit.style.display = 'none';
+        
+            $.ajax({
+                type: 'POST',
+                url: 'stock_ajout_nouveau.php',
+                data: formData,
+                dataType: 'json',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        $('#message_produit').html('<p style="color: green;">' + response.message + '</p>');
+                        $('#produitForm')[0].reset();
+                        getListeProduits();
+                        $('#modalAjouterProduit').hide();
+                    } else {
+                        $('#message_produit').html('<p style="color: red;">' + response.message + '</p>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('#message_produit').html('<p style="color: red;">Erreur lors de l\'enregistrement.</p>');
+                    console.log(xhr.responseText);
+                }
+            });
         });
-
-        // Événements pour les boutons Modifier/Supprimer
-        tableBody.addEventListener('click', (event) => {
-            const target = event.target;
-            const index = target.getAttribute('data-index');
-
-            if (target.classList.contains('btnModifier')) {
-                // Remplir le formulaire avec les informations du produit à modifier
-                const produit = produits[index];
-                document.getElementById('nomProduit').value = produit.nom;
-                document.getElementById('quantiteProduit').value = produit.quantite;
-                document.getElementById('prixUnitaireProduit').value = produit.prixUnitaire;
-                document.getElementById('dateAjoutProduit').value = produit.dateAjout;
-                document.getElementById('dateExpirationProduit').value = produit.dateExpiration;
-                document.getElementById('fournisseurProduit').value = produit.fournisseur;
-                document.getElementById('indexProduit').value = index;
-
-                document.getElementById('modalTitle').textContent = 'Modifier le Produit';
-                modalAjouterProduit.style.display = 'block';
-            }
-
-            if (target.classList.contains('btnSupprimer')) {
-                produits.splice(index, 1);
-                updateTable();
-            }
+        
+        $('.close').on('click', function() {
+            $('#modalAjouterProduit').hide();
         });
+        
+        $('#quantite, #prix_unitaire').on('input', function() {
+            var quantite = parseFloat($('#quantite').val()) || 0;
+            var prix_unitaire = parseFloat($('#prix_unitaire').val()) || 0;
+            $('#prix_total').val(quantite * prix_unitaire);
+        });
+        
 
-        // Initialiser l'affichage
-        updateTable();
+        // Actualiser le stock après chaque ajout
+        function getListeProduits() {
+            $.ajax({
+                url: 'stock_get_liste.php',
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    $('tbody').empty();
+                    if (response.donnees && response.donnees.length > 0) {
+                        response.donnees.forEach(function(produit) {
+                            var row = `<tr>
+                                <td>${produit.nom || ''}</td>
+                                <td>${produit.quantite || ''}</td>
+                                <td>${produit.prix_unitaire || ''}</td>
+                                <td>${produit.date_ajout || ''}</td>
+                                <td>${produit.date_expiration || ''}</td>
+                                <td>${produit.fournisseur || ''}</td>
+                                <td>${produit.categorie || ''}</td>
+                                <td><button class="btn btnModifier">Modifier</button>
+                                <button class="btn btnSupprimer">Supprimer</button></td>
+                            </tr>`;
+                            $('tbody').append(row);
+                        });
+                    } else {
+                        $('tbody').append('<tr><td colspan="8">Aucun produit en stock trouvé.</td></tr>');
+                    }
+                },
+                error: function() {
+                    $('tbody').append('<tr><td colspan="8" style="color:red;">Erreur lors de la récupération des produits en stock.</td></tr>');
+                }
+            });
+        }
+
+        // Charger les produits au chargement de la page
+        getListeProduits();
+    });
     </script>
     
 </body>

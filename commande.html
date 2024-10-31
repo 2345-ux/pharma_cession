@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pharmacie de Cession - Entrées de Produits</title>
+    <title>Pharmacie de Cession - entrées des produits</title>
+    <script src="js/jquery-3.6.0.min.js"></script>
     <style>
-        * {
+        body {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
@@ -17,7 +18,7 @@
             line-height: 1.6;
         }
 
-        .container {
+        .ModalAjoutCommande {
             width: 95%;
             max-width: 1200px;
             margin: 0 auto;
@@ -217,7 +218,7 @@
                 padding: 10px;
             }
 
-            .container {
+            .ModalAjoutCommande {
                 padding: 10px;
             }
 
@@ -305,7 +306,7 @@
     
     <button class="hamburger" id="hamburgerBtn">&#9776;</button>
 
-    <div class="container">
+    <div class="ModalAjoutCommande">
         <div class="content">
             <h2>Entrées de Produits</h2>
             <button class="btn" id="btnAjouterEntree">Ajouter un Produit</button>
@@ -326,6 +327,7 @@
                         <th>Date d'ajout</th>
                         <th>Date d'expiration</th>
                         <th>Fournisseur</th>
+                        <th>categorie</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -348,110 +350,177 @@
                         <td>200</td>
                         <td>15.00 €</td>
                         <td>3000.00 €</td>
-                        <td>2023-06-02</td>
-                        <td>2024-06-02</td>
+                        <td>2023-07-01</td>
+                        <td>2024-07-01</td>
                         <td>Fournisseur B</td>
                         <td>
                             <button class="btn btnModifier">Modifier</button>
                             <button class="btn">Supprimer</button>
                         </td>
                     </tr>
-                    <tr class="total-row">
-                        <td colspan="3">Total</td>
-                        <td>4000.00 €</td>
-                        <td colspan="4"></td>
-                    </tr>
                 </tbody>
             </table>
         </div>
     </div>
 
+    <!-- Modal pour ajouter un produit -->
     <div id="modalAjouterEntree" class="modal">
         <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Ajouter une Entrée</h2>
-            <form id="formAjouterEntree">
-                <input type="text" placeholder="Nom du Produit" required>
-                <input type="number" placeholder="Quantité" required>
-                <input type="number" step="0.01" placeholder="Prix (Fournisseur)" required>
-                <input type="date" placeholder="Date d'ajout" required>
-                <input type="date" placeholder="Date d'expiration" required>
-                <select required>
-                    <option value="">Sélectionner un fournisseur</option>
-                    <option value="Fournisseur A">Fournisseur A</option>
-                    <option value="Fournisseur B">Fournisseur B</option>
-                </select>
-                <button type="submit" class="btn">Ajouter</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="modalModifierEntree" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Modifier une Entrée</h2>
-            <form id="formModifierEntree">
-                <input type="text" placeholder="Nom du Produit" required>
-                <input type="number" placeholder="Quantité" required>
-                <input type="number" step="0.01" placeholder="Prix (Fournisseur)" required>
-                <input type="date" placeholder="Date d'ajout" required>
-                <input type="date" placeholder="Date d'expiration" required>
-                <select required>
-                    <option value="">Sélectionner un fournisseur</option>
-                    <option value="Fournisseur A">Fournisseur A</option>
-                    <option value="Fournisseur B">Fournisseur B</option>
-                </select>
-                <button type="submit" class="btn">Modifier</button>
-            </form>
+            <span class="close" id="closeModal">&times;</span>
+            <h3>Ajouter un Produit</h3>
+            <form id="FormajoutProduit">
+                <input type="text" placeholder="code du Produit" id="code" hidden>
+                <input type="text" placeholder="Nom du Produit" id="nom" required>
+                <input type="number" placeholder="Quantité" id="quantite" required>
+                <input type="number" placeholder="Prix Unitaire (Fournisseur)" id="prix_unitaire" required>
+                <input type="number" placeholder="Montant Total" id="prix_total" readonly>
+                <input type="date" placeholder="Date d'Ajout" id="date_ajout" required>
+                <input type="date" placeholder="Date d'Expiration" id="date_expiration" required>
+                <input type="text" placeholder="Fournisseur" id="fournisseur" required>
+                <input type="text" placeholder="categorie" id="categorie" required>
+                </form>
+                <button type="button" class="btn" id="btn_enregistrer_produit">Enregistrer</button>
+                <div id="message_produit"></div>
         </div>
     </div>
 
     <script>
-        const hamburgerBtn = document.getElementById("hamburgerBtn");
-        const navMenu = document.querySelector("nav ul");
-
-        hamburgerBtn.onclick = function() {
-            navMenu.classList.toggle("show");
-        }
-
-        document.addEventListener('click', function(event) {
-            if (!event.target.closest('nav') && !event.target.closest('.hamburger')) {
-                navMenu.classList.remove('show');
-            }
-        });
-
-        const modalAjouterEntree = document.getElementById("modalAjouterEntree");
-        const modalModifierEntree = document.getElementById("modalModifierEntree");
         const btnAjouterEntree = document.getElementById("btnAjouterEntree");
-        const btnsModifier = document.querySelectorAll(".btnModifier");
-        const spans = document.getElementsByClassName("close");
+        const modalAjouterEntree = document.getElementById("modalAjouterEntree");
+        const closeModal = document.getElementById("closeModal");
 
+        // Afficher le modal lorsque le bouton est cliqué
         btnAjouterEntree.onclick = function() {
             modalAjouterEntree.style.display = "block";
         }
 
-        btnsModifier.forEach(btn => {
-            btn.onclick = function() {
-                modalModifierEntree.style.display = "block";
-            }
-        });
-
-        for (let span of spans) {
-            span.onclick = function() {
-                modalAjouterEntree.style.display = "none";
-                modalModifierEntree.style.display = "none";
-            }
+        // Fermer le modal lorsqu'on clique sur le bouton "close"
+        closeModal.onclick = function() {
+            modalAjouterEntree.style.display = "none";
         }
 
+        // Fermer le modal en cliquant en dehors du contenu
         window.onclick = function(event) {
             if (event.target == modalAjouterEntree) {
                 modalAjouterEntree.style.display = "none";
             }
-            if (event.target == modalModifierEntree) {
-                modalModifierEntree.style.display = "none";
-            }
         }
-    </script>
+
+        // Gestion du menu hamburger
+        const hamburgerBtn = document.getElementById("hamburgerBtn");
+        const navUl = document.querySelector("nav ul");
+
+        hamburgerBtn.addEventListener("click", () => {
+            navUl.classList.toggle("show");
+        });
+
+    // Ajout d'une nouvelle entrée via le formulaire
+ // Ajout d'une nouvelle entrée via le formulaire
+$('#btn_enregistrer_produit').on('click', function() {
+    // Récupérer les valeurs du formulaire avec les bons IDs
+    var formData = {
+        nom: $('#nom').val(),
+        quantite: $('#quantite').val(),
+        prix_fournisseur: $('#prix_unitaire').val(),
+        date_ajout: $('#date_ajout').val(),
+        date_expiration: $('#date_expiration').val(),
+        fournisseur: $('#fournisseur').val(),
+        categorie: $('#categorie').val()
+    };
+
+    // Validation côté client
+    if (!formData.nom || !formData.quantite || !formData.prix_fournisseur || 
+        !formData.date_ajout || !formData.date_expiration || !formData.fournisseur || !formData.categorie) {
+        $('#message_produit').html('<p style="color: red;">Veuillez remplir tous les champs requis</p>');
+        return;
+    }
+
+    // Envoi des données avec AJAX
+    $.ajax({
+        type: 'POST',
+        url: 'commande_ajout_nouveau.php',
+        data: formData,
+        dataType: 'json',
+        success: function(response) {
+            if(response.status === 'success') {
+                $('#message_produit').html('<p style="color: green;">' + response.message + '</p>');
+                $('#FormajoutProduit')[0].reset();
+                // Si getListeSorties existe
+                if (typeof getListeSorties === 'function') {
+                    getListeSorties();
+                }
+                setTimeout(function() {
+                    document.getElementById('modalAjouterEntree').style.display = "none";
+                    $('#message_produit').html('');
+                }, 2000);
+            } else {
+                $('#message_produit').html('<p style="color: red;">' + response.message + '</p>');
+            }
+        },
+        error: function(xhr, status, error) {
+            $('#message_produit').html('<p style="color: red;">Erreur lors de l\'enregistrement: ' + error + '</p>');
+        }
+    });
+});
+
+// Calcul automatique du prix total
+$('#quantite, #prix_unitaire').on('input', function() {
+    var quantite = parseFloat($('#quantite').val()) || 0;
+    var prix_unitaire = parseFloat($('#prix_unitaire').val()) || 0;
+    $('#prix_total').val((quantite * prix_unitaire).toFixed(2));
+});
+
+    // Calcul automatique du prix total
+    $('#quantite, #prix_unitaire').on('input', function() {
+        var quantite = parseFloat($('#quantite').val()) || 0;
+        var prix_unitaire = parseFloat($('#prix_unitaire').val()) || 0;
+        $('#prix_total').val((quantite * prix_unitaire).toFixed(2));
+    });
+    //-------- Autres fonctions ici --------
+//---- Fonction pour remplir la liste des sorties
+    function getListeEntrees() {
+        $.ajax({
+            url: 'commande_get_liste.php', // Chemin vers le script PHP correct
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                $('tbody').empty();
+
+                if (response.status === 'success' && response.donnees.length > 0) {
+                    response.donnees.forEach(function(entree) {
+                        var row = '<tr>' +
+                            '<td>' + (entree.nom || '') + '</td>' +
+                            '<td>' + (entree.quantite || '') + '</td>' +
+                            '<td>' + (entree.prix_fournisseur || '') + '</td>' +
+                            '<td>' + (entree.prix_total || '') + '</td>' +
+                            '<td>' + (entree.date_ajout || '') + '</td>' +
+                            '<td>' + (entree.date_expiration || '') + '</td>' +
+                            '<td>' + (entree.fournisseur || '') + '</td>' +
+                            '<td>' + (entree.categorie || '') + '</td>' +
+                            '<td>' +
+                                '<button class="btn btnModifier">Modifier</button> ' +
+                                '<button class="btn btnSupprimer">Supprimer</button>' +
+                            '</td>' +
+                        '</tr>';
+                        $('tbody').append(row); // Ajouter la ligne à la table
+                    });
+                } else {
+                    $('tbody').append('<tr><td colspan="8">Aucune entrée trouvée.</td></tr>');
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                var errorMessage = jqXHR.responseText + ' ' + textStatus;
+                $('tbody').append('<tr><td colspan="8" style="color:red;">Erreur lors de la récupération des entrées : ' + errorMessage + '</td></tr>');
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        getListeEntrees();
+    });
+</script>
+
 
 </body>
 </html>
+

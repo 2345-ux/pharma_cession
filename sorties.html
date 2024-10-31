@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pharmacie de Cession - sortie</title>
-    <!--script src="https://code.jquery.com/jquery-3.6.0.min.js"></script-->
     <script src="js/jquery-3.6.0.min.js"></script>
     <style>
         body {
@@ -289,7 +288,8 @@ fetch('header.html')
                         <th>Prix Unitaire</th>
                         <th>Montant Total</th>
                         <th>Date de Sortie</th>
-                        <th>Destination</th>
+                        <th>Date de Expiration</th>
+                        <th>categorie</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -338,9 +338,10 @@ fetch('header.html')
             <input type="text" placeholder="Nom du Produit" id="nom_produit" required>
             <input type="number" placeholder="Quantité" id="quantite" required>
             <input type="number" placeholder="Prix Unitaire" id="prix_unitaire" required>
-            <input type="number" placeholder="Prix Total" id="prix_total" readonly>
+            <input type="number" placeholder="Prix Total" id="prix_total" hidden>
             <input type="date" placeholder="Date de Sortie" id="date_sortie" required>
             <input type="date" placeholder="Date d'Expiration" id="date_expiration" required>
+            <input type="text" placeholder="categorie" id="categorie" required>
         </form>
         <button type="button" class="btn" id="btn_enregistrer_sortie">Ajouter</button>
         <div id="message_sortie"></div>
@@ -410,38 +411,55 @@ window.addEventListener("click", function(event) {
 
 //-------- Ajout d'une nouvelle sortie ----------------
 $('#btn_enregistrer_sortie').on('click', function() {
+    // Récupérer les valeurs du formulaire
     var formData = {
         code: $('#code_sortie').val(),
         nom: $('#nom_produit').val(),
         quantite: $('#quantite').val(),
         prix_unitaire: $('#prix_unitaire').val(),
-        prix_total: $('#prix_total').val(),
+        prix_total: $('#quantite').val() * $('#prix_unitaire').val(), // Calcul automatique
         date_sortie: $('#date_sortie').val(),
         date_expiration: $('#date_expiration').val(),
+        categorie: $('#categorie').val(),
     };
+     // Validation côté client
+     if (!formData.nom || !formData.quantite || !formData.prix_unitaire || !formData.date_sortie || !formData.date_expiration || !formData.categorie) {
+        $('#message_sortie').html('<p style="color: red;">Veuillez remplir tous les champs requis</p>');
+        return;
+    }
 
     $.ajax({
         type: 'POST',
-        url: 'sortie_magazin.php',
+        url: 'sorite_magazin.php', // Correction ici : utilisation du bon nom de fichier
         data: formData,
         dataType: 'json',
         success: function(response) {
-            // Vérifier la réponse du script PHP
             if(response.status === 'success') {
                 $('#message_sortie').html('<p style="color: green;">' + response.message + '</p>');
-                
-                // Rafraîchir la liste des sorties après l'ajout
+                // Vider le formulaire
+                $('#formAjouterSortie')[0].reset();
+                // Rafraîchir la liste
                 getListeSorties();
-                modalAjouterSortie.style.display = "none";
+                // Fermer le modal après 2 secondes
+                setTimeout(function() {
+                    modalAjouterSortie.style.display = "none";
+                    $('#message_sortie').html('');
+                }, 2000);
             } else {
                 $('#message_sortie').html('<p style="color: red;">' + response.message + '</p>');
             }
         },
-        error: function(jqXHR, textStatus, errorThrown) {
-            var errorMessage = jqXHR.responseText + textStatus;
-            $('#message_sortie').html('<p style="color: red;">' + errorMessage + '</p>');
+        error: function(xhr, status, error) {
+            $('#message_sortie').html('<p style="color: red;">Erreur lors de l\'enregistrement: ' + error + '</p>');
         }
     });
+});
+
+  // Calcul automatique du prix total
+  $('#quantite, #prix_unitaire').on('input', function() {
+    var quantite = parseFloat($('#quantite').val()) || 0;
+    var prix_unitaire = parseFloat($('#prix_unitaire').val()) || 0;
+    $('#prix_total').val(quantite * prix_unitaire);
 });
 
 //---- Fonction pour remplir la liste des sorties 
@@ -457,13 +475,13 @@ function getListeSorties() {
             if (response.donnees.length > 0) {
                 response.donnees.forEach(function(sortie) {
                     var row = '<tr>' +
-                        '<td>' + (sortie.code || '') + '</td>' +
                         '<td>' + (sortie.nom || '') + '</td>' +
                         '<td>' + (sortie.quantite || '') + '</td>' +
                         '<td>' + (sortie.prix_unitaire || '') + '</td>' +
                         '<td>' + (sortie.prix_total || '') + '</td>' +
                         '<td>' + (sortie.date_sortie || '') + '</td>' +
                         '<td>' + (sortie.date_expiration || '') + '</td>' +
+                        '<td>' + (sortie.categorie || '') + '</td>' +
                         '<td>' +
                             '<button class="btn btnModifier">Modifier</button> ' +
                             '<button class="btn btnSupprimer">Supprimer</button>' +

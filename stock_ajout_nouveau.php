@@ -1,5 +1,5 @@
 <?php
-// add_sortie.php
+// stock_ajout_nouveau.php
 header('Content-Type: application/json');
 
 try {
@@ -12,13 +12,16 @@ try {
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
         ]
     );
+
     // Récupération des données POST
     $code = generateUniqueCode();
     $nom = $_POST['nom'] ?? '';
     $quantite = $_POST['quantite'] ?? 0;
     $prix_unitaire = $_POST['prix_unitaire'] ?? 0;
-    $date_sortie = $_POST['date_sortie'] ?? '';
+    $prix_total = $quantite * $prix_unitaire; // Calcul du prix total
+    $date_ajout = $_POST['date_ajout'] ?? '';
     $date_expiration = $_POST['date_expiration'] ?? '';
+    $fournisseur = $_POST['fournisseur'] ?? '';
     $categorie = $_POST['categorie'] ?? '';
 
     // Validation des données
@@ -31,24 +34,22 @@ try {
     if (empty($prix_unitaire) || $prix_unitaire <= 0) {
         throw new Exception("Le prix unitaire doit être supérieur à zéro");
     }
-    if (empty($date_sortie)) {
-        throw new Exception("La date de sortie est requise");
+    if (empty($date_ajout)) {
+        throw new Exception("La date d'ajout est requise");
     }
     if (empty($date_expiration)) {
         throw new Exception("La date d'expiration est requise");
-        
+    }
+    if (empty($fournisseur)) {
+        throw new Exception("Le fournisseur est requis");
     }
     if (empty($categorie)) {
-        throw new Exception("La categorie est requise");
-        
+        throw new Exception("La catégorie est requise");
     }
 
-    // Calcul du prix total
-    $prix_total = $quantite * $prix_unitaire;
-
-    // Insertion de la sortie de produit
-    $stmt = $pdo->prepare("INSERT INTO t_sorties (code, nom, quantite, prix_unitaire, prix_total, date_sortie, date_expiration, categorie) 
-                           VALUES (:code, :nom, :quantite, :prix_unitaire, :prix_total, :date_sortie, :date_expiration, :categorie)");
+    // Insertion des données dans la table t_stock
+    $stmt = $pdo->prepare("INSERT INTO t_stock (code, nom, quantite, prix_fournisseur, prix_total, date_ajout, date_expiration, fournisseur, categorie)
+                          VALUES (:code, :nom, :quantite, :prix_unitaire, :prix_total, :date_ajout, :date_expiration, :fournisseur, :categorie)");
 
     $stmt->execute([
         ':code' => $code,
@@ -56,23 +57,25 @@ try {
         ':quantite' => $quantite,
         ':prix_unitaire' => $prix_unitaire,
         ':prix_total' => $prix_total,
-        ':date_sortie' => $date_sortie,
+        ':date_ajout' => $date_ajout,
         ':date_expiration' => $date_expiration,
+        ':fournisseur' => $fournisseur,
         ':categorie' => $categorie
     ]);
 
     // Retourner la réponse de succès
     echo json_encode([
         'status' => 'success',
-        'message' => 'Sortie de produit ajoutée avec succès !',
+        'message' => 'Produit ajouté avec succès !',
         'data' => [
             'code' => $code,
             'nom' => $nom,
             'quantite' => $quantite,
             'prix_unitaire' => $prix_unitaire,
             'prix_total' => $prix_total,
-            'date_sortie' => $date_sortie,
+            'date_ajout' => $date_ajout,
             'date_expiration' => $date_expiration,
+            'fournisseur' => $fournisseur,
             'categorie' => $categorie
         ]
     ]);
@@ -93,8 +96,8 @@ try {
     ]);
 }
 
-// Fonction pour générer un code unique pour chaque sortie
+// Fonction pour générer un code unique
 function generateUniqueCode() {
     $date = new DateTime();
-    return 'SRT' . $date->format('YmdHis') . sprintf('%03d', rand(0, 999));
+    return 'ENT' . $date->format('YmdHis') . sprintf('%03d', rand(0, 999));
 }
