@@ -46,7 +46,33 @@ try {
     if (empty($categorie)) {
         throw new Exception("La categorie est requis");
     }
+    
+    $stmtCheck = $pdo->prepare("SELECT code FROM t_produit WHERE nom = :nom");
+    $stmtCheck->execute([':nom' => $nom]);
 
+    if (!$stmtCheck->fetch()) {
+        // La catégorie n'existe pas, on l'ajoute
+        $stmtAddCategorie = $pdo->prepare("INSERT INTO t_produit (code, nom) VALUES (:code, :nom)");
+        $stmtAddCategorie->execute([':code' => $nom, ':nom' => $nom]);
+    }
+
+    $stmtCheck = $pdo->prepare("SELECT code FROM t_categories WHERE nom = :categorie");
+    $stmtCheck->execute([':categorie' => $categorie]);
+
+    if (!$stmtCheck->fetch()) {
+        // Le fournisserur n'existe pas, on l'ajoute
+        $stmtAddCategorie = $pdo->prepare("INSERT INTO t_categories (code, nom) VALUES (:code, :nom)");
+        $stmtAddCategorie->execute([':code' => $categorie, ':nom' => $categorie]);
+    }
+
+    $stmtCheck = $pdo->prepare("SELECT code FROM t_fournisseurs WHERE nom = :fournisseur");
+    $stmtCheck->execute([':fournisseur' => $fournisseur]);
+
+    if (!$stmtCheck->fetch()) {
+        // La catégorie n'existe pas, on l'ajoute
+        $stmtAddCategorie = $pdo->prepare("INSERT INTO t_fournisseurs (code, nom) VALUES (:code, :nom)");
+        $stmtAddCategorie->execute([':code' => $fournisseur, ':nom' => $fournisseur]);
+    }
     // Insertion avec le prix_total
     $stmt = $pdo->prepare("INSERT INTO t_entrees (code, nom, quantite, prix_fournisseur, prix_total, date_ajout, date_expiration, fournisseur, categorie)
                           VALUES (:code, :nom, :quantite, :prix_fournisseur, :prix_total, :date_ajout, :date_expiration, :fournisseur, :categorie)");

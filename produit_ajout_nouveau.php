@@ -26,7 +26,7 @@ try {
         throw new Exception("La catégorie est requise");
     }
 
-    $stmtCheck = $pdo->prepare("SELECT code FROM t_categories WHERE code = :categorie");
+    $stmtCheck = $pdo->prepare("SELECT code FROM t_categories WHERE nom = :categorie");
     $stmtCheck->execute([':categorie' => $categorie]);
 
     if (!$stmtCheck->fetch()) {

@@ -276,6 +276,36 @@
                 margin: 5% auto;
             }
         }
+        .combo-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .combo-container select {
+            flex: 1;
+            padding: 8px;
+        }
+        
+        .btn-add {
+            padding: 8px 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        #newProductForm, #newSupplierForm, #newCategoryForm {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -327,7 +357,7 @@
                         <th>Date d'ajout</th>
                         <th>Date d'expiration</th>
                         <th>Fournisseur</th>
-                        <th>categorie</th>
+                        <th hidden>categorie</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -364,25 +394,64 @@
     </div>
 
     <!-- Modal pour ajouter un produit -->
-    <div id="modalAjouterEntree" class="modal">
-        <div class="modal-content">
-            <span class="close" id="closeModal">&times;</span>
-            <h3>Ajouter un Produit</h3>
-            <form id="FormajoutProduit">
-                <input type="text" placeholder="code du Produit" id="code" hidden>
-                <input type="text" placeholder="Nom du Produit" id="nom" required>
-                <input type="number" placeholder="Quantité" id="quantite" required>
-                <input type="number" placeholder="Prix Unitaire (Fournisseur)" id="prix_unitaire" required>
-                <input type="number" placeholder="Montant Total" id="prix_total" readonly>
-                <input type="date" placeholder="Date d'Ajout" id="date_ajout" required>
-                <input type="date" placeholder="Date d'Expiration" id="date_expiration" required>
-                <input type="text" placeholder="Fournisseur" id="fournisseur" required>
-                <input type="text" placeholder="categorie" id="categorie" required>
-                </form>
-                <button type="button" class="btn" id="btn_enregistrer_produit">Enregistrer</button>
-                <div id="message_produit"></div>
-        </div>
+<div id="modalAjouterEntree" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeModal">&times;</span>
+        <h3>Ajouter un Produit</h3>
+        <form id="FormajoutProduit">
+            <input type="text" id="code" hidden>
+            
+            <div class="form-group">
+                <label for="nom">Produit:</label>
+                <div class="combo-container">
+                    <select id="nom" required>
+                        <option value="">Sélectionner un produit</option>
+                    </select>
+                    <button type="button" class="btn-add" onclick="toggleNewProductForm()">+</button>
+                </div>
+                <div id="newProductForm" style="display:none;">
+                    <input type="text" id="newProductName" placeholder="Nouveau produit">
+                    <button type="button" class="btn" onclick="addNewProduct()">Ajouter</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="fournisseur">Fournisseur:</label>
+                <div class="combo-container">
+                    <select id="fournisseur" required>
+                        <option value="">Sélectionner un fournisseur</option>
+                    </select>
+                    <button type="button" class="btn-add" onclick="toggleNewSupplierForm()">+</button>
+                </div>
+                <div id="newSupplierForm" style="display:none;">
+                    <input type="text" id="newSupplierName" placeholder="Nouveau fournisseur">
+                    <button type="button" class="btn" onclick="addNewSupplier()">Ajouter</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="categorie">Catégorie:</label>
+                <div class="combo-container">
+                    <select id="categorie" required>
+                        <option value="">Sélectionner une catégorie</option>
+                    </select>
+                    <button type="button" class="btn-add" onclick="toggleNewCategoryForm()">+</button>
+                </div>
+                <div id="newCategoryForm" style="display:none;">
+                    <input type="text" id="newCategoryName" placeholder="Nouvelle catégorie">
+                    <button type="button" class="btn" onclick="addNewCategory()">Ajouter</button>
+                </div>
+            </div>
+
+            <input type="number" placeholder="Quantité" id="quantite" required>
+            <input type="number" placeholder="Prix Unitaire (Fournisseur)" id="prix_unitaire" required>
+            <input type="number" placeholder="Montant Total" id="prix_total" readonly>
+            <input type="date" placeholder="Date d'Ajout" id="date_ajout" required>
+            <input type="date" placeholder="Date d'Expiration" id="date_expiration" required>
+        </form>
+        <button type="button" class="btn" id="btn_enregistrer_produit">Enregistrer</button>
+        <div id="message_produit"></div>
     </div>
+</div>
 
     <script>
         const btnAjouterEntree = document.getElementById("btnAjouterEntree");
@@ -470,12 +539,6 @@ $('#quantite, #prix_unitaire').on('input', function() {
     $('#prix_total').val((quantite * prix_unitaire).toFixed(2));
 });
 
-    // Calcul automatique du prix total
-    $('#quantite, #prix_unitaire').on('input', function() {
-        var quantite = parseFloat($('#quantite').val()) || 0;
-        var prix_unitaire = parseFloat($('#prix_unitaire').val()) || 0;
-        $('#prix_total').val((quantite * prix_unitaire).toFixed(2));
-    });
     //-------- Autres fonctions ici --------
 //---- Fonction pour remplir la liste des sorties
     function getListeEntrees() {
@@ -496,7 +559,7 @@ $('#quantite, #prix_unitaire').on('input', function() {
                             '<td>' + (entree.date_ajout || '') + '</td>' +
                             '<td>' + (entree.date_expiration || '') + '</td>' +
                             '<td>' + (entree.fournisseur || '') + '</td>' +
-                            '<td>' + (entree.categorie || '') + '</td>' +
+                          //  '<td>' + (entree.categorie || '') + '</td>' +
                             '<td>' +
                                 '<button class="btn btnModifier">Modifier</button> ' +
                                 '<button class="btn btnSupprimer">Supprimer</button>' +
@@ -518,6 +581,148 @@ $('#quantite, #prix_unitaire').on('input', function() {
     $(document).ready(function() {
         getListeEntrees();
     });
+    // Chargement initial des données
+document.addEventListener('DOMContentLoaded', function() {
+    loadProducts();
+    loadSuppliers();
+    loadCategories();
+});
+
+// Fonctions de chargement des données
+// Modifiez la fonction loadProducts pour stocker les données des produits
+let productsData = [];
+
+function loadProducts() {
+    $.ajax({
+        url: 'get_products.php',
+        type: 'GET',
+        success: function(data) {
+            productsData = data; // Stocker toutes les données des produits
+            const select = document.getElementById('nom');
+            select.innerHTML = '<option value="">Sélectionner un produit</option>';
+            
+            data.forEach(product => {
+                const option = new Option(product.nom, product.id);
+                select.add(option);
+            });
+        }
+    });
+}
+
+// Ajouter un écouteur d'événement pour le changement de produit
+document.getElementById('nom').addEventListener('change', function(e) {
+    const selectedProductId = e.target.value;
+    if (selectedProductId) {
+        const product = productsData.find(p => p.id === selectedProductId);
+        if (product && product.categorie_nom) {
+            // Sélectionner automatiquement la catégorie
+            const categorieSelect = document.getElementById('categorie');
+            const options = Array.from(categorieSelect.options);
+            const matchingOption = options.find(option => option.text === product.categorie_nom);
+            
+            if (matchingOption) {
+                categorieSelect.value = matchingOption.value;
+            }
+            
+            // Désactiver le champ catégorie puisqu'il est auto-rempli
+            categorieSelect.disabled = true;
+            
+            // Cacher le bouton d'ajout de catégorie
+            const addCategoryBtn = categorieSelect.parentElement.querySelector('.btn-add');
+            if (addCategoryBtn) {
+                addCategoryBtn.style.display = 'none';
+            }
+        }
+    } else {
+        // Réactiver le champ catégorie si aucun produit n'est sélectionné
+        document.getElementById('categorie').disabled = false;
+        const addCategoryBtn = document.getElementById('categorie').parentElement.querySelector('.btn-add');
+        if (addCategoryBtn) {
+            addCategoryBtn.style.display = 'block';
+        }
+    }
+});
+
+function loadSuppliers() {
+    $.ajax({
+        url: 'get_suppliers.php',
+        type: 'GET',
+        success: function(data) {
+            const select = document.getElementById('fournisseur');
+            data.forEach(supplier => {
+                const option = new Option(supplier.nom, supplier.nom);
+                select.add(option);
+            });
+        }
+    });
+}
+
+
+// Fonctions pour afficher/masquer les formulaires d'ajout
+function toggleNewProductForm() {
+    const form = document.getElementById('newProductForm');
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+function toggleNewSupplierForm() {
+    const form = document.getElementById('newSupplierForm');
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+function toggleNewCategoryForm() {
+    const form = document.getElementById('newCategoryForm');
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+// Fonctions pour ajouter de nouveaux éléments
+// Modifier la fonction addNewProduct pour inclure la catégorie
+function addNewProduct() {
+    const newName = document.getElementById('newProductName').value;
+    if (!newName) return;
+
+    $.ajax({
+        type: 'POST',
+        url: 'add_product.php',
+        data: { nom: newName },
+        success: function(data) {
+            if (data.status === 'success') {
+                const productSelect = document.getElementById('nom');
+                const categorySelect = document.getElementById('categorie');
+
+                const option = new Option(data.data.nom, data.data.nom);
+                productSelect.add(option);
+                productSelect.value = data.data.nom;
+
+                const categoryOption = new Option(data.data.categorie, data.data.categorie);
+                categorySelect.add(categoryOption);
+                categorySelect.value = data.data.categorie;
+
+                document.getElementById('newProductForm').style.display = 'none';
+                document.getElementById('newProductName').value = '';
+            }
+        }
+    });
+}
+function addNewSupplier() {
+    const newName = document.getElementById('newSupplierName').value;
+    if (!newName) return;
+
+    $.ajax({
+        type: 'POST',
+        url: 'add_supplier.php',
+        data: { nom: newName },
+        success: function(data) {
+            if (data.status === 'success') {
+                const select = document.getElementById('fournisseur');
+                const option = new Option(newName, newName);
+                select.add(option);
+                select.value = newName;
+                document.getElementById('newSupplierForm').style.display = 'none';
+                document.getElementById('newSupplierName').value = '';
+            }
+        }
+    });
+}
 </script>
 
 

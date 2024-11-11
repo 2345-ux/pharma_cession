@@ -32,8 +32,6 @@ try {
     ]);
 }
 
-
-
 function generateUniqueCode()
 {
     // Obtenir la date et l'heure actuelles

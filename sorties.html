@@ -430,7 +430,7 @@ $('#btn_enregistrer_sortie').on('click', function() {
 
     $.ajax({
         type: 'POST',
-        url: 'sorite_magazin.php', // Correction ici : utilisation du bon nom de fichier
+        url: 'sortie_magazin.php', // Correction ici : utilisation du bon nom de fichier
         data: formData,
         dataType: 'json',
         success: function(response) {

@@ -267,6 +267,36 @@
                 text-align: left;
             }
         }
+        .combo-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .combo-container select {
+            flex: 1;
+            padding: 8px;
+        }
+        
+        .btn-add {
+            padding: 8px 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        #newCategoryForm {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
     </style>
 </head>
 
@@ -352,7 +382,19 @@ fetch('header.html')
             <form id="formAjouterCategorie">
                 <input type="text" placeholder="code du produit" id="code" hidden>
                 <input type="text" placeholder="Nom du produit" id="nom" required>
-                <input type="text" placeholder="categorie du produit" id="categorie">
+                <div class="form-group">
+                    <label for="categorie">Catégorie:</label>
+                    <div class="combo-container">
+                        <select id="categorie" required>
+                            <option value="">Sélectionner une catégorie</option>
+                        </select>
+                        <button type="button" class="btn-add" onclick="toggleNewCategoryForm()">+</button>
+                    </div>
+                    <div id="newCategoryForm" style="display:none;">
+                        <input type="text" id="newCategoryName" placeholder="Nouvelle catégorie">
+                        <button type="button" class="btn" onclick="addNewCategory()">Ajouter</button>
+                    </div>
+                </div>    
             </form>
             <button type="submit" class="btn" id="btnNouveauProduit">Ajouter</button>
             <div id="message"></div>
@@ -488,10 +530,105 @@ fetch('header.html')
             });
         }
         
-        // Appeler la fonction pour charger les fournisseurs au chargement de la page
-        $(document).ready(function() {
-            getListe();
+  // Appeler les fonctions de chargement au chargement de la page
+$(document).ready(function() {
+    getListe();        // Chargement de la liste des produits
+    loadCategories();  // Chargement des catégories dans le formulaire
+});
+
+// Exemple de fonction getListe avec les colonnes corrigées
+function getListe() {
+    $.ajax({
+        url: 'produit_get_liste.php',
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            $('tbody').empty(); // Vider la table avant d'ajouter les lignes
+            if (response.donnees && response.donnees.length > 0) {
+                response.donnees.forEach(function(produit) {
+                    const row = `
+                        <tr>
+                            <td>${produit.nom || ''}</td>
+                            <td>${produit.categorie || ''}</td> <!-- Utilisez ici le bon champ-->
+                            <td>
+                                <button class="btn btnModifier">Modifier</button>
+                                <button class="btn btnSupprimer">Supprimer</button>
+                            </td>
+                        </tr>
+                    `;
+                    $('tbody').append(row); // Ajouter la ligne à la table
+                });
+            } else {
+                $('tbody').append('<tr><td colspan="5">Aucun produit trouvé.</td></tr>');
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            const errorMessage = jqXHR.responseText + textStatus;
+            $('tbody').append(`<tr><td colspan="5" style="color:red;">Erreur lors de la récupération des produits: ${errorMessage}</td></tr>`);
+        }
+    });
+}
+
+
+// 2. Fonction pour charger les catégories dans le formulaire de sélection
+function loadCategories() {
+    $.ajax({
+        url: 'get_categories.php',
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            const select = document.getElementById('categorie');
+            select.innerHTML = '<option value="">Sélectionner une catégorie</option>'; // Réinitialiser les options
+
+            const option = new Option("nom", "id");
+                select.add(option);
+            
+            data.forEach(category => {
+                const option = new Option(category.nom, category.id);
+                select.add(option);
+            });
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.error("Erreur lors du chargement des catégories : ", errorThrown);
+        }
+    });
+}
+
+// 3. Fonction pour afficher/masquer le champ de nouvelle catégorie
+function toggleNewCategoryForm() {
+    const newCategoryForm = document.getElementById('newCategoryForm');
+    newCategoryForm.style.display = newCategoryForm.style.display === 'none' ? 'block' : 'none';
+}
+
+// Fonction pour ajouter une nouvelle catégorie si elle n'existe pas
+function addNewCategory() {
+    const newCategoryName = document.getElementById('newCategoryName').value;
+
+    if (newCategoryName) {
+        $.ajax({
+            type: 'POST',
+            url: 'add_categories.php',
+            data: { nom: newCategoryName },
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success') {
+                    $('#message').html('<p style="color: green;">' + response.message + '</p>');
+                    loadCategories(); // Recharge la liste des catégories
+                    document.getElementById('newCategoryName').value = ''; // Vide le champ
+                    toggleNewCategoryForm(); // Cache le formulaire de nouvelle catégorie
+                } else {
+                    $('#message').html('<p style="color: red;">' + response.message + '</p>');
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                $('#message').html('<p style="color: red;">Erreur lors de l\'ajout de la catégorie.</p>');
+            }
         });
+    } else {
+        $('#message').html('<p style="color: red;">Veuillez entrer un nom de catégorie.</p>');
+    }
+}
+
     </script>
 
 </body>
