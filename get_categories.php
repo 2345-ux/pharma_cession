@@ -8,12 +8,11 @@ try {
     ]);
 
     // Préparation et exécution de la requête pour récupérer les catégories
-    $stmt = $pdo->query("SELECT id, nom FROM t_categories");
+    $stmt = $pdo->query("SELECT * FROM t_categories");
     $categories = $stmt->fetchAll(PDO::FETCH_ASSOC); // Récupère les résultats sous forme de tableau associatif
 
     // Encode les résultats en JSON et les envoie au client
     echo json_encode($categories);
-
 } catch (PDOException $e) {
     // En cas d'erreur, renvoie un message d'erreur en JSON
     echo json_encode(['status' => 'error', 'message' => 'Erreur: ' . $e->getMessage()]);

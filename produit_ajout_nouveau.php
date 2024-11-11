@@ -26,14 +26,14 @@ try {
         throw new Exception("La catégorie est requise");
     }
 
-    $stmtCheck = $pdo->prepare("SELECT code FROM t_categories WHERE nom = :categorie");
+    /*$stmtCheck = $pdo->prepare("SELECT code FROM t_categories WHERE nom = :categorie");
     $stmtCheck->execute([':categorie' => $categorie]);
 
     if (!$stmtCheck->fetch()) {
         // La catégorie n'existe pas, on l'ajoute
         $stmtAddCategorie = $pdo->prepare("INSERT INTO t_categories (code, nom) VALUES (:code, :nom)");
         $stmtAddCategorie->execute([':code' => $categorie, ':nom' => $categorie]);
-    }
+    }*/
 
     // Insertion du produit
     $stmt = $pdo->prepare("INSERT INTO t_produit (code, nom, categorie) VALUES (:code, :nom, :categorie)");
@@ -53,7 +53,6 @@ try {
             'categorie' => $categorie
         ]
     ]);
-
 } catch (PDOException $e) {
     // Gestion des erreurs de base de données
     http_response_code(500);
@@ -70,7 +69,8 @@ try {
     ]);
 }
 
-function generateUniqueCode() {
+function generateUniqueCode()
+{
     $date = new DateTime();
     // Préfixe PRD pour Produit suivi de la date et un nombre aléatoire
     return 'PRD' . $date->format('YmdHis') . sprintf('%03d', rand(0, 999));

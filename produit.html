@@ -387,16 +387,17 @@ fetch('header.html')
                     <div class="combo-container">
                         <select id="categorie" required>
                             <option value="">Sélectionner une catégorie</option>
+                            <!-- ici la liste des categorie sera ajouté par AJAX -->
                         </select>
                         <button type="button" class="btn-add" onclick="toggleNewCategoryForm()">+</button>
                     </div>
                     <div id="newCategoryForm" style="display:none;">
                         <input type="text" id="newCategoryName" placeholder="Nouvelle catégorie">
-                        <button type="button" class="btn" onclick="addNewCategory()">Ajouter</button>
+                        <button type="button" class="btn" onclick="addNewCategory()">Ajouter Catégorie</button>
                     </div>
                 </div>    
             </form>
-            <button type="submit" class="btn" id="btnNouveauProduit">Ajouter</button>
+            <button type="submit" class="btn" id="btnNouveauProduit">Ajouter le produit</button>
             <div id="message"></div>
         </div>
     </div>
@@ -452,7 +453,9 @@ fetch('header.html')
                 modalModifierProduit.style.display = "none";
             }
         }
-        //-------- Ajout categories ----------------
+
+
+        //-------- Ajout nouveau Produit ----------------
         $('#btnNouveauProduit').on('click', function() {
            
             //alert("Ajout");
@@ -479,58 +482,20 @@ fetch('header.html')
  
                          
                      } else {
-                         $('#message').html('<p style="color: red;">' + response.message + '</p>');
+                         $('#message').html('<p style="color: red;"> Ajout Produit: ' + response.message + '</p>');
                      }
                  },
                  error: function(jqXHR, textStatus, errorThrown) {
                      // Affichez l'erreur exacte
                      var errorMessage = jqXHR.responseText + textStatus;
-                     $('#message').html('<p style="color: red;">' + errorMessage + '</p>');
+                     $('#message').html('<p style="color: red;"> Ajout Produit: ' + errorMessage + '</p>');
                  }
              });
          });
  
 
-        //---- Creons la fonction qui va remplir la liste des fcategories 
-        function getListe() {
-            $.ajax({
-                url: 'produit_get_liste.php', // Chemin vers le script PHP
-                type: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    // Vider le corps de la table avant d'ajouter de nouvelles lignes
-                    $('tbody').empty();
-                    
-                    if (response.donnees.length > 0) {
-                        response.donnees.forEach(function(produit) {
-                            var row = '<tr>' +
-                    '<td>' + (produit.nom || '') + '</td>' + // Affiche une chaîne vide si categorie.nom est null ou vide
-                    '<td>' + (produit.categorie || '') + '</td>' + // Affiche une chaîne vide si categorie.nom est null ou vide
-                    '<button class="btn btnModifier">Modifier</button> ' +
-                    '<button class="btn btnSupprimer">Supprimer</button>' +
-                    '<td>' +
-            '<button class="btn btnModifier">Modifier</button> ' +
-            '<button class="btn btnSupprimer">Supprimer</button>' +
-            '</td>' +
-            '</tr>';
-                $('tbody').append(row); // Ajouter la ligne à la table
-                        });
-                    } else {
-                        $('tbody').append('<tr><td colspan="5">Aucun Produit trouvé.</td></tr>');
-                    }
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    var errorMessage = jqXHR.responseText + textStatus;
-                    //console.error("Erreur lors de la récupération des produit : " + textStatus);
-                    $('tbody').append('<tr><td colspan="5" style="color:red;">Erreur lors de la récupération des produits.'+ errorMessage+'</td></tr>');
-                    // Affichez l'erreur exacte
-                    
-                           // $('#message').html('<p style="color: red;">' + errorMessage + '</p>');
-                }
-            });
-        }
         
-  // Appeler les fonctions de chargement au chargement de la page
+  // Appeler les fonctions de chargement de la page
 $(document).ready(function() {
     getListe();        // Chargement de la liste des produits
     loadCategories();  // Chargement des catégories dans le formulaire
@@ -549,7 +514,7 @@ function getListe() {
                     const row = `
                         <tr>
                             <td>${produit.nom || ''}</td>
-                            <td>${produit.categorie || ''}</td> <!-- Utilisez ici le bon champ-->
+                            <td>${produit.nom_cat || ''}</td> <!-- Utilisez ici le bon champ-->
                             <td>
                                 <button class="btn btnModifier">Modifier</button>
                                 <button class="btn btnSupprimer">Supprimer</button>
@@ -580,11 +545,12 @@ function loadCategories() {
             const select = document.getElementById('categorie');
             select.innerHTML = '<option value="">Sélectionner une catégorie</option>'; // Réinitialiser les options
 
-            const option = new Option("nom", "id");
+            /*const option = new Option("nom", "code");
                 select.add(option);
+                console.log('Cat ajouté: ' + option);*/
             
             data.forEach(category => {
-                const option = new Option(category.nom, category.id);
+                const option = new Option(category.nom, category.code);
                 select.add(option);
             });
         },

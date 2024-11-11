@@ -12,7 +12,8 @@ try {
 
 
 
-    $stmt = $pdo->prepare("SELECT * FROM t_produit");
+    $stmt = $pdo->prepare("SELECT t_produit.code, t_produit.nom, t_categories.nom as nom_cat, categorie FROM t_produit, t_categories
+WHERE t_produit.categorie = t_categories.code;");
 
     $stmt->execute([]);
     // Récupérer les résultats
