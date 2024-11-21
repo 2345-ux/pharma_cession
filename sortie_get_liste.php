@@ -11,7 +11,12 @@ try {
     );
 
     // Requête pour récupérer toutes les sorties
-    $stmt = $pdo->prepare("SELECT * FROM t_sorties");
+    $stmt = $pdo->prepare("SELECT t_sorties.id, produit_id, quantite, prix_unitaire, prix_total, date_sortie, date_expiration, t_categories.nom AS nom_cat,
+t_produit.nom, t_produit.categorie
+FROM t_sorties, t_produit, t_categories
+WHERE t_sorties.produit_id = t_produit.id 
+AND t_produit.categorie = t_categories.code
+ORDER by t_sorties.id");
     $stmt->execute();
 
     // Récupérer les résultats

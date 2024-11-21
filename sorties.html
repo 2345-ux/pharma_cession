@@ -239,6 +239,119 @@
                 margin: 5% auto;
             }
         }
+/* Style général du modal */
+#modalAjouterSortie {
+    display: none; /* Masqué par défaut */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fond semi-transparent */
+}
+
+/* Style du contenu du modal */
+.modal-content {
+    background-color: #ffffff;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 500px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+/* Bouton de fermeture du modal */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #f44336; /* Couleur rouge au survol */
+}
+
+/* Style du titre du modal */
+.modal-content h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Style pour chaque groupe de formulaire */
+.form-group {
+    margin-bottom: 15px;
+}
+
+/* Champs de saisie */
+#formAjouterSortie input[type="text"],
+#formAjouterSortie input[type="number"],
+#formAjouterSortie input[type="date"],
+#formAjouterSortie select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Style pour le bouton d'ajout de nouvelle catégorie */
+.btn-add {
+    padding: 8px 12px;
+    background-color: #f7a205;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+.btn-add:hover {
+    background-color: #e69504; /* Couleur légèrement plus foncée au survol */
+}
+
+/* Style pour le formulaire de nouvelle catégorie */
+#newCategoryForm {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+/* Bouton principal "Ajouter" pour enregistrer la sortie */
+#btn_enregistrer_sortie {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+#btn_enregistrer_sortie:hover {
+    background-color: #45a049; /* Couleur au survol */
+}
+
+/* Message d'erreur ou de succès */
+#message_sortie {
+    margin-top: 10px;
+    font-size: 14px;
+    text-align: center;
+}
+
     </style>
 </head>
 
@@ -289,7 +402,6 @@ fetch('header.html')
                         <th>Montant Total</th>
                         <th>Date de Sortie</th>
                         <th>Date de Expiration</th>
-                        <th>categorie</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -327,27 +439,36 @@ fetch('header.html')
             </table>
         </div>
     </div>
-
 <!-- Modal pour ajouter une sortie -->
-<div id="modalAjouterSortie" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2>Ajouter une Sortie</h2>
-        <form id="formAjouterSortie">
-            <input type="text" placeholder="Code de la Sortie" id="code_sortie" hidden>
-            <input type="text" placeholder="Nom du Produit" id="nom_produit" required>
-            <input type="number" placeholder="Quantité" id="quantite" required>
-            <input type="number" placeholder="Prix Unitaire" id="prix_unitaire" required>
-            <input type="number" placeholder="Prix Total" id="prix_total" hidden>
-            <input type="date" placeholder="Date de Sortie" id="date_sortie" required>
-            <input type="date" placeholder="Date d'Expiration" id="date_expiration" required>
-            <input type="text" placeholder="categorie" id="categorie" required>
-        </form>
-        <button type="button" class="btn" id="btn_enregistrer_sortie">Ajouter</button>
-        <div id="message_sortie"></div>
-    </div>
-</div>
+    <div id="modalAjouterSortie" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Ajouter une nouvelle Sortie</h2>
+            <form id="formAjouterSortie">
+                <input type="text" placeholder="Code de la Sortie" id="code_sortie" hidden>
+               <!-- Sélection du produit -->
+            <div class="form-group">
+                <label for="produit_id">Nom du Produit :</label>
+                <select id="produit_id" name="produit_id">
+                    <option value="">Sélectionner un produit</option>
+                    <!-- Les options sont ajoutées dynamiquement par `get_products.php` -->
+                </select>                
+            </div>
+                <input type="number" placeholder="Quantité" id="quantite" required>
+                <input type="number" placeholder="Prix Unitaire" id="prix_unitaire" required>
+                <input type="number" placeholder="Prix Total" id="prix_total" hidden>
+                <input type="date" placeholder="Date de Sortie" id="date_sortie" required>
+                <input type="date" placeholder="Date d'Expiration" id="date_expiration" required>
+    
+                <!-- Select pour les catégories avec option d'ajout dynamique -->
 
+                <button type="button" class="btn" id="btn_enregistrer_sortie">Ajouter</button>
+                <div id="message_sortie"></div>
+            </form>
+        </div>
+    </div>
+    
+    
 <!-- Modal pour modifier une sortie -->
 <div id="modalModifierSortie" class="modal">
     <div class="modal-content">
@@ -355,7 +476,7 @@ fetch('header.html')
         <h2>Modifier une Sortie</h2>
         <form id="formModifierSortie">
             <input type="text" placeholder="Code de la Sortie" id="code_sortie_modifier" hidden>
-            <input type="text" placeholder="Nom du Produit" id="nom_produit_modifier" required>
+            <input type="text" placeholder="Nom du Produit" id="produit_id_modifier" required>
             <input type="number" placeholder="Quantité" id="quantite_modifier" required>
             <input type="number" placeholder="Prix Unitaire" id="prix_unitaire_modifier" required>
             <input type="number" placeholder="Prix Total" id="prix_total_modifier" readonly>
@@ -367,145 +488,167 @@ fetch('header.html')
 </div>
 
 <script>
-// Gestion des modals pour ajouter et modifier
-const btnAjouterSortie = document.getElementById("btnAjouterSortie");
-const modalAjouterSortie = document.getElementById("modalAjouterSortie");
-const modalModifierSortie = document.getElementById("modalModifierSortie");
-const btnEnregistrerSortie = document.getElementById("btn_enregistrer_sortie");
-const closeButtons = document.querySelectorAll(".close");
-
-// Ouvrir le modal d'ajout de sortie
-btnAjouterSortie.addEventListener("click", function() {
-    modalAjouterSortie.style.display = "block";
-});
-
-// Ouvrir le modal de modification de sortie (avec exemple de données)
-function openModalModifierSortie(code, nom, quantite, prixUnitaire, prixTotal, dateSortie, dateExpiration) {
-    document.getElementById("code_sortie_modifier").value = code;
-    document.getElementById("nom_produit_modifier").value = nom;
-    document.getElementById("quantite_modifier").value = quantite;
-    document.getElementById("prix_unitaire_modifier").value = prixUnitaire;
-    document.getElementById("prix_total_modifier").value = prixTotal;
-    document.getElementById("date_sortie_modifier").value = dateSortie;
-    document.getElementById("date_expiration_modifier").value = dateExpiration;
-    modalModifierSortie.style.display = "block";
-}
-
-// Fermer les modals
-closeButtons.forEach(btn => {
-    btn.addEventListener("click", function() {
-        modalAjouterSortie.style.display = "none";
-        modalModifierSortie.style.display = "none";
+    // Variables globales pour les modals
+    const btnAjouterSortie = document.getElementById("btnAjouterSortie");
+    const modalAjouterSortie = document.getElementById("modalAjouterSortie");
+    const modalModifierSortie = document.getElementById("modalModifierSortie");
+    const btnEnregistrerSortie = document.getElementById("btn_enregistrer_sortie");
+    const closeButtons = document.querySelectorAll(".close");
+    
+    // -------- Gestion des modals --------
+    btnAjouterSortie.addEventListener("click", function() {
+        modalAjouterSortie.style.display = "block";
     });
-});
-
-// Fermer les modals en cliquant à l'extérieur
-window.addEventListener("click", function(event) {
-    if (event.target == modalAjouterSortie) {
-        modalAjouterSortie.style.display = "none";
+    
+    function openModalModifierSortie(code, nom, quantite, prixUnitaire, prixTotal, dateSortie, dateExpiration) {
+        document.getElementById("code_sortie_modifier").value = code;
+        document.getElementById("produit_id_modifier").value = nom;
+        document.getElementById("quantite_modifier").value = quantite;
+        document.getElementById("prix_unitaire_modifier").value = prixUnitaire;
+        document.getElementById("prix_total_modifier").value = prixTotal;
+        document.getElementById("date_sortie_modifier").value = dateSortie;
+        document.getElementById("date_expiration_modifier").value = dateExpiration;
+        modalModifierSortie.style.display = "block";
     }
-    if (event.target == modalModifierSortie) {
-        modalModifierSortie.style.display = "none";
-    }
-});
-
-//-------- Ajout d'une nouvelle sortie ----------------
-$('#btn_enregistrer_sortie').on('click', function() {
-    // Récupérer les valeurs du formulaire
-    var formData = {
-        code: $('#code_sortie').val(),
-        nom: $('#nom_produit').val(),
-        quantite: $('#quantite').val(),
-        prix_unitaire: $('#prix_unitaire').val(),
-        prix_total: $('#quantite').val() * $('#prix_unitaire').val(), // Calcul automatique
-        date_sortie: $('#date_sortie').val(),
-        date_expiration: $('#date_expiration').val(),
-        categorie: $('#categorie').val(),
-    };
-     // Validation côté client
-     if (!formData.nom || !formData.quantite || !formData.prix_unitaire || !formData.date_sortie || !formData.date_expiration || !formData.categorie) {
-        $('#message_sortie').html('<p style="color: red;">Veuillez remplir tous les champs requis</p>');
-        return;
-    }
-
-    $.ajax({
-        type: 'POST',
-        url: 'sortie_magazin.php', // Correction ici : utilisation du bon nom de fichier
-        data: formData,
-        dataType: 'json',
-        success: function(response) {
-            if(response.status === 'success') {
-                $('#message_sortie').html('<p style="color: green;">' + response.message + '</p>');
-                // Vider le formulaire
-                $('#formAjouterSortie')[0].reset();
-                // Rafraîchir la liste
-                getListeSorties();
-                // Fermer le modal après 2 secondes
-                setTimeout(function() {
-                    modalAjouterSortie.style.display = "none";
-                    $('#message_sortie').html('');
-                }, 2000);
-            } else {
-                $('#message_sortie').html('<p style="color: red;">' + response.message + '</p>');
-            }
-        },
-        error: function(xhr, status, error) {
-            $('#message_sortie').html('<p style="color: red;">Erreur lors de l\'enregistrement: ' + error + '</p>');
+    
+    // Fermeture des modals
+    closeButtons.forEach(btn => {
+        btn.addEventListener("click", function() {
+            modalAjouterSortie.style.display = "none";
+            modalModifierSortie.style.display = "none";
+        });
+    });
+    
+    window.addEventListener("click", function(event) {
+        if (event.target == modalAjouterSortie) {
+            modalAjouterSortie.style.display = "none";
+        }
+        if (event.target == modalModifierSortie) {
+            modalModifierSortie.style.display = "none";
         }
     });
-});
+    
+  // Stocker les données des produits, avec informations de la catégorie associée
+let productsData = [];
 
-  // Calcul automatique du prix total
-  $('#quantite, #prix_unitaire').on('input', function() {
-    var quantite = parseFloat($('#quantite').val()) || 0;
-    var prix_unitaire = parseFloat($('#prix_unitaire').val()) || 0;
-    $('#prix_total').val(quantite * prix_unitaire);
-});
 
-//---- Fonction pour remplir la liste des sorties 
-function getListeSorties() {
+// Fonction pour charger les produits et stocker les données
+function loadProducts() {
     $.ajax({
-        url: 'sortie_get_liste.php', // Chemin vers le script PHP pour récupérer la liste des sorties
+        url: 'get_products.php',
         type: 'GET',
         dataType: 'json',
         success: function(response) {
-            // Vider le corps de la table avant d'ajouter de nouvelles lignes
+            if (response.status === 'success') {
+                productsData = response.data;
+                const productSelect = document.getElementById('produit_id');
+                productSelect.innerHTML = '<option value="">Sélectionner un produit</option>';
+                productsData.forEach(product => {
+                    const option = new Option(product.nom, product.id); // Utilise product.id comme valeur
+                    productSelect.add(option);
+                });
+            } else {
+                console.error('Erreur lors du chargement des produits:', response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Erreur AJAX lors du chargement des produits:', error);
+        }
+    });
+}
+
+
+// Charger les catégories et produits au chargement de la page
+$(document).ready(function() {
+    loadProducts();   // Charger les produits
+});
+    //-------- Ajout Sorties ---------------- 
+    $('#btn_enregistrer_sortie').on('click', function() {
+        const formData = {
+            code: $('#code_sortie').val(),
+            produit_id: $('#produit_id').val(),
+            quantite: parseFloat($('#quantite').val()) || 0,
+            prix_unitaire: parseFloat($('#prix_unitaire').val()) || 0,
+            prix_total: parseFloat($('#quantite').val()) * parseFloat($('#prix_unitaire').val()),
+            date_sortie: $('#date_sortie').val(),
+            date_expiration: $('#date_expiration').val()
+        };
+        
+        if (!formData.produit_id || !formData.quantite || !formData.prix_unitaire || !formData.date_sortie || !formData.date_expiration) {
+            $('#message_sortie').html('<p style="color: red;">Veuillez remplir tous les champs requis</p>');
+            return;
+        }
+    
+        $.ajax({
+            type: 'POST',
+            url: 'sortie_magazin.php',
+            data: formData,
+            dataType: 'json',
+            success: function(response) {
+                if(response.status === 'success') {
+                    $('#message_sortie').html('<p style="color: green;">' + response.message + '</p>');
+                    $('#formAjouterSortie')[0].reset();
+                    getListeSorties();
+                    setTimeout(function() {
+                        modalAjouterSortie.style.display = "none";
+                        $('#message_sortie').html('');
+                    }, 2000);
+                } else {
+                    $('#message_sortie').html('<p style="color: red;">' + response.message + '</p>');
+                }
+            },
+            error: function(error) {
+                $('#message_sortie').html('<p style="color: red;">Erreur lors de l\'enregistrement: ' + error.responseText + '</p>');
+            }
+        });
+    });
+    
+
+$('#quantite, #prix_unitaire').on('input', function() {
+    const quantite = parseFloat($('#quantite').val()) || 0;
+    const prix_unitaire = parseFloat($('#prix_unitaire').val()) || 0;
+    $('#prix_total').val(quantite * prix_unitaire);
+});
+//---- Fonction pour remplir la liste des sorties
+function getListeSorties() {
+    $.ajax({
+        url: 'sortie_get_liste.php', // Utilisation de la bonne URL
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
             $('tbody').empty();
 
-            if (response.donnees.length > 0) {
+            if (response.donnees && response.donnees.length > 0) {
                 response.donnees.forEach(function(sortie) {
-                    var row = '<tr>' +
-                        '<td>' + (sortie.nom || '') + '</td>' +
-                        '<td>' + (sortie.quantite || '') + '</td>' +
-                        '<td>' + (sortie.prix_unitaire || '') + '</td>' +
-                        '<td>' + (sortie.prix_total || '') + '</td>' +
-                        '<td>' + (sortie.date_sortie || '') + '</td>' +
-                        '<td>' + (sortie.date_expiration || '') + '</td>' +
-                        '<td>' + (sortie.categorie || '') + '</td>' +
-                        '<td>' +
-                            '<button class="btn btnModifier">Modifier</button> ' +
-                            '<button class="btn btnSupprimer">Supprimer</button>' +
-                        '</td>' +
-                    '</tr>';
-                    $('tbody').append(row); // Ajouter la ligne à la table
+                    const row = `<tr>
+                        <td>${sortie.nom || ''}</td>
+                        <td>${sortie.quantite || ''}</td>
+                        <td>${sortie.prix_unitaire || ''}</td>
+                        <td>${sortie.prix_total || ''}</td>
+                        <td>${sortie.date_sortie || ''}</td>
+                        <td>${sortie.date_expiration || ''}</td>
+                        <td>
+                            <button class="btn btnModifier">Modifier</button>
+                            <button class="btn btnSupprimer">Supprimer</button>
+                        </td>
+                    </tr>`;
+                    $('tbody').append(row);
                 });
             } else {
                 $('tbody').append('<tr><td colspan="8">Aucune sortie trouvée.</td></tr>');
             }
         },
-        error: function(jqXHR, textStatus, errorThrown) {
-            var errorMessage = jqXHR.responseText + textStatus;
-            $('tbody').append('<tr><td colspan="8" style="color:red;">Erreur lors de la récupération des sorties: ' + errorMessage + '</td></tr>');
+        error: function(error) {
+            $('tbody').append('<tr><td colspan="8" style="color:red;">Erreur lors de la récupération des sorties: ' + error + '</td></tr>');
         }
     });
 }
 
-// Charger la liste des sorties au chargement de la page
 $(document).ready(function() {
+    loadProducts();
     getListeSorties();
 });
-
-</script>
+    </script> 
 
 </body>
 </html>

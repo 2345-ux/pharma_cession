@@ -1,20 +1,20 @@
-// get_products.php
 <?php
-header('Content-Type: application/json');
+// get_products.php
+header('Content-Type: application/json'); // Indique que la réponse sera en JSON
 
 try {
-    $pdo = new PDO("mysql:host=localhost;dbname=pharma_cession;charset=utf8", "saw24", "saw24");
-    
-    // Modifier la requête pour inclure la catégorie
-    $stmt = $pdo->query("
-        SELECT p.*, c.nom as categorie_nom 
-        FROM t_produit p 
-        LEFT JOIN t_categories c ON p.categorie_id = c.id 
-        ORDER BY p.nom
-    ");
-    
-    echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+    // Connexion à la base de données avec gestion des erreurs
+    $pdo = new PDO("mysql:host=localhost;dbname=pharma_cession;charset=utf8", "saw24", "saw24", [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+    ]);
+
+    // Préparation et exécution de la requête pour récupérer les produits
+    $stmt = $pdo->query("SELECT id, code, nom FROM t_produit");
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC); // Récupère les résultats sous forme de tableau associatif
+
+    // Encode les résultats en JSON et les envoie au client
+    echo json_encode(['status' => 'success', 'data' => $products]);
 } catch (PDOException $e) {
-    http_response_code(500);
-    echo json_encode(['error' => $e->getMessage()]);
+    // En cas d'erreur, renvoie un message d'erreur en JSON
+    echo json_encode(['status' => 'error', 'message' => 'Erreur: ' . $e->getMessage()]);
 }
