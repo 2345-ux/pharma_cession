@@ -1,8 +1,9 @@
 <?php
-// get_entrees.php
+// get_commande.php
 header('Content-Type: application/json');
 
 try {
+    // Connexion à la base de données
     $pdo = new PDO(
         "mysql:host=localhost;dbname=pharma_cession;charset=utf8",
         "saw24",
@@ -13,52 +14,61 @@ try {
         ]
     );
 
-    // Requête pour récupérer toutes les entrées avec les noms de colonnes corrects
+    // Requête pour récupérer toutes les commandes avec les informations nécessaires
     $query = "SELECT 
-                id,
-                code,
-                nom,
-                quantite,
-                prix_fournisseur,
-                prix_total,
-                DATE_FORMAT(date_ajout, '%d-%m-%Y') as date_ajout,
-                DATE_FORMAT(date_expiration, '%d-%m-%Y') as date_expiration,
-                fournisseur,
-                DATE_FORMAT(date_creation, '%d-%m-%Y %H:%i:%s') as date_creation,
-                DATE_FORMAT(date_modification, '%d-%m-%Y %H:%i:%s') as date_modification
-              FROM t_entrees 
-              ORDER BY date_creation DESC";
-              
+                id_produit, 
+                id_fournisseur, 
+                quantite, 
+                prix_unitaire,
+                prix_total, 
+                date_ajout, 
+                date_expiration 
+              FROM t_commandes";
+    
     $stmt = $pdo->prepare($query);
     $stmt->execute();
 
-    // Récupérer les résultats
-    $entrees = $stmt->fetchAll();
+    // Vérification des résultats
+    $commandes = $stmt->fetchAll();
+    if (!$commandes) {
+        $commandes = []; // Retourner un tableau vide si aucune commande trouvée
+    }
 
-    // Calculer les statistiques avec les noms de colonnes corrects
+    // Calculer les statistiques liées aux commandes
     $statsQuery = "SELECT 
-                    COUNT(*) as total_entrees,
-                    SUM(quantite) as total_quantite,
-                    SUM(prix_total) as total_montant,
-                    MIN(date_ajout) as premiere_entree,
-                    MAX(date_ajout) as derniere_entree
-                   FROM t_entrees";
+                    COUNT(*) AS total_commandes,
+                    SUM(quantite) AS total_quantite,
+                    SUM(quantite * prix_unitaire) AS total_montant, -- Correction pour calculer le montant total
+                    MIN(date_ajout) AS premiere_commande,
+                    MAX(date_ajout) AS derniere_commande
+                   FROM t_commandes";
     
     $statsStmt = $pdo->prepare($statsQuery);
     $statsStmt->execute();
     $stats = $statsStmt->fetch();
 
+    if (!$stats) {
+        // Si aucune statistique, renvoyer des valeurs par défaut
+        $stats = [
+            'total_commandes' => 0,
+            'total_quantite' => 0,
+            'total_montant' => 0,
+            'premiere_commande' => null,
+            'derniere_commande' => null,
+        ];
+    }
+
     // Renvoyer les données en format JSON
     echo json_encode([
         'status' => 'success',
-        'message' => 'Liste des entrées récupérée avec succès !',
-        'donnees' => $entrees,
+        'message' => 'Liste des commandes récupérée avec succès !',
+        'donnees' => $commandes,
         'statistiques' => [
-            'nombre_entrees' => $stats['total_entrees'],
+            'nombre_commandes' => $stats['total_commandes'],
             'quantite_totale' => $stats['total_quantite'],
             'montant_total' => number_format($stats['total_montant'], 2, '.', ' '),
-            'premiere_entree' => $stats['premiere_entree'],
-            'derniere_entree' => $stats['derniere_entree']
+            'premiere_commande' => $stats['premiere_commande'],
+            'derniere_commande' => $stats['derniere_commande']
         ]
     ]);
 

@@ -36,7 +36,7 @@ try {
     }*/
 
     // Insertion du produit
-    $stmt = $pdo->prepare("INSERT INTO t_produit (code, nom, categorie) VALUES (:code, :nom, :categorie)");
+    $stmt = $pdo->prepare("INSERT INTO t_produits (code, nom, categorie) VALUES (:code, :nom, :categorie)");
     $stmt->execute([
         ':code' => $code,
         ':nom' => $nom,

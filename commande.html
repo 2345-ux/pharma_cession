@@ -306,6 +306,27 @@
             background-color: #f9f9f9;
             border-radius: 4px;
         }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 8px;
+            position: relative;
+        }
     </style>
 </head>
 <body>
@@ -393,7 +414,7 @@
         </div>
     </div>
 
-    <!-- Modal pour ajouter un produit -->
+    <!-- Modal pour ajouter un id_produit -->
 <div id="modalAjouterEntree" class="modal">
     <div class="modal-content">
         <span class="close" id="closeModal">&times;</span>
@@ -404,10 +425,10 @@
             <div class="form-group">
                 <label for="nom">Produit:</label>
                 <div class="combo-container">
-                    <select id="nom" required>
+                    <select id="id_produit" required>
                         <option value="">Sélectionner un produit</option>
                     </select>
-                    <button type="button" class="btn-add" onclick="toggleNewProductForm()">+</button>
+                    <button hidden type="button" class="btn-add" onclick="toggleNewProductForm()">+</button>
                 </div>
                 <div id="newProductForm" style="display:none;">
                     <input type="text" id="newProductName" placeholder="Nouveau produit">
@@ -418,20 +439,20 @@
             <div class="form-group">
                 <label for="fournisseur">Fournisseur:</label>
                 <div class="combo-container">
-                    <select id="fournisseur" required>
+                    <select id="id_fournisseur" required>
                         <option value="">Sélectionner un fournisseur</option>
                     </select>
-                    <button type="button" class="btn-add" onclick="toggleNewSupplierForm()">+</button>
+                    <button hidden type="button" class="btn-add" onclick="toggleNewSupplierForm()">+</button>
                 </div>
                 <div id="newSupplierForm" style="display:none;">
                     <input type="text" id="newSupplierName" placeholder="Nouveau fournisseur">
                     <button type="button" class="btn" onclick="addNewSupplier()">Ajouter</button>
                 </div>
             </div>
-            <div class="form-group">
+            <div class="form-group" hidden>
                 <label for="categorie">Catégorie:</label>
                 <div class="combo-container">
-                    <select id="categorie" required>
+                    <select id="categorie" hidden>
                         <option value="">Sélectionner une catégorie</option>
                     </select>
                     <button type="button" class="btn-add" onclick="toggleNewCategoryForm()">+</button>
@@ -454,27 +475,32 @@
 </div>
 
     <script>
-        const btnAjouterEntree = document.getElementById("btnAjouterEntree");
-        const modalAjouterEntree = document.getElementById("modalAjouterEntree");
-        const closeModal = document.getElementById("closeModal");
-
-        // Afficher le modal lorsque le bouton est cliqué
-        btnAjouterEntree.onclick = function() {
-            modalAjouterEntree.style.display = "block";
-        }
-
-        // Fermer le modal lorsqu'on clique sur le bouton "close"
-        closeModal.onclick = function() {
-            modalAjouterEntree.style.display = "none";
-        }
-
-        // Fermer le modal en cliquant en dehors du contenu
-        window.onclick = function(event) {
-            if (event.target == modalAjouterEntree) {
-                modalAjouterEntree.style.display = "none";
+        document.addEventListener('DOMContentLoaded', function() {
+            const btnAjouterEntree = document.getElementById("btnAjouterEntree");
+            const modalAjouterEntree = document.getElementById("modalAjouterEntree");
+            const closeModal = document.getElementById("closeModal");
+        
+            // Vérifier si le bouton existe
+            if (btnAjouterEntree && modalAjouterEntree) {
+                btnAjouterEntree.addEventListener('click', function() {
+                    modalAjouterEntree.style.display = "block";
+                });
             }
-        }
-
+        
+            // Gestion de la fermeture
+            if (closeModal) {
+                closeModal.addEventListener('click', function() {
+                    modalAjouterEntree.style.display = "none";
+                });
+            }
+        
+            // Fermeture en cliquant en dehors du modal
+            window.addEventListener('click', function(event) {
+                if (event.target == modalAjouterEntree) {
+                    modalAjouterEntree.style.display = "none";
+                }
+            });
+        });
         // Gestion du menu hamburger
         const hamburgerBtn = document.getElementById("hamburgerBtn");
         const navUl = document.querySelector("nav ul");
@@ -483,61 +509,71 @@
             navUl.classList.toggle("show");
         });
 
-    // Ajout d'une nouvelle entrée via le formulaire
- // Ajout d'une nouvelle entrée via le formulaire
-$('#btn_enregistrer_produit').on('click', function() {
-    // Récupérer les valeurs du formulaire avec les bons IDs
-    var formData = {
-        nom: $('#nom').val(),
-        quantite: $('#quantite').val(),
-        prix_fournisseur: $('#prix_unitaire').val(),
-        date_ajout: $('#date_ajout').val(),
-        date_expiration: $('#date_expiration').val(),
-        fournisseur: $('#fournisseur').val(),
-        categorie: $('#categorie').val()
+    // Fonction pour calculer le prix total
+function calculateTotal() {
+    const quantite = parseFloat(document.getElementById('quantite').value) || 0;
+    const prixUnitaire = parseFloat(document.getElementById('prix_unitaire').value) || 0;
+    document.getElementById('prix_total').value = (quantite * prixUnitaire).toFixed(2);
+}
+
+// Événements pour recalculer automatiquement le montant total
+document.getElementById('quantite').addEventListener('input', calculateTotal);
+document.getElementById('prix_unitaire').addEventListener('input', calculateTotal);
+
+// Fonction D'ajout de produit
+function ajouterCommande() {
+    // Récupérer les valeurs
+    const formData = {
+        id_produit: document.getElementById('id_produit').value,
+        id_fournisseur: document.getElementById('id_fournisseur').value,
+        quantite: document.getElementById('quantite').value,
+        prix_unitaire: document.getElementById('prix_unitaire').value,
+        date_ajout: document.getElementById('date_ajout').value,
+        date_expiration: document.getElementById('date_expiration').value
     };
 
-    // Validation côté client
-    if (!formData.nom || !formData.quantite || !formData.prix_fournisseur || 
-        !formData.date_ajout || !formData.date_expiration || !formData.fournisseur || !formData.categorie) {
-        $('#message_produit').html('<p style="color: red;">Veuillez remplir tous les champs requis</p>');
+    // Vérification des champs obligatoires
+    if (!formData.id_produit || 
+        !formData.id_fournisseur || 
+        !formData.quantite || 
+        !formData.prix_unitaire || 
+        !formData.date_ajout || 
+        !formData.date_expiration) {
+        alert("Veuillez remplir tous les champs obligatoires !");
         return;
     }
 
-    // Envoi des données avec AJAX
+    // Log des données avant envoi
+    console.log("Données à envoyer:", formData);
+
+    // Envoyer les données via AJAX
     $.ajax({
-        type: 'POST',
         url: 'commande_ajout_nouveau.php',
+        type: 'POST',
         data: formData,
         dataType: 'json',
         success: function(response) {
-            if(response.status === 'success') {
-                $('#message_produit').html('<p style="color: green;">' + response.message + '</p>');
-                $('#FormajoutProduit')[0].reset();
-                // Si getListeSorties existe
-                if (typeof getListeSorties === 'function') {
-                    getListeSorties();
-                }
-                setTimeout(function() {
-                    document.getElementById('modalAjouterEntree').style.display = "none";
-                    $('#message_produit').html('');
-                }, 2000);
+            console.log("Réponse reçue:", response);
+            if (response.status === 'success') {
+                alert("Commande ajoutée avec succès !");
+                document.getElementById('FormajoutProduit').reset();
+                document.getElementById('prix_total').value = "";
+                closeModal();
+                loadCommandes();
             } else {
-                $('#message_produit').html('<p style="color: red;">' + response.message + '</p>');
+                alert("Erreur lors de l'ajout : " + response.message);
             }
         },
         error: function(xhr, status, error) {
-            $('#message_produit').html('<p style="color: red;">Erreur lors de l\'enregistrement: ' + error + '</p>');
+            console.error("Erreur AJAX :", error);
+            console.error("Status :", status);
+            console.error("Réponse complète :", xhr.responseText);
+            alert("Une erreur est survenue lors de l'ajout de la commande. Vérifiez la console pour plus de détails.");
         }
     });
-});
-
-// Calcul automatique du prix total
-$('#quantite, #prix_unitaire').on('input', function() {
-    var quantite = parseFloat($('#quantite').val()) || 0;
-    var prix_unitaire = parseFloat($('#prix_unitaire').val()) || 0;
-    $('#prix_total').val((quantite * prix_unitaire).toFixed(2));
-});
+}
+// Associer le bouton "Enregistrer" au clic pour appeler ajouterCommande
+document.getElementById('btn_enregistrer_produit').addEventListener('click', ajouterCommande);
 
     //-------- Autres fonctions ici --------
 //---- Fonction pour remplir la liste des sorties
@@ -587,29 +623,41 @@ document.addEventListener('DOMContentLoaded', function() {
     loadSuppliers();
     loadCategories();
 });
+document.addEventListener('DOMContentLoaded', function() {
+    loadCommandes(); // Charger les commandes au démarrage
+});
+
 
 // Fonctions de chargement des données
-// Modifiez la fonction loadProducts pour stocker les données des produits
-let productsData = [];
-
 function loadProducts() {
     $.ajax({
-        url: 'get_products.php',
-        type: 'GET',
-        success: function(data) {
-            productsData = data; // Stocker toutes les données des produits
-            const select = document.getElementById('nom');
-            select.innerHTML = '<option value="">Sélectionner un produit</option>';
-            
-            data.forEach(product => {
-                const option = new Option(product.nom, product.id);
-                select.add(option);
-            });
+        url: 'get_products.php', // Chemin vers le script PHP
+        type: 'GET',            // Méthode HTTP
+        dataType: 'json',       // Type de données attendu
+        success: function(response) {
+            if (response.status === 'success') {
+                const products = response.data; // Récupérer les produits depuis la réponse
+                const select = document.getElementById('id_produit'); // ID du champ select
+
+                // Réinitialiser les options existantes (sauf la première option)
+                select.innerHTML = '<option value="">Sélectionner un produit</option>';
+
+                // Ajouter les nouvelles options
+                products.forEach(product => {
+                    const option = new Option(product.nom, product.id_produit);
+                    select.add(option);
+                });
+            } else {
+                alert("Erreur lors du chargement des produits : " + response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            alert("Une erreur est survenue lors de la requête : " + error);
         }
     });
 }
 
-// Ajouter un écouteur d'événement pour le changement de produit
+// Ajouter un écouteur d'événement pour le changement de id_produit
 document.getElementById('nom').addEventListener('change', function(e) {
     const selectedProductId = e.target.value;
     if (selectedProductId) {
@@ -634,7 +682,7 @@ document.getElementById('nom').addEventListener('change', function(e) {
             }
         }
     } else {
-        // Réactiver le champ catégorie si aucun produit n'est sélectionné
+        // Réactiver le champ catégorie si aucun id_produit n'est sélectionné
         document.getElementById('categorie').disabled = false;
         const addCategoryBtn = document.getElementById('categorie').parentElement.querySelector('.btn-add');
         if (addCategoryBtn) {
@@ -648,7 +696,7 @@ function loadSuppliers() {
         url: 'get_suppliers.php',
         type: 'GET',
         success: function(data) {
-            const select = document.getElementById('fournisseur');
+            const select = document.getElementById('id_fournisseur');
             data.forEach(supplier => {
                 const option = new Option(supplier.nom, supplier.nom);
                 select.add(option);
@@ -724,8 +772,6 @@ function addNewSupplier() {
     });
 }
 </script>
-
-
 </body>
 </html>
 

@@ -9,7 +9,7 @@ try {
     ]);
 
     // Préparation et exécution de la requête pour récupérer les produits
-    $stmt = $pdo->query("SELECT id, code, nom FROM t_produit");
+    $stmt = $pdo->query("SELECT * FROM t_produits");
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC); // Récupère les résultats sous forme de tableau associatif
 
     // Encode les résultats en JSON et les envoie au client

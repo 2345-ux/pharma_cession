@@ -14,16 +14,16 @@ try {
     $code = generateUniqueCode();
     $nom = $_POST['nom'] ?? '';
     $tel = $_POST['tel'] ?? '';
-    $adre = $_POST['adre'] ?? '';
+    $adresse = $_POST['adresse'] ?? '';
     $email = $_POST['email'] ?? '';
 
-    $stmt = $pdo->prepare("INSERT INTO t_fournisseurs (code, nom, tel, adre, email) VALUES (:code, :nom, :tel, :adre, :email)");
+    $stmt = $pdo->prepare("INSERT INTO t_fournisseurs (code, nom, tel, adresse, email) VALUES (:code, :nom, :tel, :adresse, :email)");
 
     $stmt->execute([
         ':code' => $code,
         ':nom' => $nom,
         ':tel' => $tel,
-        ':adre' => $adre,
+        ':adresse' => $adresse,
         ':email' => $email
     ]);
 

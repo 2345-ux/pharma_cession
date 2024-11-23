@@ -170,7 +170,7 @@
                 <input type="text" placeholder="Nom du Fournisseur" id="nom" required>
                 <input type="email" placeholder="Contact (email)" id="email">
                 <input type="tel" placeholder="Téléphone" id="tel">
-                <input type="text" placeholder="Adresse" id="adre">
+                <input type="text" placeholder="Adresse" id="adresse">
                 
             </form>
             <button type="button" class="btn" id="btn_enregitrer_nouveau">Ajouter</button>
@@ -257,7 +257,7 @@
                 code: $('#code').val(),
                 nom: $('#nom').val(),
                 tel: $('#tel').val(),
-                adre: $('#adre').val(),
+                adresse: $('#adresse').val(),
                 email: $('#email').val()
             };
 
@@ -305,7 +305,7 @@
             '<td>' + (fournisseur.nom || '') + '</td>' + // Affiche une chaîne vide si fournisseur.nom est null ou vide
             '<td>' + (fournisseur.email || '') + '</td>' + // Affiche une chaîne vide si fournisseur.email est null ou vide
             '<td>' + (fournisseur.tel || '') + '</td>' + // Affiche une chaîne vide si fournisseur.tel est null ou vide
-            '<td>' + (fournisseur.adre || '') + '</td>' + // Affiche une chaîne vide si fournisseur.adre est null ou vide
+            '<td>' + (fournisseur.adresse || '') + '</td>' + // Affiche une chaîne vide si fournisseur.adresse est null ou vide
             '<td>' +
             '<button class="btn btnModifier">Modifier</button> ' +
             '<button class="btn btnSupprimer">Supprimer</button>' +
