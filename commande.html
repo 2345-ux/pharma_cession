@@ -371,14 +371,13 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Nom du Produit</th>
-                        <th>Quantité</th>
-                        <th>Prix (Fournisseur)</th>
-                        <th>Montant</th>
-                        <th>Date d'ajout</th>
-                        <th>Date d'expiration</th>
+                        <th>Produit</th>
                         <th>Fournisseur</th>
-                        <th hidden>categorie</th>
+                        <th>Quantité</th>
+                        <th>Prix Unitaire</th>
+                        <th>Prix Total</th>
+                        <th>Date d'Ajout</th>
+                        <th>Date d'Expiration</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -577,46 +576,45 @@ document.getElementById('btn_enregistrer_produit').addEventListener('click', ajo
 
     //-------- Autres fonctions ici --------
 //---- Fonction pour remplir la liste des sorties
-    function getListeEntrees() {
-        $.ajax({
-            url: 'commande_get_liste.php', // Chemin vers le script PHP correct
-            type: 'GET',
-            dataType: 'json',
-            success: function(response) {
-                $('tbody').empty();
+function getListeEntrees() {
+    $.ajax({
+        url: 'commande_get_liste.php', // Nom correct du script PHP
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            $('tbody').empty();
 
-                if (response.status === 'success' && response.donnees.length > 0) {
-                    response.donnees.forEach(function(entree) {
-                        var row = '<tr>' +
-                            '<td>' + (entree.nom || '') + '</td>' +
-                            '<td>' + (entree.quantite || '') + '</td>' +
-                            '<td>' + (entree.prix_fournisseur || '') + '</td>' +
-                            '<td>' + (entree.prix_total || '') + '</td>' +
-                            '<td>' + (entree.date_ajout || '') + '</td>' +
-                            '<td>' + (entree.date_expiration || '') + '</td>' +
-                            '<td>' + (entree.fournisseur || '') + '</td>' +
-                          //  '<td>' + (entree.categorie || '') + '</td>' +
-                            '<td>' +
-                                '<button class="btn btnModifier">Modifier</button> ' +
-                                '<button class="btn btnSupprimer">Supprimer</button>' +
-                            '</td>' +
-                        '</tr>';
-                        $('tbody').append(row); // Ajouter la ligne à la table
-                    });
-                } else {
-                    $('tbody').append('<tr><td colspan="8">Aucune entrée trouvée.</td></tr>');
-                }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                var errorMessage = jqXHR.responseText + ' ' + textStatus;
-                $('tbody').append('<tr><td colspan="8" style="color:red;">Erreur lors de la récupération des entrées : ' + errorMessage + '</td></tr>');
+            if (response.status === 'success' && response.donnees.length > 0) {
+                response.donnees.forEach(function(entree) {
+                    var row = '<tr>' +
+                        '<td>' + (entree.id_produit || '') + '</td>' +
+                        '<td>' + (entree.id_fournisseur || '') + '</td>' +
+                        '<td>' + (entree.quantite || '') + '</td>' +
+                        '<td>' + (entree.prix_unitaire || '') + '</td>' +
+                        '<td>' + (entree.prix_total || '') + '</td>' +
+                        '<td>' + (entree.date_ajout || '') + '</td>' +
+                        '<td>' + (entree.date_expiration || '') + '</td>' +
+                        '<td>' +
+                            '<button class="btn btnModifier">Modifier</button> ' +
+                            '<button class="btn btnSupprimer">Supprimer</button>' +
+                        '</td>' +
+                    '</tr>';
+                    $('tbody').append(row); // Ajouter la ligne à la table
+                });
+            } else {
+                $('tbody').append('<tr><td colspan="8">Aucune commande trouvée.</td></tr>');
             }
-        });
-    }
-
-    $(document).ready(function() {
-        getListeEntrees();
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            var errorMessage = jqXHR.responseText || errorThrown;
+            $('tbody').append('<tr><td colspan="8" style="color:red;">Erreur lors de la récupération des commandes : ' + errorMessage + '</td></tr>');
+        }
     });
+}
+
+$(document).ready(function() {
+    getListeEntrees();
+});
     // Chargement initial des données
 document.addEventListener('DOMContentLoaded', function() {
     loadProducts();

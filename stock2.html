@@ -291,7 +291,6 @@
         <div id="alertsContainer"></div>
         <div class="content">
             <h2>Fiche de Stock</h2>
-            <button class="btn" id="btnAjouterProduit">Ajouter un Produit</button>
             <button class="btn">Imprimer</button>
             <div id="search-bar-container"></div>
 <script>
@@ -311,7 +310,6 @@
                             <th>Date d'Ajout</th>
                             <th>Date d'Expiration</th>
                             <th>Fournisseur</th>
-                            <th>categorie</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -346,7 +344,7 @@
             
             <!-- Section pour afficher le montant total -->
             <div id="totalContainer" style="margin-top: 20px;">
-                <h3>Montant Total du Stock : <span id="totalStock">0.00 €</span></h3>
+                <h3>Montant Total du Stock : <span id="totalStock">0.00 F CFA</span></h3>
             </div>
         </div>
     </div>
@@ -443,37 +441,46 @@
         // Actualiser le stock après chaque ajout
         function getListeProduits() {
             $.ajax({
-                url: 'stock_get_liste.php',
+                url: 'stock_get_liste.php', // Chemin vers le script PHP
                 type: 'GET',
                 dataType: 'json',
                 success: function(response) {
-                    $('tbody').empty();
-                    if (response.donnees && response.donnees.length > 0) {
+                    $('tbody').empty(); // Vide le tableau avant d'ajouter de nouvelles lignes
+                    
+                    if (response.status === 'success' && response.donnees && response.donnees.length > 0) {
                         response.donnees.forEach(function(produit) {
                             var row = `<tr>
-                                <td>${produit.nom || ''}</td>
+                                <td>${produit.id_produit || ''}</td>
                                 <td>${produit.quantite || ''}</td>
                                 <td>${produit.prix_unitaire || ''}</td>
+                                <td>${produit.montant_total || ''}</td>
                                 <td>${produit.date_ajout || ''}</td>
                                 <td>${produit.date_expiration || ''}</td>
-                                <td>${produit.fournisseur || ''}</td>
-                                <td>${produit.categorie || ''}</td>
-                                <td><button class="btn btnModifier">Modifier</button>
-                                <button class="btn btnSupprimer">Supprimer</button></td>
+                                <td>
+                                    <button class="btn btnModifier">Modifier</button>
+                                    <button class="btn btnSupprimer">Supprimer</button>
+                                </td>
                             </tr>`;
-                            $('tbody').append(row);
+                            $('tbody').append(row); // Ajoute la ligne au tableau
                         });
                     } else {
-                        $('tbody').append('<tr><td colspan="8">Aucun produit en stock trouvé.</td></tr>');
+                        $('tbody').append('<tr><td colspan="7">Aucun produit en stock trouvé.</td></tr>');
                     }
                 },
-                error: function() {
-                    $('tbody').append('<tr><td colspan="8" style="color:red;">Erreur lors de la récupération des produits en stock.</td></tr>');
+                error: function(jqXHR, textStatus, errorThrown) {
+                    // Gère les erreurs de requête AJAX
+                    $('tbody').append(`<tr><td colspan="7" style="color:red;">
+                        Erreur lors de la récupération des produits en stock : ${textStatus} - ${errorThrown}
+                    </td></tr>`);
                 }
             });
         }
-
-        // Charger les produits au chargement de la page
+  // Charger les produits au chargement de la page
+ $(document).ready(function() {
+          getListeProduits(); // Appelle la fonction lors du chargement de la page
+    });
+        
+      
         getListeProduits();
     });
     </script>
