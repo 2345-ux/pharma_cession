@@ -642,7 +642,7 @@ function loadProducts() {
 
                 // Ajouter les nouvelles options
                 products.forEach(product => {
-                    const option = new Option(product.nom, product.id_produit);
+                    const option = new Option(product.nom, product.id);
                     select.add(option);
                 });
             } else {
@@ -696,7 +696,7 @@ function loadSuppliers() {
         success: function(data) {
             const select = document.getElementById('id_fournisseur');
             data.forEach(supplier => {
-                const option = new Option(supplier.nom, supplier.nom);
+                const option = new Option(supplier.nom, supplier.id);
                 select.add(option);
             });
         }
