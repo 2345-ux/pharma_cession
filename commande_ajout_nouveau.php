@@ -90,25 +90,69 @@ try {
         ':date_expiration' => $date_expiration
     ];
     $stmtCommandes->execute($paramsCommandes);
+    $id_commande = $pdo->lastInsertId();
 
     // Mettre à jour ou insérer dans t_stock
-    $stmtStock = $pdo->prepare("INSERT INTO t_stock (
-        id_produit, quantite, prix_unitaire, date_ajout, date_expiration
+    // Étape 1 : Vérifier si la ligne existe déjà
+$stmtSelect = $pdo->prepare("
+SELECT COUNT(*) AS count 
+FROM t_stock 
+WHERE id_produit = :id_produit AND date_expiration = :date_expiration AND prix_unitaire = :prix_unitaire
+");
+
+$paramsSelect = [
+':id_produit' => $id_produit,
+':date_expiration' => $date_expiration,
+':prix_unitaire' => $prix_unitaire
+];
+
+$stmtSelect->execute($paramsSelect);
+$result = $stmtSelect->fetch(PDO::FETCH_ASSOC);
+
+if ($result['count'] > 0) {
+// Étape 2 : Si la ligne existe, faire un UPDATE
+$stmtUpdate = $pdo->prepare("
+    UPDATE t_stock 
+    SET 
+        quantite = quantite + :quantite,
+        prix_unitaire = :prix_unitaire,
+        date_ajout = :date_ajout
+    WHERE 
+        id_produit = :id_produit AND date_expiration = :date_expiration AND prix_unitaire = :prix_unitaire
+");
+
+$paramsUpdate = [
+    ':quantite' => $quantite,
+    ':prix_unitaire' => $prix_unitaire,
+    ':date_ajout' => $date_ajout,
+    ':id_produit' => $id_produit,
+    ':date_expiration' => $date_expiration
+];
+
+$stmtUpdate->execute($paramsUpdate);
+
+} else {
+// Étape 3 : Si la ligne n'existe pas, faire un INSERT
+$stmtInsert = $pdo->prepare("
+    INSERT INTO t_stock (
+        id_produit, quantite, prix_unitaire, date_ajout, date_expiration, id_commandes
     ) VALUES (
-        :id_produit, :quantite, :prix_unitaire, :date_ajout, :date_expiration
-    ) ON DUPLICATE KEY UPDATE 
-        quantite = quantite + VALUES(quantite),
-        prix_unitaire = VALUES(prix_unitaire),
-        date_ajout = VALUES(date_ajout),
-        date_expiration = VALUES(date_expiration)");
-    $paramsStock = [
-        ':id_produit' => $id_produit,
-        ':quantite' => $quantite,
-        ':prix_unitaire' => $prix_unitaire,
-        ':date_ajout' => $date_ajout,
-        ':date_expiration' => $date_expiration
-    ];
-    $stmtStock->execute($paramsStock);
+        :id_produit, :quantite, :prix_unitaire, :date_ajout, :date_expiration, :id_commandes
+    )
+");
+
+$paramsInsert = [
+    ':id_produit' => $id_produit,
+    ':quantite' => $quantite,
+    ':prix_unitaire' => $prix_unitaire,
+    ':date_ajout' => $date_ajout,
+    ':date_expiration' => $date_expiration,
+    ':id_commandes' => $id_commande,
+];
+
+$stmtInsert->execute($paramsInsert);
+}
+
 
     // Valider la transaction
     $pdo->commit();
@@ -129,7 +173,7 @@ try {
     error_log("Erreur PDO : " . $e->getMessage());
     echo json_encode([
         'status' => 'error',
-        'message' => 'Erreur lors de l\'opération en base de données.',
+        'message' => 'Erreur lors de l\'opération en base de données.'.$e->getMessage(),
         'debug' => $e->getMessage()
     ]);
 } catch (Exception $e) {

@@ -12,14 +12,12 @@ try {
 
     // Requête pour récupérer tous les produits en stock avec des champs spécifiques
     $query = "
-        SELECT 
-            id_produit, 
-            quantite, 
-            prix_unitaire, 
-            (quantite * prix_unitaire) AS montant_total,
-            date_ajout, 
-            date_expiration 
-        FROM t_stock";
+          SELECT t_stock.id_produit, t_produits.nom, t_stock.prix_unitaire, t_stock.quantite, t_stock.valeur_totale, t_stock.date_expiration, t_stock.date_ajout, t_fournisseurs.nom as nom_fournisseurs
+FROM t_stock, t_produits, t_commandes, t_fournisseurs
+WHERE t_stock.id_produit = t_produits.id
+AND t_stock.id_commandes = t_commandes.id_commande
+AND t_commandes.id_fournisseur = t_fournisseurs.id";
+
     $stmt = $pdo->prepare($query);
     $stmt->execute();
 

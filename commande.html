@@ -587,13 +587,13 @@ function getListeEntrees() {
             if (response.status === 'success' && response.donnees.length > 0) {
                 response.donnees.forEach(function(entree) {
                     var row = '<tr>' +
-                        '<td>' + (entree.id_produit || '') + '</td>' +
-                        '<td>' + (entree.id_fournisseur || '') + '</td>' +
-                        '<td>' + (entree.quantite || '') + '</td>' +
-                        '<td>' + (entree.prix_unitaire || '') + '</td>' +
+                        '<td>' + (entree.nom || '') + '</td>' +
+                        '<td>' + (entree.prix_unitaire || '') + '</td>' +                        
+                        '<td>' + (entree.quantite || '') + '</td>' +                       
                         '<td>' + (entree.prix_total || '') + '</td>' +
-                        '<td>' + (entree.date_ajout || '') + '</td>' +
                         '<td>' + (entree.date_expiration || '') + '</td>' +
+                        '<td>' + (entree.date_ajout || '') + '</td>' +
+                        '<td>' + (entree.nom_fournisseurs || '') + '</td>' +
                         '<td>' +
                             '<button class="btn btnModifier">Modifier</button> ' +
                             '<button class="btn btnSupprimer">Supprimer</button>' +

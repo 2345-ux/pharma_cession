@@ -15,15 +15,11 @@ try {
     );
 
     // Requête pour récupérer toutes les commandes avec les informations nécessaires
-    $query = "SELECT 
-                id_produit, 
-                id_fournisseur, 
-                quantite, 
-                prix_unitaire,
-                prix_total, 
-                date_ajout, 
-                date_expiration 
-              FROM t_commandes";
+    $query = "SELECT id_commande,id_produit, t_produits.nom, quantite, prix_unitaire, prix_total,  date_ajout, date_expiration, id_fournisseur, t_fournisseurs.nom as nom_fournisseurs
+FROM t_commandes, t_fournisseurs, t_produits
+WHERE t_commandes.id_produit = t_produits.id
+AND t_commandes.id_fournisseur + t_fournisseurs.id
+ORDER by id_commande";
     
     $stmt = $pdo->prepare($query);
     $stmt->execute();

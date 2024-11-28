@@ -305,10 +305,11 @@
                     <thead>
                         <tr>
                             <th>Nom du Produit</th>
-                            <th>Quantité</th>
                             <th>Prix Unitaire</th>
-                            <th>Date d'Ajout</th>
+                            <th>Quantité</th>
+                            <th>Montant</th>
                             <th>Date d'Expiration</th>
+                            <th>Date d'Ajout</th>
                             <th>Fournisseur</th>
                             <th>Actions</th>
                         </tr>
@@ -316,23 +317,12 @@
                     <tbody>
                         <tr>
                             <td data-label="Nom du Produit">Paracétamol</td>
+                            <td data-label="Prix Unitaire">2</td>
                             <td data-label="Quantité">5000</td>
-                            <td data-label="Prix Unitaire">2.50</td>
-                            <td data-label="Date d'Ajout">2024-06-01</td>
+                            <td data-label="Montant">10000</td>
                             <td data-label="Date d'Expiration">2024-06-01</td>
+                            <td data-label="Date d'Ajout">2024-06-01</td>
                             <td data-label="Fournisseur">Fournisseur A</td>
-                            <td data-label="Actions">
-                                <button class="btn btnModifier">Modifier</button>
-                                <button class="btn">Supprimer</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td data-label="Nom du Produit">Amoxicilline</td>
-                            <td data-label="Quantité">200</td>
-                            <td data-label="Prix Unitaire">5.00</td>
-                            <td data-label="Date d'Ajout">2023-12-31</td>
-                            <td data-label="Date d'Expiration">2023-12-31</td>
-                            <td data-label="Fournisseur">Fournisseur B</td>
                             <td data-label="Actions">
                                 <button class="btn btnModifier">Modifier</button>
                                 <button class="btn">Supprimer</button>
@@ -450,12 +440,13 @@
                     if (response.status === 'success' && response.donnees && response.donnees.length > 0) {
                         response.donnees.forEach(function(produit) {
                             var row = `<tr>
-                                <td>${produit.id_produit || ''}</td>
-                                <td>${produit.quantite || ''}</td>
+                                <td>${produit.nom || ''}</td>
                                 <td>${produit.prix_unitaire || ''}</td>
-                                <td>${produit.montant_total || ''}</td>
-                                <td>${produit.date_ajout || ''}</td>
+                                <td>${produit.quantite || ''}</td>
+                                <td>${produit.valeur_totale || ''}</td>
                                 <td>${produit.date_expiration || ''}</td>
+                                <td>${produit.date_ajout || ''}</td>
+                                <td>${produit.nom_fournisseurs || ''}</td>
                                 <td>
                                     <button class="btn btnModifier">Modifier</button>
                                     <button class="btn btnSupprimer">Supprimer</button>
