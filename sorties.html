@@ -448,8 +448,8 @@ fetch('header.html')
                 <input type="text" placeholder="Code de la Sortie" id="code_sortie" hidden>
                <!-- Sélection du produit -->
             <div class="form-group">
-                <label for="produit_id">Nom du Produit :</label>
-                <select id="produit_id" name="produit_id">
+                <label for="produit">Entrez nom du Produit :</label>
+                <select id="id_produit" name="produit">
                     <option value="">Sélectionner un produit</option>
                     <!-- Les options sont ajoutées dynamiquement par `get_products.php` -->
                 </select>                
@@ -541,7 +541,7 @@ function loadProducts() {
         success: function(response) {
             if (response.status === 'success') {
                 productsData = response.data;
-                const productSelect = document.getElementById('produit_id');
+                const productSelect = document.getElementById('id_produit');
                 productSelect.innerHTML = '<option value="">Sélectionner un produit</option>';
                 productsData.forEach(product => {
                     const option = new Option(product.nom, product.id); // Utilise product.id comme valeur
@@ -566,7 +566,7 @@ $(document).ready(function() {
     $('#btn_enregistrer_sortie').on('click', function() {
         const formData = {
             code: $('#code_sortie').val(),
-            produit_id: $('#produit_id').val(),
+            id_produit: $('#id_produit').val(),
             quantite: parseFloat($('#quantite').val()) || 0,
             prix_unitaire: parseFloat($('#prix_unitaire').val()) || 0,
             prix_total: parseFloat($('#quantite').val()) * parseFloat($('#prix_unitaire').val()),
@@ -574,7 +574,7 @@ $(document).ready(function() {
             date_expiration: $('#date_expiration').val()
         };
         
-        if (!formData.produit_id || !formData.quantite || !formData.prix_unitaire || !formData.date_sortie || !formData.date_expiration) {
+        if (!formData.id_produit || !formData.quantite || !formData.prix_unitaire || !formData.date_sortie || !formData.date_expiration) {
             $('#message_sortie').html('<p style="color: red;">Veuillez remplir tous les champs requis</p>');
             return;
         }

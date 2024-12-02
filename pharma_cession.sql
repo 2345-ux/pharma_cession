@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Nov 11, 2024 at 01:53 PM
+-- Generation Time: Dec 02, 2024 at 10:15 AM
 -- Server version: 5.7.31
 -- PHP Version: 7.3.21
 
@@ -30,70 +30,67 @@ SET time_zone = "+00:00";
 DROP TABLE IF EXISTS `t_categories`;
 CREATE TABLE IF NOT EXISTS `t_categories` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `code` varchar(50) NOT NULL,
-  `nom` varchar(100) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `code` (`code`),
-  UNIQUE KEY `nom` (`nom`)
-) ENGINE=MyISAM AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
+  `code` varchar(50) DEFAULT NULL,
+  `nom` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `t_categories`
 --
 
-INSERT INTO `t_categories` (`id`, `code`, `nom`) VALUES
-(8, '202411051424061852', 'Hygiène'),
-(7, '202411051423560333', 'Matériel médical'),
-(6, '202411051423424021', 'Médicaments'),
-(9, '202411051424271457', 'Parapharmacie'),
-(10, '202411051424405063', 'Premier soins'),
-(11, 'CAT-202411051602168140', 'Anti-Biotic'),
-(12, '11', '11'),
-(13, '8', '8'),
-(14, '202411060802095719', 'Anasthesique'),
-(15, '14', '14'),
-(16, '202411080953491435', 'Anti-vers'),
-(17, '16', '16'),
-(18, '202411080958493825', 'HSQOFISJ'),
-(19, '18', '18');
+INSERT INTO `t_categories` (`id`, `code`, `nom`, `created_at`, `updated_at`) VALUES
+(1, '202411221413448498', 'Médicaments', '2024-11-22 14:13:44', '2024-11-22 14:13:44'),
+(2, '202411301808386426', 'Premier soins', '2024-11-30 18:08:38', '2024-11-30 18:08:38');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `t_entrees`
+-- Table structure for table `t_commandes`
 --
 
-DROP TABLE IF EXISTS `t_entrees`;
-CREATE TABLE IF NOT EXISTS `t_entrees` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `code` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Code unique généré automatiquement',
-  `nom` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Nom du produit',
-  `quantite` int(11) NOT NULL DEFAULT '0' COMMENT 'Quantité du produit',
-  `prix_fournisseur` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Prix unitaire fournisseur',
-  `prix_total` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT 'Prix total du produit',
-  `date_ajout` date NOT NULL COMMENT 'Date d''ajout du produit',
-  `date_expiration` date NOT NULL COMMENT 'Date d''expiration du produit',
-  `fournisseur` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Nom du fournisseur',
-  `categorie` varchar(50) CHARACTER SET utf8 NOT NULL,
-  `date_creation` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Date de création de l''enregistrement',
-  `date_modification` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Date de dernière modification',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `code` (`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DROP TABLE IF EXISTS `t_commandes`;
+CREATE TABLE IF NOT EXISTS `t_commandes` (
+  `id_commande` int(11) NOT NULL AUTO_INCREMENT,
+  `code` varchar(50) DEFAULT NULL,
+  `id_produit` varchar(50) DEFAULT NULL,
+  `id_fournisseur` varchar(50) DEFAULT NULL,
+  `quantite` int(11) DEFAULT NULL,
+  `prix_unitaire` decimal(10,2) DEFAULT NULL,
+  `prix_total` decimal(10,2) GENERATED ALWAYS AS ((`quantite` * `prix_unitaire`)) STORED,
+  `date_ajout` date DEFAULT NULL,
+  `date_expiration` date DEFAULT NULL,
+  PRIMARY KEY (`id_commande`)
+) ENGINE=MyISAM AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `t_entrees`
+-- Dumping data for table `t_commandes`
 --
 
-INSERT INTO `t_entrees` (`id`, `code`, `nom`, `quantite`, `prix_fournisseur`, `prix_total`, `date_ajout`, `date_expiration`, `fournisseur`, `categorie`, `date_creation`, `date_modification`) VALUES
-(1, 'ENT20241031094212152', 'Amoxicilline', 10, '1000.00', '10000.00', '2025-02-28', '2025-01-01', 'moha', '', '2024-10-31 09:42:12', '2024-10-31 09:42:12'),
-(2, 'ENT20241031110237635', 'para', 120, '1200.00', '144000.00', '2024-10-31', '2024-11-07', 'moha', 'comp', '2024-10-31 11:02:37', '2024-10-31 11:02:37'),
-(3, 'ENT20241031110321052', 'artemether', 12, '1450.00', '17400.00', '2024-10-31', '2025-05-21', 'moha', 'gelulles', '2024-10-31 11:03:21', '2024-10-31 11:03:21'),
-(4, 'ENT20241031152907621', 'Amoxicilline', 130, '1200.00', '156000.00', '2024-10-31', '2025-05-29', 'moha', 'gelulles', '2024-10-31 15:29:07', '2024-10-31 15:29:07'),
-(5, 'ENT20241031153859145', 'Amoxicilline', 10, '1000.00', '10000.00', '2024-10-31', '2025-04-30', 'moha', 'gelulles', '2024-10-31 15:38:59', '2024-10-31 15:38:59'),
-(6, 'ENT20241101092335017', 'paracetamol', 500, '100.00', '50000.00', '2024-11-01', '2025-09-25', 'moha', 'comprimés', '2024-11-01 09:23:35', '2024-11-01 09:23:35'),
-(7, 'ENT20241101100832523', 'hhhh', 22, '52.00', '1144.00', '2024-11-01', '2025-02-27', 'moha', 'anti-tout', '2024-11-01 10:08:32', '2024-11-01 10:08:32'),
-(8, 'ENT20241101100917885', 'Amoxicilline', 130, '1200.00', '156000.00', '2024-11-01', '2025-03-26', 'moha', 'anti-tout', '2024-11-01 10:09:17', '2024-11-01 10:09:17');
+INSERT INTO `t_commandes` (`id_commande`, `code`, `id_produit`, `id_fournisseur`, `quantite`, `prix_unitaire`, `date_ajout`, `date_expiration`) VALUES
+(1, 'CMD202411231127305855', 'Amoxicilline', 'Alfousseini', 10, '100.00', '2024-11-30', '2024-11-23'),
+(2, 'CMD202411231140528709', 'paracetamol cp 250 mg', 'Hamadou Alfousseini sarmey', 100, '2000.00', '2024-11-23', '2024-11-30'),
+(3, 'CMD202411251354556264', 'cloxa gel 500 mg', 'Alfousseini', 10, '1000.00', '2024-11-25', '2025-06-26'),
+(4, 'CMD202411260725264941', 'cloxa gel 500 mg', 'Alfousseini', 12, '1000.00', '2024-11-26', '2025-01-23'),
+(5, 'CMD202411260725315362', 'cloxa gel 500 mg', 'Alfousseini', 12, '1000.00', '2024-11-26', '2025-01-23'),
+(6, 'CMD202411260825096438', 'Amoxicilline', 'Alfousseini', 1000, '1001.00', '2024-11-26', '2024-11-27'),
+(7, 'CMD202411260830087513', 'Amoxicilline', 'Alfousseini', 1100, '1220.00', '2024-11-26', '2025-03-04'),
+(8, 'CMD202411260908400315', '1', '2', 10, '4000.00', '2024-11-26', '2025-02-05'),
+(9, 'CMD202411260921273851', '3', '1', 10, '10000.00', '2024-11-26', '2025-01-27'),
+(10, 'CMD202411260922156048', '1', '1', 11000, '1010.00', '2024-11-06', '2025-02-24'),
+(11, 'CMD202411260923386734', '1', '1', 1000, '100.00', '2024-11-26', '2025-05-02'),
+(12, 'CMD202411260924301328', '2', '2', 100, '1000.00', '2024-11-26', '2025-01-28'),
+(13, 'CMD202411261007557459', '2', '2', 10, '1000.00', '2024-11-26', '2024-12-26'),
+(14, 'CMD202411280901552950', '3', '3', 10, '1000.00', '2024-11-28', '2025-02-26'),
+(15, 'CMD202411281019189683', '2', '2', 10, '1000.00', '2024-11-28', '2024-12-31'),
+(16, 'CMD202411281031027643', '2', '2', 5, '500.00', '2024-11-28', '2024-12-30'),
+(17, 'CMD202411281037308012', '2', '2', 15, '200.00', '2024-11-28', '2024-12-29'),
+(18, 'CMD202411281039197669', '2', '2', 4, '5.00', '2024-11-28', '2024-12-28'),
+(19, 'CMD202411281042275068', '2', '2', 10, '1500.00', '2024-11-28', '2024-12-28'),
+(20, 'CMD202411281046453977', '2', '2', 5, '1500.00', '2024-11-28', '2024-12-28'),
+(21, 'CMD202411281124295135', '1', '3', 12, '6000.00', '2024-11-28', '2025-01-01');
 
 -- --------------------------------------------------------
 
@@ -103,68 +100,51 @@ INSERT INTO `t_entrees` (`id`, `code`, `nom`, `quantite`, `prix_fournisseur`, `p
 
 DROP TABLE IF EXISTS `t_fournisseurs`;
 CREATE TABLE IF NOT EXISTS `t_fournisseurs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(50) NOT NULL,
-  `nom` varchar(50) NOT NULL,
-  `tel` varchar(50) DEFAULT NULL,
-  `adre` varchar(250) DEFAULT NULL,
-  `email` varchar(50) DEFAULT NULL,
-  PRIMARY KEY (`code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `nom` varchar(255) NOT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `tel` varchar(15) DEFAULT NULL,
+  `adresse` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `t_fournisseurs`
 --
 
-INSERT INTO `t_fournisseurs` (`code`, `nom`, `tel`, `adre`, `email`) VALUES
-('001', 'DAHICO', '12346', 'Niamey', NULL),
-('002', 'UBIPHARM', '12346789', 'Niamey2', NULL),
-('003', 'Laborex', NULL, NULL, NULL),
-('202410241138553394', 'Abdoulwahabou SOULEY', '', 'Niamey', 'abdoulwahabous@gmail.com'),
-('202410241139242855', 'HumanWell', '', '', ''),
-('202410241206096525', 'Un autre', '', '', ''),
-('202410241206297892', 'Vendeur unique', '', '', ''),
-('202410241210148620', 'fournisseur externe', '25897', 'Filingué', 'four@info.ne'),
-('202410241210458550', 'Abdoulwahabou SOULEY v2', '25897', 'Niamey', 'abdoulwahabous@gmail.com'),
-('202410251032360938', 'Hamadou Alfousseini', '', 'Reference/Tchangarey', 'haidarahamadou128@gmail.com'),
-('202410251033054191', 'Hamadou Alfousseini', '', 'Reference/Tchangarey', 'haidarahamadou128@gmail.com'),
-('202410251142019921', 'Hamadou Alfousseini sarmey', '', 'Reference/Tchangarey', 'haidarahamadou128@gmail.com'),
-('202410291059435178', 'UNIPHARM', '+22792868032', 'Reference/Tchangarey', 'haidarahamadou128@gmail.com');
+INSERT INTO `t_fournisseurs` (`id`, `code`, `nom`, `email`, `tel`, `adresse`, `created_at`, `updated_at`) VALUES
+(1, '202411221428535540', 'Hamadou Alfousseini', 'haidarahamadou128@gmail.com', '+22792868032', 'Reference/Tchangarey', '2024-11-22 14:28:53', '2024-11-22 14:28:53'),
+(2, '202411230859020835', 'Alfousseini', 'haidarahamadou128@gmail.com', '', 'Reference/Tchangarey', '2024-11-23 08:59:02', '2024-11-23 08:59:02'),
+(3, '202411230959013795', 'Hamadou Alfousseini sarmey', 'haidarahamadou128@gmail.com', '+22792868032', 'Reference/Tchangarey', '2024-11-23 09:59:01', '2024-11-23 09:59:01');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `t_produit`
+-- Table structure for table `t_produits`
 --
 
-DROP TABLE IF EXISTS `t_produit`;
-CREATE TABLE IF NOT EXISTS `t_produit` (
+DROP TABLE IF EXISTS `t_produits`;
+CREATE TABLE IF NOT EXISTS `t_produits` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(50) NOT NULL,
-  `nom` varchar(100) NOT NULL,
-  `categorie_id` int(11) DEFAULT NULL,
-  `categorie` varchar(50) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `code` (`code`),
-  KEY `categorie_id` (`categorie_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
+  `nom` varchar(255) NOT NULL,
+  `categorie` varchar(50) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `t_produit`
+-- Dumping data for table `t_produits`
 --
 
-INSERT INTO `t_produit` (`id`, `code`, `nom`, `categorie_id`, `categorie`) VALUES
-(1, 'MED001', 'Paracétamol', 1, ''),
-(2, 'MED002', 'Ibuprofène', 1, ''),
-(3, 'MAT001', 'Seringues', 2, ''),
-(4, 'HYG001', 'Gel hydroalcoolique', 3, ''),
-(5, 'PAR001', 'Vitamines C', 4, ''),
-(6, 'PS001', 'Bandages', 5, ''),
-(7, 'PRD20241106073839732', 'Amoxicilline', NULL, '11'),
-(8, 'PRD20241106074027217', 'Amoxicilline', NULL, '11'),
-(9, 'PRD20241106074042429', 'Amoxicilline', NULL, '8'),
-(10, 'PRD20241106080213448', 'adrenaline', NULL, '14'),
-(11, 'PRD20241108095442177', 'Albendazole', NULL, '16'),
-(12, 'PRD20241108095859506', '¨DUJHLLIDSQ', NULL, '18');
+INSERT INTO `t_produits` (`id`, `code`, `nom`, `categorie`, `created_at`, `updated_at`) VALUES
+(1, 'PRD20241122142341744', 'Amoxicilline', '202411221413448498', '2024-11-22 14:23:41', '2024-11-22 14:23:41'),
+(2, 'PRD20241123084045607', 'paracetamol cp 250 mg', '202411221413448498', '2024-11-23 08:40:45', '2024-11-23 08:40:45'),
+(3, 'PRD20241125135428037', 'cloxa gel 500 mg', '202411221413448498', '2024-11-25 13:54:28', '2024-11-25 13:54:28');
 
 -- --------------------------------------------------------
 
@@ -174,27 +154,27 @@ INSERT INTO `t_produit` (`id`, `code`, `nom`, `categorie_id`, `categorie`) VALUE
 
 DROP TABLE IF EXISTS `t_sorties`;
 CREATE TABLE IF NOT EXISTS `t_sorties` (
-  `code` varchar(50) NOT NULL,
-  `nom` varchar(255) NOT NULL,
-  `quantite` int(11) NOT NULL,
-  `prix_unitaire` decimal(10,2) NOT NULL,
-  `prix_total` decimal(10,2) NOT NULL,
-  `date_sortie` date NOT NULL,
-  `date_expiration` date NOT NULL,
-  `categorie` varchar(50) NOT NULL,
-  `destinataire` varchar(50) NOT NULL,
-  PRIMARY KEY (`code`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `code` varchar(50) DEFAULT NULL,
+  `id_produit` int(11) DEFAULT NULL,
+  `quantite` int(11) DEFAULT NULL,
+  `prix_unitaire` decimal(10,2) DEFAULT NULL,
+  `prix_total` decimal(10,2) DEFAULT NULL,
+  `date_sortie` date DEFAULT NULL,
+  `date_expiration` date DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `t_sorties`
 --
 
-INSERT INTO `t_sorties` (`code`, `nom`, `quantite`, `prix_unitaire`, `prix_total`, `date_sortie`, `date_expiration`, `categorie`, `destinataire`) VALUES
-('SRT20241030090507498', 'amoxicilline', 120, '1200.00', '144000.00', '2024-10-30', '2025-01-15', '', ''),
-('SRT20241030121455451', 'ampiciline', 200, '1500.00', '300000.00', '2024-10-30', '2024-12-11', '', ''),
-('SRT20241031105435947', 'para', 12, '1000.00', '12000.00', '2024-10-31', '2025-02-26', 'inj', ''),
-('SRT20241101095907549', 'amoxicilline', 500, '1100.00', '550000.00', '2024-11-01', '2025-05-01', 'gelulles', '');
+INSERT INTO `t_sorties` (`id`, `code`, `id_produit`, `quantite`, `prix_unitaire`, `prix_total`, `date_sortie`, `date_expiration`, `created_at`, `updated_at`) VALUES
+(1, NULL, 1, 10, '10.00', '100.00', '2024-11-22', '2024-11-22', '2024-11-22 14:33:41', '2024-11-22 14:33:41'),
+(2, NULL, 2, 12, '1000.00', '12000.00', '2024-11-27', '2024-12-26', '2024-11-26 07:28:02', '2024-11-26 07:28:02'),
+(3, 'SORT202411301653533815', 2, 12, '6000.00', '72000.00', '2024-11-30', '2024-12-28', '2024-11-30 16:53:53', '2024-11-30 16:53:53');
 
 -- --------------------------------------------------------
 
@@ -204,27 +184,28 @@ INSERT INTO `t_sorties` (`code`, `nom`, `quantite`, `prix_unitaire`, `prix_total
 
 DROP TABLE IF EXISTS `t_stock`;
 CREATE TABLE IF NOT EXISTS `t_stock` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `code` varchar(50) NOT NULL,
-  `nom` varchar(100) NOT NULL,
-  `quantite` int(11) NOT NULL,
-  `prix_fournisseur` decimal(10,2) NOT NULL,
-  `prix_total` decimal(10,2) NOT NULL,
-  `date_ajout` date NOT NULL,
-  `date_expiration` date NOT NULL,
-  `fournisseur` varchar(100) NOT NULL,
-  `categorie` varchar(50) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `code` (`code`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+  `id_stock` int(11) NOT NULL AUTO_INCREMENT,
+  `id_produit` int(11) NOT NULL,
+  `id_commandes` int(11) NOT NULL,
+  `quantite` int(11) NOT NULL DEFAULT '0',
+  `date_ajout` datetime DEFAULT NULL,
+  `date_expiration` datetime DEFAULT NULL,
+  `prix_unitaire` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `valeur_totale` decimal(10,2) GENERATED ALWAYS AS ((`quantite` * `prix_unitaire`)) STORED,
+  PRIMARY KEY (`id_stock`),
+  UNIQUE KEY `id_produit` (`id_produit`,`date_expiration`)
+) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `t_stock`
 --
 
-INSERT INTO `t_stock` (`id`, `code`, `nom`, `quantite`, `prix_fournisseur`, `prix_total`, `date_ajout`, `date_expiration`, `fournisseur`, `categorie`) VALUES
-(1, 'ENT20241031154539772', 'Amoxicilline', 10, '1000.00', '10000.00', '2024-10-31', '2025-04-23', 'moha', 'gelulles'),
-(2, 'ENT20241031154622186', 'ampiciline', 120, '1200.00', '144000.00', '2024-10-31', '2025-05-27', 'moha', 'sirop');
+INSERT INTO `t_stock` (`id_stock`, `id_produit`, `id_commandes`, `quantite`, `date_ajout`, `date_expiration`, `prix_unitaire`) VALUES
+(1, 1, 8, 24020, '2024-11-26 00:00:00', '2025-05-02 00:00:00', '100.00'),
+(2, 3, 9, 40, '2024-11-28 00:00:00', '2025-02-26 00:00:00', '1000.00'),
+(3, 2, 12, 238, '2024-11-28 00:00:00', '2024-12-30 00:00:00', '500.00'),
+(4, 2, 20, 3, '2024-11-28 00:00:00', '2024-12-28 00:00:00', '1500.00'),
+(5, 1, 21, 12, '2024-11-28 00:00:00', '2025-01-01 00:00:00', '6000.00');
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
