@@ -12,7 +12,7 @@ try {
 
 
 
-    $stmt = $pdo->prepare("SELECT t_produits.code, t_produits.nom, t_categories.nom as nom_cat, categorie FROM t_produits, t_categories
+    $stmt = $pdo->prepare("SELECT t_produits.code, t_produits.nom, t_produits.seuil_produit, t_categories.nom as nom_cat, categorie FROM t_produits, t_categories
 WHERE t_produits.categorie = t_categories.code;");
 
     $stmt->execute([]);

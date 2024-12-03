@@ -16,11 +16,15 @@ try {
     // Récupération des données POST
     $code = generateUniqueCode();
     $nom = $_POST['nom'] ?? '';
+    $seuil_produit = $_POST['seuil_produit'] ?? '';
     $categorie = $_POST['categorie'] ?? '';
 
     // Validation des données
     if (empty($nom)) {
         throw new Exception("Le nom du produit est requis");
+    }
+    if (empty($seuil_produit)) {
+        throw new Exception("Le  seuil du produit est requis");
     }
     if (empty($categorie)) {
         throw new Exception("La catégorie est requise");
@@ -36,10 +40,11 @@ try {
     }*/
 
     // Insertion du produit
-    $stmt = $pdo->prepare("INSERT INTO t_produits (code, nom, categorie) VALUES (:code, :nom, :categorie)");
+    $stmt = $pdo->prepare("INSERT INTO t_produits (code, nom, seuil_produit, categorie) VALUES (:code, :nom, :seuil_produit, :categorie)");
     $stmt->execute([
         ':code' => $code,
         ':nom' => $nom,
+        ':seuil_produit' => $seuil_produit,
         ':categorie' => $categorie  // Correction de la variable $categories en $categorie
     ]);
 
@@ -50,6 +55,7 @@ try {
         'data' => [
             'code' => $code,
             'nom' => $nom,
+            ':seuil_produit' => $seuil_produit,
             'categorie' => $categorie
         ]
     ]);

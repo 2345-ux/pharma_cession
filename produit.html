@@ -346,6 +346,7 @@ fetch('header.html')
                     <tr>
                         <th hidden>Code</th>
                         <th>Nom du Produit</th>
+                        <th>Seuil du Produit</th>
                         <th>Catégorie</th>
                         <th>Actions</th>
                     </tr>
@@ -382,6 +383,7 @@ fetch('header.html')
             <form id="formAjouterCategorie">
                 <input type="text" placeholder="code du produit" id="code" hidden>
                 <input type="text" placeholder="Nom du produit" id="nom" required>
+                <input type="text" placeholder="Seuil du produit" id="seuil_produit" required>
                 <div class="form-group">
                     <label for="categorie">Catégorie:</label>
                     <div class="combo-container">
@@ -463,6 +465,7 @@ fetch('header.html')
              var formData = {
                  code: $('#code').val(),
                  nom: $('#nom').val(),
+                 seuil_produit: $('#seuil_produit').val(),
                  categorie: $('#categorie').val(),
              };
  
@@ -514,6 +517,7 @@ function getListe() {
                     const row = `
                         <tr>
                             <td>${produit.nom || ''}</td>
+                            <td>${produit.seuil_produit || ''}</td>
                             <td>${produit.nom_cat || ''}</td> <!-- Utilisez ici le bon champ-->
                             <td>
                                 <button class="btn btnModifier">Modifier</button>

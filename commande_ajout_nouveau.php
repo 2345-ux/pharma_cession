@@ -31,6 +31,7 @@ try {
     $prix_unitaire = $_POST['prix_unitaire'] ?? 0;
     $date_ajout = $_POST['date_ajout'] ?? '';
     $date_expiration = $_POST['date_expiration'] ?? '';
+    $prix_fournis = $_POST['prix_fournis'] ?? '';
 
     // Valider les données
     if (empty($id_produit)) {
@@ -56,6 +57,9 @@ try {
     if (empty($date_expiration)) {
         throw new Exception("La date d'expiration est requise.");
     }
+    if (empty($prix_fournis)) {
+        throw new Exception("Le prix fournisseur est requise.");
+    }
 
     // Début de la transaction
     $pdo->beginTransaction();
@@ -76,9 +80,9 @@ try {
 
     // Insérer dans t_commandes
     $stmtCommandes = $pdo->prepare("INSERT INTO t_commandes (
-        code, id_produit, id_fournisseur, quantite, prix_unitaire, date_ajout, date_expiration
+        code, id_produit, id_fournisseur, quantite, prix_unitaire, date_ajout, date_expiration, prix_fournis
     ) VALUES (
-        :code, :id_produit, :id_fournisseur, :quantite, :prix_unitaire, :date_ajout, :date_expiration
+        :code, :id_produit, :id_fournisseur, :quantite, :prix_unitaire, :date_ajout, :date_expiration, :prix_fournis
     )");
     $paramsCommandes = [
         ':code' => $code,
@@ -87,7 +91,8 @@ try {
         ':quantite' => $quantite,
         ':prix_unitaire' => $prix_unitaire,
         ':date_ajout' => $date_ajout,
-        ':date_expiration' => $date_expiration
+        ':date_expiration' => $date_expiration,
+        ':prix_fournis' => $prix_fournis
     ];
     $stmtCommandes->execute($paramsCommandes);
     $id_commande = $pdo->lastInsertId();
@@ -154,17 +159,17 @@ $stmtInsert->execute($paramsInsert);
 }
 
 
-    // Valider la transaction
-    $pdo->commit();
+   // Valider la transaction
+$pdo->commit();
 
-    echo json_encode([
-        'status' => 'success',
-        'message' => 'Commande ajoutée et stock mis à jour avec succès.',
-        'data' => [
-            'code' => $code,
-            'id' => $pdo->lastInsertId()
-        ]
-    ]);
+echo json_encode([
+    'status' => 'success',
+    'data' => [
+        'code' => $code,
+        'id' => $pdo->lastInsertId()
+    ]
+]);
+
 } catch (PDOException $e) {
     // Annuler la transaction en cas d'erreur SQL
     if ($pdo->inTransaction()) {
