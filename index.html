@@ -208,22 +208,26 @@ fetch('header.html')
     <div class="container">
         <div class="dashboard">
             <div class="card">
-                <h2>Produits disponibles</h2>
-                <p id="produits-disponibles">1234</p>
+                <h2>Montant du Stock</h2>
+                <p id="montant">200</p>
             </div>
             <div class="card">
-                <h2>Produit FAR</h2>
+                <h2>Benefices</h2>
                 <p id="produit-far">Paracétamol</p>
             </div>
             <div class="card">
-                <h2>Total des sorties</h2>
+                <h2>Peremption</h2>
+                <p id="total-sorties">5678</p>
+            </div>
+            <div class="card">
+                <h2>Produit en voie de rupture</h2>
                 <p id="total-sorties">5678</p>
             </div>
         </div>
-        <div class="chart">
+        <!--div class="chart">
             <h2>Courbe des produits sorties</h2>
             <img src="/api/placeholder/800/400" alt="Graphique des produits sorties">
-        </div>
+        </div-->
     </div>
 
     <script>
@@ -239,7 +243,30 @@ fetch('header.html')
                 navMenu.classList.remove('show');
             }
         });
-    </script>
+            $(document).ready(function() {
+                // ID ou classe où afficher le montant
+                const montantElement = $('#montant'); 
+        
+                // Appeler le script PHP via AJAX
+                $.ajax({
+                    url: 'acceuil_get_montant_total.php', // Change avec le chemin réel
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.montant !== undefined) {
+                            // Affiche le montant
+                            montantElement.text(`Montant total : ${data.montant} FCFA`);
+                        } else {
+                            montantElement.text('Aucun montant trouvé.');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Erreur AJAX:', error);
+                        montantElement.text('Erreur lors de la récupération du montant.');
+                    }
+                });
+            });
+        </script>
     <script>
         fetch('header.html')
             .then(response => response.text())

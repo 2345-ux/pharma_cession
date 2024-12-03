@@ -12,7 +12,7 @@ try {
 
     // Requête pour récupérer tous les produits en stock avec des champs spécifiques
     $query = "
-          SELECT t_stock.id_produit, t_produits.nom, t_stock.prix_unitaire, t_stock.quantite, t_stock.valeur_totale, t_stock.date_expiration, t_stock.date_ajout, t_fournisseurs.nom as nom_fournisseurs
+          SELECT t_stock.id_produit, t_produits.nom, t_stock.prix_unitaire, t_stock.quantite, t_stock.valeur_totale, t_stock.date_expiration, t_stock.date_ajout, t_produits.seuil_produit, t_fournisseurs.nom as nom_fournisseurs
 FROM t_stock, t_produits, t_commandes, t_fournisseurs
 WHERE t_stock.id_produit = t_produits.id
 AND t_stock.id_commandes = t_commandes.id_commande
