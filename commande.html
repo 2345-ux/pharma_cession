@@ -4,536 +4,407 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pharmacie de Cession - entrées des produits</title>
+    <script src="assets\js\chart.j@4.js"></script>
+    <script src="assets\js\lucide@04680.min.js"></script>
+    <link href="assets\css\tailwind.min.css" rel="stylesheet">
+    <link href="assets\css\all.min.css" rel="stylesheet">
     <script src="js/jquery-3.6.0.min.js"></script>
     <style>
-        body {
-            box-sizing: border-box;
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
 
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
             line-height: 1.6;
-        }
-
-        .ModalAjoutCommande {
-            width: 95%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 15px;
+            margin: 20px;
+            background-color: #f4f4f9;
         }
 
         header {
-            background-color: #4CAF50;
-            color: white;
-            text-align: center;
-            padding: 1em;
-        }
-
-        header h1 {
-            font-size: clamp(1.2rem, 4vw, 2rem);
-        }
-
-        .hamburger {
-            display: none;
-            font-size: 30px;
-            cursor: pointer;
-            background: none;
-            border: none;
-            color: white;
-            padding: 10px;
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 100;
-        }
-
-        nav {
-            background-color: #333;
-            color: white;
-            padding: 10px;
-            overflow-x: auto;
-            position: relative;
-        }
-
-        nav ul {
-            list-style-type: none;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        nav ul li a {
-            color: white;
-            text-decoration: none;
-            padding: 8px 12px;
-            white-space: nowrap;
-            transition: background-color 0.3s;
-        }
-
-        nav ul li a:hover {
-            background-color: #4CAF50;
-            border-radius: 4px;
-        }
-
-        .content {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            padding: 20px;
-            margin-top: 20px;
-            overflow-x: auto;
-        }
-
-        .search-box {
-            margin: 20px 0;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .search-box input {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .btn {
-            background-color: #4CAF50;
-            border: none;
-            color: white;
+            background: #333;
+            color: #fff;
             padding: 10px 20px;
             text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 14px;
-            margin: 4px 2px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background-color 0.3s;
         }
 
-        .btn:hover {
-            background-color: #45a049;
+        .container {
+            width: 100%;
+            max-width: 1700px;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            padding-top: 2rem;
+            padding-bottom: 2rem;
         }
-
+    
+        .content {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            padding: 1.5rem;
+            border-left: 4px solid #047857;
+        }
+    
+        .content:hover {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Table Container */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            border: 1px solid #d1d5db;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            background-color: #ffffff;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 12px 8px;
+        
+        /* Table Header */
+        thead {
+            background-color: #047857; /* bg-green-600 */
+            color: white; /* text-white */
+            transition: background-color 0.3s ease; /* Smooth hover effect */
+        }
+        
+        thead:hover {
+            background-color: #065f46; /* hover:bg-green-700 */
+        }
+        
+        /* Header Cells */
+        thead th {
+            padding: 1rem;
             text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-            white-space: nowrap;
-        }
-
-        .total-row {
             font-weight: bold;
-            background-color: #e6e6e6;
+            font-size: 1rem;
+            border-bottom: 2px solid #d1d5db;
         }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
+        
+        /* Body Rows */
+        tbody tr {
+            background-color: #ffffff;
+            transition: background-color 0.3s ease;
         }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 90%;
-            max-width: 500px;
-            border-radius: 8px;
+        
+        tbody tr:nth-child(even) {
+            background-color: #f9fafb;
         }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
+        
+        tbody tr:hover {
+            background-color: #f0fdf4;
+        }
+        
+        /* Body Cells */
+        tbody td {
+            border: 1px solid #d1d5db;
+            padding: 1rem;
+            text-align: left;
+            font-size: 0.875rem;
+        }
+        
+        /* Action Buttons */
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            color: #ffffff;
+            background-color: #16a34a; /* bg-green-600 */
+            border-radius: 0.5rem;
+            text-decoration: none;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
-
-        .close:hover {
-            color: #000;
+        
+        .btn:hover {
+            background-color: #15803d; /* hover:bg-green-700 */
         }
+        
 
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        form input, 
-        form select {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-
-        @media screen and (max-width: 768px) {
-            .hamburger {
-                display: block;
-            }
-
-            nav ul {
-                display: none;
-                flex-direction: column;
-                align-items: center;
-                padding-top: 20px;
-            }
-
-            nav ul.show {
-                display: flex;
-            }
-
-            nav ul li {
-                width: 100%;
-                text-align: center;
-            }
-
-            nav ul li a {
-                display: block;
+        @media (max-width: 768px) {
+            .container {
                 padding: 10px;
             }
 
-            .ModalAjoutCommande {
-                padding: 10px;
-            }
-
-            .content {
-                padding: 15px;
+            .modal {
+                width: 90%;
             }
 
             .btn {
                 width: 100%;
-                margin: 5px 0;
-            }
-
-            table {
-                display: block;
-                overflow-x: auto;
-                white-space: nowrap;
-            }
-
-            td, th {
-                min-width: 120px;
-            }
-
-            .modal-content {
-                margin: 10% auto;
-                padding: 15px;
+                text-align: center;
             }
         }
-
-        @media screen and (min-width: 769px) {
-            .hamburger {
-                display: none;
-            }
-
-            nav ul {
-                display: flex !important;
-                flex-direction: row;
-            }
-        }
-
-        @media screen and (max-width: 480px) {
-            header h1 {
-                font-size: 1.2rem;
-            }
-
-            .search-box {
-                flex-direction: column;
-            }
-
-            .search-box input {
-                width: 100%;
-            }
-
-            .modal-content {
-                width: 95%;
-                margin: 5% auto;
-            }
-        }
-        .combo-container {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
+        #modalAjouterEntree {
+            display: none; /* Initially hidden */
+            position: fixed; /* Fixed to the viewport */
+            inset: 0; /* Full-screen overlay */
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+            z-index: 1000; /* Ensure it appears on top of other content */
+            display: flex; /* Flexbox to center content */
+            align-items: center; /* Vertically center */
+            justify-content: center; /* Horizontally center */
         }
         
-        .combo-container select {
-            flex: 1;
-            padding: 8px;
+        #modalAjouterEntree .modal-content {
+            background: white; /* Modal box background */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+            padding: 24px; /* Spacing inside the modal */
+            width: 100%; /* Full width by default */
+            max-width: 600px; /* Limit width to prevent oversized modal */
         }
-        
-        .btn-add {
-            padding: 8px 12px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        #newProductForm, #newSupplierForm, #newCategoryForm {
-            margin-top: 10px;
-            padding: 10px;
-            background-color: #f9f9f9;
-            border-radius: 4px;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.4);
-        }
-        
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 90%;
-            max-width: 500px;
-            border-radius: 8px;
-            position: relative;
-        }
+ 
+        .hidden {
+            display: none; /* Utility class to hide elements */
+        }      
     </style>
 </head>
-<body>
-    <header>
-        <h1>Pharmacie de Cession - Entrées de Produits</h1>
-    </header>
-    <div id="header-placeholder"></div>
-
-    <script>
-    fetch('header.html')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('header-placeholder').innerHTML = data;
-    
-            // Après l'insertion du header, réexécuter le script pour marquer la page active
-            const currentPage = window.location.pathname.split('/').pop();
-            const links = document.querySelectorAll('.nav-list a');
-    
-            links.forEach(link => {
-                const href = link.getAttribute('href');
-                if (href === currentPage || (currentPage === "" && href === "index.html")) {
-                    link.classList.add('active');
-                }
-            });
-        })
-        .catch(error => console.error('Erreur lors du chargement du header:', error));
-    </script>
-    
-    <button class="hamburger" id="hamburgerBtn">&#9776;</button>
-
-    <div class="ModalAjoutCommande">
-        <div class="content">
-            <h2>Entrées de Produits</h2>
-            <button class="btn" id="btnAjouterEntree">Ajouter un Produit</button>
-            <button class="btn">Imprimer</button>
-            <div class="search-box">
-                <input type="text" placeholder="Produit">
-                <input type="date" placeholder="Date de début">
-                <input type="date" placeholder="Date de fin">
-                <button class="btn">Rechercher</button>
+        <body class="bg-gray-100 text-gray-800">
+            <header class="bg-green-600 text-white py-4">
+                <h1 class="text-center text-2xl font-bold">Pharmacie de Cession - Entrées de Produits</h1>
+            </header>
+            <div class="container">
+                <div id="side-menu" class="fixed top-0 left-0 h-full bg-white shadow-lg transform -translate-x-full transition-transform duration-300 ease-in-out z-50 w-64 hover:opacity-100 group">
+                    <div class="absolute top-0 right-0 m-4 cursor-pointer hover:text-red-500">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </div>
+                    <nav class="p-6 pt-16">
+                        <h2 class="text-2xl font-bold text-green-600 mb-6">Menu</h2>
+                        <ul class="space-y-4">
+                            <li><a href="index.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                                <i data-lucide="home" class="w-5 h-5 mr-3"></i>Accueil</a></li>
+                            <li><a href="stock2.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                                <i data-lucide="package" class="w-5 h-5 mr-3"></i>Stock</a></li>
+                            <li><a href="commande.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                                <i data-lucide="shopping-cart" class="w-5 h-5 mr-3"></i>Commandes</a></li>
+                            <li><a href="sorties.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                                <i data-lucide="log-out" class="w-5 h-5 mr-3"></i>Sorties</a></li>
+                            <li><a href="produit.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                                <i data-lucide="box" class="w-5 h-5 mr-3"></i>Produits</a></li>
+                            <li><a href="categorie.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                                <i data-lucide="layers" class="w-5 h-5 mr-3"></i>Catégories</a></li>
+                            <li><a href="fournisseurs.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                                <i data-lucide="truck" class="w-5 h-5 mr-3"></i>Fournisseurs</a></li>
+                        </ul>
+                    </nav>
+                </div>        
+            <div class="container mx-auto mt-8 p-4 bg-white shadow-md rounded-lg">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-semibold">Entrées de Produits</h2>
+                    <div>
+                        <button id="btnAjouterEntree" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 focus:outline-none">Ajouter un Produit</button>
+                        <button class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 focus:outline-none">Imprimer</button>
+                    </div>
+                </div>
+        
+                <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <input type="text" placeholder="Produit" class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-green-600">
+                    <input type="date" placeholder="Date de début" class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-green-600">
+                    <input type="date" placeholder="Date de fin" class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-green-600">
+                    <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 focus:outline-none">Rechercher</button>
+                </div>
+        
+                <table class="mt-8 w-full border-collapse border border-gray-200 rounded-lg overflow-hidden">
+                    <thead class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 focus:outline-none">
+                        <tr>
+                            <th class="border border-gray-300 px-4 py-2">Produit</th>
+                            <th class="border border-gray-300 px-4 py-2">Prix Achat</th>
+                            <th class="border border-gray-300 px-4 py-2">Prix Vente</th>
+                            <th class="border border-gray-300 px-4 py-2">Quantité</th>
+                            <th class="border border-gray-300 px-4 py-2">Prix Total</th>
+                            <th class="border border-gray-300 px-4 py-2">Date d'Ajout</th>
+                            <th class="border border-gray-300 px-4 py-2">Date d'Expiration</th>
+                            <th class="border border-gray-300 px-4 py-2">Fournisseur</th>
+                            <th class="border border-gray-300 px-4 py-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="bg-white hover:bg-gray-50">
+                            <td class="border border-gray-300 px-4 py-2">Produit A</td>
+                            <td class="border border-gray-300 px-4 py-2">100</td>
+                            <td class="border border-gray-300 px-4 py-2">10.00 €</td>
+                            <td class="border border-gray-300 px-4 py-2">1000.00 €</td>
+                            <td class="border border-gray-300 px-4 py-2">2023-06-01</td>
+                            <td class="border border-gray-300 px-4 py-2">2024-06-01</td>
+                            <td class="border border-gray-300 px-4 py-2">Fournisseur A</td>
+                            <td class="border border-gray-300 px-4 py-2">
+                                <button class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">Modifier</button>
+                                <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Supprimer</button>
+                            </td>
+                        </tr>
+                        <!-- Répétez pour d'autres lignes -->
+                    </tbody>
+                </table>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Produit</th>
-                        <th>Prix Achat</th>
-                        <th>Prix Vente</th>
-                        <th>Quantité</th>
-                        <th>Prix Total</th>
-                        <th>Date d'Ajout</th>
-                        <th>Date d'Expiration</th>
-                        <th>Fournisseur</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Produit A</td>
-                        <td>100</td>
-                        <td>10.00 €</td>
-                        <td>1000.00 €</td>
-                        <td>2023-06-01</td>
-                        <td>2024-06-01</td>
-                        <td>Fournisseur A</td>
-                        <td>
-                            <button class="btn btnModifier">Modifier</button>
-                            <button class="btn">Supprimer</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Produit B</td>
-                        <td>200</td>
-                        <td>15.00 €</td>
-                        <td>3000.00 €</td>
-                        <td>2023-07-01</td>
-                        <td>2024-07-01</td>
-                        <td>Fournisseur B</td>
-                        <td>
-                            <button class="btn btnModifier">Modifier</button>
-                            <button class="btn">Supprimer</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
    <!-- Modal pour ajouter un id_produit -->
-<div id="modalAjouterEntree" class="modal">
-    <div class="modal-content">
-        <span class="close" id="closeModal">&times;</span>
-        <h3>Ajouter un Produit</h3>
-        <form id="FormajoutProduit">
+   <div id="modalAjouterEntree" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-xl">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold">Ajouter un Produit</h3>
+            <button id="closeModal" class="text-gray-400 hover:text-gray-600">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+        <form id="FormajoutProduit" class="space-y-4">
             <input type="text" id="code" hidden>
 
-            <div class="form-group">
-                <label for="nom">Produit:</label>
-                <div class="combo-container">
-                    <select id="id_produit" required>
+            <div class="space-y-2">
+                <label for="id_produit" class="block text-sm font-medium">Produit:</label>
+                <div class="relative">
+                    <select id="id_produit" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                         <option value="">Sélectionner un produit</option>
                     </select>
-                    <button hidden type="button" class="btn-add" onclick="toggleNewProductForm()">+</button>
-                </div>
-                <div id="newProductForm" style="display:none;">
-                    <input type="text" id="newProductName" placeholder="Nouveau produit">
-                    <button type="button" class="btn" onclick="addNewProduct()">Ajouter</button>
+                    <button hidden type="button" onclick="toggleNewProductForm()" class="absolute right-2 top-2">
+                        <i data-lucide="plus-circle" class="w-6 h-6 text-green-600"></i>
+                    </button>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label for="fournisseur">Fournisseur:</label>
-                <div class="combo-container">
-                    <select id="id_fournisseur" required>
+            <div class="space-y-2">
+                <label for="id_fournisseur" class="block text-sm font-medium">Fournisseur:</label>
+                <div class="relative">
+                    <select id="id_fournisseur" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                         <option value="">Sélectionner un fournisseur</option>
                     </select>
-                    <button hidden type="button" class="btn-add" onclick="toggleNewSupplierForm()">+</button>
-                </div>
-                <div id="newSupplierForm" style="display:none;">
-                    <input type="text" id="newSupplierName" placeholder="Nouveau fournisseur">
-                    <button type="button" class="btn" onclick="addNewSupplier()">Ajouter</button>
-                </div>
-            </div>
-            <div class="form-group" hidden>
-                <label for="categorie">Catégorie:</label>
-                <div class="combo-container">
-                    <select id="categorie" hidden>
-                        <option value="">Sélectionner une catégorie</option>
-                    </select>
-                    <button type="button" class="btn-add" onclick="toggleNewCategoryForm()">+</button>
-                </div>
-                <div id="newCategoryForm" style="display:none;">
-                    <input type="text" id="newCategoryName" placeholder="Nouvelle catégorie">
-                    <button type="button" class="btn" onclick="addNewCategory()">Ajouter</button>
+                    <button hidden type="button" onclick="toggleNewSupplierForm()" class="absolute right-2 top-2">
+                        <i data-lucide="plus-circle" class="w-6 h-6 text-green-600"></i>
+                    </button>
                 </div>
             </div>
 
-            <input type="number" placeholder="Quantité" id="quantite" required>
-            <input type="number" placeholder="Prix d'achat" id="prix_fournis" required>
-            <input type="number" placeholder="Prix de vente" id="prix_unitaire" required>
-            <input type="number" placeholder="Montant Total" id="prix_total" readonly>
-            <input type="date" placeholder="Date d'Ajout" id="date_ajout" required>
-            <input type="date" placeholder="Date d'Expiration" id="date_expiration" required>
+            <div class="space-y-2">
+                <label for="quantite" class="block text-sm font-medium">Quantité:</label>
+                <input type="number" id="quantite" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
+            </div>
+
+            <div class="space-y-2">
+                <label for="prix_fournis" class="block text-sm font-medium">Prix d'achat:</label>
+                <input type="number" id="prix_fournis" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
+            </div>
+
+            <div class="space-y-2">
+                <label for="prix_unitaire" class="block text-sm font-medium">Prix de vente:</label>
+                <input type="number" id="prix_unitaire" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
+            </div>
+
+            <div class="space-y-2">
+                <label for="prix_total" class="block text-sm font-medium">Montant Total:</label>
+                <input type="number" id="prix_total" class="w-full border rounded-lg px-3 py-2 bg-gray-100 focus:outline-none" readonly>
+            </div>
+
+            <div class="space-y-2">
+                <label for="date_ajout" class="block text-sm font-medium">Date d'Ajout:</label>
+                <input type="date" id="date_ajout" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
+            </div>
+
+            <div class="space-y-2">
+                <label for="date_expiration" class="block text-sm font-medium">Date d'Expiration:</label>
+                <input type="date" id="date_expiration" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
+            </div>
+
+            <div class="flex justify-end space-x-2">
+                <button type="button" id="btn_enregistrer_produit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 focus:outline-none">Enregistrer</button>
+            </div>
         </form>
-        <button type="button" class="btn" id="btn_enregistrer_produit">Enregistrer</button>
-        <div id="message_produit"></div>
     </div>
 </div>
-
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const btnAjouterEntree = document.getElementById("btnAjouterEntree");
-        const modalAjouterEntree = document.getElementById("modalAjouterEntree");
-        const closeModalBtn = document.getElementById("closeModal");
+    // Initialize Lucide icons
+    lucide.createIcons();
 
-        // Ouvrir le modal
-        if (btnAjouterEntree && modalAjouterEntree) {
-            btnAjouterEntree.addEventListener('click', function () {
-                modalAjouterEntree.style.display = "block";
+    $(document).ready(function () {
+        // Initialisation du menu latéral
+        function initializeSideMenu() {
+            const sideMenu = $('#side-menu');
+            const menuTriggerWidth = 50;
+
+            $('<div>')
+                .css({
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    width: `${menuTriggerWidth}px`,
+                    zIndex: 40,
+                })
+                .on('mouseenter', function () {
+                    sideMenu.removeClass('-translate-x-full');
+                })
+                .appendTo('body');
+
+            sideMenu.on('mouseleave', function () {
+                $(this).addClass('-translate-x-full');
             });
         }
 
-        // Fermer le modal en cliquant sur le bouton de fermeture
-        if (closeModalBtn) {
-            closeModalBtn.addEventListener('click', function () {
-                closeModal();
-            });
-        }
+        initializeSideMenu();
 
-        // Fermer le modal en cliquant en dehors
-        window.addEventListener('click', function (event) {
-            if (event.target == modalAjouterEntree) {
-                closeModal();
-            }
+        // Gestion du modal pour l'ajout de commandes
+$(document).ready(function () {
+    const btnAjouterEntree = $('#btnAjouterEntree');
+    const modalAjouterEntree = $('#modalAjouterEntree');
+    const closeModalBtn = $('#closeModal');
+
+    // Ensure the modal is hidden initially
+    modalAjouterEntree.hide();
+
+    // Open modal when the button is clicked
+    if (btnAjouterEntree.length && modalAjouterEntree.length) {
+        btnAjouterEntree.on('click', function () {
+            modalAjouterEntree.show(); // Show the modal
         });
+    }
 
-        // Fonction pour fermer le modal
-        function closeModal() {
-            modalAjouterEntree.style.display = "none";
+    // Close modal when the close button is clicked
+    if (closeModalBtn.length) {
+        closeModalBtn.on('click', function () {
+            closeModal();
+        });
+    }
+
+    // Close modal when clicking outside of it
+    $(window).on('click', function (event) {
+        if ($(event.target).is(modalAjouterEntree)) {
+            closeModal();
         }
+    });
 
-        // Fonction pour calculer le prix total
+    // Function to hide the modal
+    function closeModal() {
+        modalAjouterEntree.hide(); // Hide the modal
+    }
+});
+
+        // Calcul automatique du prix total
         function calculateTotal() {
-            const quantite = parseFloat(document.getElementById('quantite').value) || 0;
-            const prixUnitaire = parseFloat(document.getElementById('prix_unitaire').value) || 0;
-            document.getElementById('prix_total').value = (quantite * prixUnitaire).toFixed(2);
+            const quantite = parseFloat($('#quantite').val()) || 0;
+            const prixUnitaire = parseFloat($('#prix_unitaire').val()) || 0;
+            $('#prix_total').val((quantite * prixUnitaire).toFixed(2));
         }
 
-        // Ajouter des événements pour le calcul automatique
-        document.getElementById('quantite').addEventListener('input', calculateTotal);
-        document.getElementById('prix_unitaire').addEventListener('input', calculateTotal);
+        $('#quantite, #prix_unitaire').on('input', calculateTotal);
 
         // Réinitialiser le formulaire du modal
         function resetModalForm() {
-            document.getElementById('FormajoutProduit').reset();
-            document.getElementById('prix_total').value = "";
+            $('#FormajoutProduit')[0].reset();
+            $('#prix_total').val('');
         }
 
-        // Fonction pour ajouter une commande via AJAX
+        // Ajouter une commande via AJAX
         function ajouterCommande() {
             const formData = {
-                id_produit: document.getElementById('id_produit').value,
-                id_fournisseur: document.getElementById('id_fournisseur').value,
-                quantite: document.getElementById('quantite').value,
-                prix_unitaire: document.getElementById('prix_unitaire').value,
-                date_ajout: document.getElementById('date_ajout').value,
-                date_expiration: document.getElementById('date_expiration').value,
-                prix_fournis: document.getElementById('prix_fournis').value
+                id_produit: $('#id_produit').val(),
+                id_fournisseur: $('#id_fournisseur').val(),
+                quantite: $('#quantite').val(),
+                prix_unitaire: $('#prix_unitaire').val(),
+                date_ajout: $('#date_ajout').val(),
+                date_expiration: $('#date_expiration').val(),
+                prix_fournis: $('#prix_fournis').val(),
             };
 
             if (!Object.values(formData).every(value => value)) {
@@ -562,7 +433,7 @@
             });
         }
 
-        document.getElementById('btn_enregistrer_produit').addEventListener('click', ajouterCommande);
+        $('#btn_enregistrer_produit').on('click', ajouterCommande);
 
         // Charger les données des commandes
         function loadCommandes() {
@@ -571,11 +442,11 @@
                 type: 'GET',
                 dataType: 'json',
                 success: function (response) {
-                    const tbody = document.querySelector('tbody');
-                    tbody.innerHTML = '';
-                    if (response.status === 'success') {
+                    const tbody = $('tbody');
+                    tbody.empty();
+                    if (response.status === 'success' && Array.isArray(response.donnees)) {
                         response.donnees.forEach(entree => {
-                            tbody.innerHTML += `
+                            tbody.append(`
                                 <tr>
                                     <td>${entree.nom || ''}</td>
                                     <td>${entree.prix_fournis || ''}</td>
@@ -589,10 +460,11 @@
                                         <button class="btn btnModifier">Modifier</button>
                                         <button class="btn btnSupprimer">Supprimer</button>
                                     </td>
-                                </tr>`;
+                                </tr>
+                            `);
                         });
                     } else {
-                        tbody.innerHTML = '<tr><td colspan="8">Aucune commande trouvée.</td></tr>';
+                        tbody.append('<tr><td colspan="8">Aucune commande trouvée.</td></tr>');
                     }
                 },
                 error: function (xhr) {
@@ -609,11 +481,11 @@
                 type: 'GET',
                 dataType: 'json',
                 success: function (response) {
-                    if (response.status === 'success') {
-                        const select = document.getElementById('id_produit');
-                        select.innerHTML = '<option value="">Sélectionner un produit</option>';
+                    if (response.status === 'success' && Array.isArray(response.data)) {
+                        const select = $('#id_produit');
+                        select.html('<option value="">Sélectionner un produit</option>');
                         response.data.forEach(product => {
-                            select.innerHTML += `<option value="${product.id}">${product.nom}</option>`;
+                            select.append(`<option value="${product.id}">${product.nom}</option>`);
                         });
                     } else {
                         alert("Erreur lors du chargement des produits.");
@@ -627,12 +499,15 @@
             $.ajax({
                 url: 'get_suppliers.php',
                 type: 'GET',
-                success: function (data) {
-                    const select = document.getElementById('id_fournisseur');
-                    select.innerHTML = '<option value="">Sélectionner un fournisseur</option>';
-                    data.forEach(supplier => {
-                        select.innerHTML += `<option value="${supplier.id}">${supplier.nom}</option>`;
-                    });
+                dataType: 'json',
+                success: function (response) {
+                    if (response && Array.isArray(response)) {
+                        const select = $('#id_fournisseur');
+                        select.html('<option value="">Sélectionner un fournisseur</option>');
+                        response.forEach(supplier => {
+                            select.append(`<option value="${supplier.id}">${supplier.nom}</option>`);
+                        });
+                    }
                 }
             });
         }
@@ -643,7 +518,5 @@
         loadCommandes();
     });
 </script>
-
 </body>
 </html>
-

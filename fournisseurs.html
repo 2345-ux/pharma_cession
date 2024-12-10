@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pharmacie de Cession - Fournisseurs</title>
-    <!--script src="https://code.jquery.com/jquery-3.6.0.min.js"></script-->
     <script src="js/jquery-3.6.0.min.js"></script>
+    <script src="assets\js\chart.j@4.js"></script>
+    <script src="assets\js\lucide@04680.min.js"></script>
+    <link href="assets\css\tailwind.min.css" rel="stylesheet">
+    <link href="assets\css\all.min.css" rel="stylesheet">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -111,54 +114,103 @@
             margin-bottom: 10px;
             padding: 5px;
         }
+          /* Responsive Adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    td, th {
+        padding: 0.5rem;
+        font-size: 0.875rem;
+    }
+}
+
+/* Hamburger Menu Styles */
+.hamburger {
+    color: white;
+    background-color: #16a34a;
+    border-radius: 0.375rem;
+    padding: 0.5rem;
+    transition: background-color 0.2s;
+}
+
+.hamburger:hover {
+    background-color: #15803d;
+}
     </style>
 </head>
 <body>
-    <header>
-        <h1>Pharmacie de Cession - Gestion des Fournisseurs</h1>
+    <header class="bg-green-600 text-white py-4">
+        <h1 class="text-center text-2xl font-bold">Pharmacie de Cession - Stock des Produits</h1>
     </header>
-    <div id="header-placeholder"></div>
 
-    
+    <!-- Hover Trigger Area -->
+    <div id="hover-trigger"></div>
+
+    <!-- Side Menu -->
     <div class="container">
-        <div class="content">
-            <h2>Liste des Fournisseurs</h2>
-            <button class="btn" id="btnAjouterFournisseur">Ajouter un Fournisseur</button>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nom du Fournisseur</th>
-                        <th>Contact</th>
-                        <th>Telephone</th>
-                        <th>Adresse</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Fournisseur A</td>
-                        <td>contact@fournisseura.com</td>
-                        <td>+22792075013</td>
-                        <td>harobanda</td>
-                        <td>
-                            <button class="btn btnModifier">Modifier</button>
-                            <button class="btn">Supprimer</button>
-                        </td>
-                    </tr>
-                    <!--tr>
-                        <td>Fournisseur B</td>
-                        <td>contact@fournisseurb.com</td>
-                        <td>+22796552104</td>
-                        <td>harobanda</td>
-                        <td>
-                            <button class="btn btnModifier">Modifier</button>
-                            <button class="btn">Supprimer</button>
-                        </td>
-                    </tr-->
-                </tbody>
-            </table>
+        <div id="side-menu" class="fixed top-0 left-0 h-full bg-white shadow-lg transform -translate-x-full transition-transform duration-300 ease-in-out z-50 w-64 hover:opacity-100 group">
+            <div class="absolute top-0 right-0 m-4 cursor-pointer hover:text-red-500">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </div>
+            <nav class="p-6 pt-16">
+                <h2 class="text-2xl font-bold text-green-600 mb-6">Menu</h2>
+                <ul class="space-y-4">
+                    <li><a href="index.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="home" class="w-5 h-5 mr-3"></i>Accueil</a></li>
+                    <li><a href="stock2.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="package" class="w-5 h-5 mr-3"></i>Stock</a></li>
+                    <li><a href="commande.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="shopping-cart" class="w-5 h-5 mr-3"></i>Commandes</a></li>
+                    <li><a href="sorties.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="log-out" class="w-5 h-5 mr-3"></i>Sorties</a></li>
+                    <li><a href="produit.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="box" class="w-5 h-5 mr-3"></i>Produits</a></li>
+                    <li><a href="categorie.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="layers" class="w-5 h-5 mr-3"></i>Catégories</a></li>
+                    <li><a href="fournisseurs.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="truck" class="w-5 h-5 mr-3"></i>Fournisseurs</a></li>
+                </ul>
+            </nav>
+        </div> 
+    
+        <div class="container">
+            <div class="content">
+                <h2>Liste des Fournisseurs</h2>
+                <button class="btn bg-green-600 text-white py-4" id="btnAjouterFournisseur">Ajouter un Fournisseur</button>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nom du Fournisseur</th>
+                            <th>Contact</th>
+                            <th>Telephone</th>
+                            <th>Adresse</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Fournisseur A</td>
+                            <td>contact@fournisseura.com</td>
+                            <td>+22792075013</td>
+                            <td>harobanda</td>
+                            <td>
+                                <button class="btn btnModifier bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 focus:outline-none">Modifier</button>
+                                <button class="btn bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 focus:outline-none">Supprimer</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
+        
 
     <!-- Modal pour ajouter un fournisseur -->
     <div id="modalAjouterFournisseur" class="modal">
@@ -194,146 +246,136 @@
     </div>
 
     <script>
-
-        //----- Script INSertion du menu Haut ------------------
-        fetch('header.html')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('header-placeholder').innerHTML = data;
+        $(document).ready(function () {
+            // Initialize Lucide icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
     
-            // Après l'insertion du header, réexécuter le script pour marquer la page active
-            const currentPage = window.location.pathname.split('/').pop();
-            const links = document.querySelectorAll('.nav-list a');
+            // Handle sidebar behavior
+            const sideMenu = $('#side-menu');
+            const hoverTrigger = $('#hover-trigger');
+            const closeMenu = $('#close-menu');
     
-            links.forEach(link => {
-                const href = link.getAttribute('href');
-                if (href === currentPage || (currentPage === "" && href === "index.html")) {
-                    link.classList.add('active');
-                }
+            hoverTrigger.on('mouseenter', function () {
+                sideMenu.addClass('open');
             });
-        })
-        .catch(error => console.error('Erreur lors du chargement du header:', error));
-
-
-        // JavaScript pour gérer l'ouverture et la fermeture des modals
-        const modalAjouterFournisseur = document.getElementById("modalAjouterFournisseur");
-        const modalModifierFournisseur = document.getElementById("modalModifierFournisseur");
-        const btnAjouterFournisseur = document.getElementById("btnAjouterFournisseur");
-        const btnsModifier = document.querySelectorAll(".btnModifier");
-        const spans = document.getElementsByClassName("close");
-
-        btnAjouterFournisseur.onclick = function() {
-            modalAjouterFournisseur.style.display = "block";
-        }
-
-        btnsModifier.forEach(btn => {
-            btn.onclick = function() {
-                modalModifierFournisseur.style.display = "block";
-            }
-        });
-
-        for (let span of spans) {
-            span.onclick = function() {
-                modalAjouterFournisseur.style.display = "none";
-                modalModifierFournisseur.style.display = "none";
-            }
-        }
-
-        window.onclick = function(event) {
-            if (event.target == modalAjouterFournisseur) {
-                modalAjouterFournisseur.style.display = "none";
-            }
-            if (event.target == modalModifierFournisseur) {
-                modalModifierFournisseur.style.display = "none";
-            }
-        }
-        
-        //-------- Ajout Founisseur ----------------
-        $('#btn_enregitrer_nouveau').on('click', function() {
-           
-           //alert("Ajout");
-            
-            var formData = {
-                code: $('#code').val(),
-                nom: $('#nom').val(),
-                tel: $('#tel').val(),
-                adresse: $('#adresse').val(),
-                email: $('#email').val()
+    
+            sideMenu.on('mouseleave', function () {
+                sideMenu.removeClass('open');
+            });
+    
+            closeMenu.on('click', function () {
+                sideMenu.removeClass('open');
+            });
+    
+            // Modals for adding and modifying suppliers
+            const modalAjouterFournisseur = document.getElementById("modalAjouterFournisseur");
+            const modalModifierFournisseur = document.getElementById("modalModifierFournisseur");
+            const btnAjouterFournisseur = document.getElementById("btnAjouterFournisseur");
+            const btnsModifier = document.querySelectorAll(".btnModifier");
+            const spans = document.getElementsByClassName("close");
+    
+            // Open modal for adding a supplier
+            btnAjouterFournisseur.onclick = function () {
+                modalAjouterFournisseur.style.display = "block";
             };
-
-            $.ajax({
-                type: 'POST',
-                url: 'fournisseurs_ajout_nouveau.php',
-                data: formData,
-                dataType: 'json',
-                success: function(response) {
-                    //--- Ajax a eu une reponse du script PHP ; fournisseurs_ajout_nouveau.php
-                    if(response.status === 'success') { //---- Verification du status de la reponse, soit success ou error
-                        $('#message').html('<p style="color: green;">' + response.message + '</p>');
-
-                        //---- Raffraichir la liste des fournisseur apres ajout du nouveau
-                        getListe();
-                        modalAjouterFournisseur.style.display = "none";
-
-                        
-                    } else {
-                        $('#message').html('<p style="color: red;">' + response.message + '</p>');
-                    }
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    // Affichez l'erreur exacte
-                    var errorMessage = jqXHR.responseText + textStatus;
-                    $('#message').html('<p style="color: red;">' + errorMessage + '</p>');
-                }
+    
+            // Open modal for modifying a supplier
+            btnsModifier.forEach(btn => {
+                btn.onclick = function () {
+                    modalModifierFournisseur.style.display = "block";
+                };
             });
-        });
-
-
-        //---- Creons la fonction qui va remplir la liste des fournisseurs 
-        function getListe() {
-    $.ajax({
-        url: 'fournisseurs_get_liste.php', // Chemin vers le script PHP
-        type: 'GET',
-        dataType: 'json',
-        success: function(response) {
-            // Vider le corps de la table avant d'ajouter de nouvelles lignes
-            $('tbody').empty();
-            
-            if (response.donnees.length > 0) {
-                response.donnees.forEach(function(fournisseur) {
-                    var row = '<tr>' +
-            '<td>' + (fournisseur.nom || '') + '</td>' + // Affiche une chaîne vide si fournisseur.nom est null ou vide
-            '<td>' + (fournisseur.email || '') + '</td>' + // Affiche une chaîne vide si fournisseur.email est null ou vide
-            '<td>' + (fournisseur.tel || '') + '</td>' + // Affiche une chaîne vide si fournisseur.tel est null ou vide
-            '<td>' + (fournisseur.adresse || '') + '</td>' + // Affiche une chaîne vide si fournisseur.adresse est null ou vide
-            '<td>' +
-            '<button class="btn btnModifier">Modifier</button> ' +
-            '<button class="btn btnSupprimer">Supprimer</button>' +
-            '</td>' +
-            '</tr>';
-        $('tbody').append(row); // Ajouter la ligne à la table
-                });
-            } else {
-                $('tbody').append('<tr><td colspan="5">Aucun fournisseur trouvé.</td></tr>');
+    
+            // Close modals
+            for (let span of spans) {
+                span.onclick = function () {
+                    modalAjouterFournisseur.style.display = "none";
+                    modalModifierFournisseur.style.display = "none";
+                };
             }
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            var errorMessage = jqXHR.responseText + textStatus;
-            //console.error("Erreur lors de la récupération des fournisseurs : " + textStatus);
-            $('tbody').append('<tr><td colspan="5" style="color:red;">Erreur lors de la récupération des fournisseurs.'+ errorMessage+'</td></tr>');
-            // Affichez l'erreur exacte
-            
-                   // $('#message').html('<p style="color: red;">' + errorMessage + '</p>');
-        }
-    });
-}
-
-// Appeler la fonction pour charger les fournisseurs au chargement de la page
-$(document).ready(function() {
-    getListe();
-});
-
+    
+            // Close modals when clicking outside of them
+            window.onclick = function (event) {
+                if (event.target === modalAjouterFournisseur) {
+                    modalAjouterFournisseur.style.display = "none";
+                }
+                if (event.target === modalModifierFournisseur) {
+                    modalModifierFournisseur.style.display = "none";
+                }
+            };
+    
+            // Add a new supplier
+            $('#btn_enregitrer_nouveau').on('click', function () {
+                const formData = {
+                    code: $('#code').val(),
+                    nom: $('#nom').val(),
+                    tel: $('#tel').val(),
+                    adresse: $('#adresse').val(),
+                    email: $('#email').val()
+                };
+    
+                $.ajax({
+                    type: 'POST',
+                    url: 'fournisseurs_ajout_nouveau.php',
+                    data: formData,
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.status === 'success') {
+                            $('#message').html('<p style="color: green;">' + response.message + '</p>');
+                            getListe(); // Refresh the supplier list
+                            modalAjouterFournisseur.style.display = "none";
+                        } else {
+                            $('#message').html('<p style="color: red;">' + response.message + '</p>');
+                        }
+                    },
+                    error: function (jqXHR, textStatus) {
+                        const errorMessage = jqXHR.responseText + textStatus;
+                        $('#message').html('<p style="color: red;">Erreur : ' + errorMessage + '</p>');
+                    }
+                });
+            });
+    
+            // Fetch and display the supplier list
+            function getListe() {
+                $.ajax({
+                    url: 'fournisseurs_get_liste.php',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (response) {
+                        $('tbody').empty(); // Clear the table body
+                        if (response.donnees && response.donnees.length > 0) {
+                            response.donnees.forEach(function (fournisseur) {
+                                const row = `
+                                    <tr>
+                                        <td>${fournisseur.nom || ''}</td>
+                                        <td>${fournisseur.email || ''}</td>
+                                        <td>${fournisseur.tel || ''}</td>
+                                        <td>${fournisseur.adresse || ''}</td>
+                                        <td>
+                                            <button class="btn btnModifier">Modifier</button>
+                                            <button class="btn btnSupprimer">Supprimer</button>
+                                        </td>
+                                    </tr>`;
+                                $('tbody').append(row);
+                            });
+                        } else {
+                            $('tbody').append('<tr><td colspan="5">Aucun fournisseur trouvé.</td></tr>');
+                        }
+                    },
+                    error: function (jqXHR, textStatus) {
+                        const errorMessage = jqXHR.responseText + textStatus;
+                        $('tbody').append('<tr><td colspan="5" style="color:red;">Erreur lors de la récupération des fournisseurs : ' + errorMessage + '</td></tr>');
+                    }
+                });
+            }
+    
+            // Load the supplier list on page load
+            getListe();
+        });
     </script>
+    
 
 </body>
 </html>

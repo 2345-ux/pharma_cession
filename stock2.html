@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pharmacie de Cession - sortie</title>
+    <title>Pharmacie de Cession</title>
+    <!-- TailwindCSS -->
     <script src="js/jquery-3.6.0.min.js"></script>
-    <title>Pharmacie de Cession - Stock</title>
+    <script src="assets\js\chart.j@4.js"></script>
+    <script src="assets\js\lucide@04680.min.js"></script>
+    <link href="assets\css\tailwind.min.css" rel="stylesheet">
+    <link href="assets\css\all.min.css" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -19,462 +24,305 @@
             line-height: 1.6;
         }
 
-        .container {
-            width: 95%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 15px;
-        }
-
         header {
             background-color: #4CAF50;
             color: white;
             text-align: center;
             padding: 1em;
         }
-
-        header h1 {
-            font-size: clamp(1.2rem, 4vw, 2rem);
+        .container {
+            width: 100%;
+            max-width: 1800px;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+    
+        .content {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            padding: 1.5rem;
+            border-left: 4px solid #047857;
+        }
+    
+        .content:hover {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+    
+        .btn {
+            background-color: #16a34a;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+    
+        .btn:hover {
+            background-color: #15803d;
+        }
+    
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+    
+        th {
+            background-color: #f0fdf4;
+            color: #15803d;
+            font-weight: 600;
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #d1fae5;
+        }
+    
+        tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+    
+        tr:hover {
+            background-color: #f0fdf4;
+            transition: background-color 0.2s;
+        }
+    
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
         }
 
-        nav {
-            background-color: #333;
-            color: white;
-            padding: 10px;
-            overflow-x: auto;
+        /* Sidebar */
+        #side-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 16rem;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 50;
+            opacity: 0.95;
+        }
+
+        #side-menu.open {
+            transform: translateX(0);
+        }
+
+        #hover-trigger {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 10px;
+            background: transparent;
+            z-index: 40;
         }
 
         nav ul {
             list-style-type: none;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
+            padding: 1rem;
         }
 
         nav ul li a {
-            color: white;
-            text-decoration: none;
-            padding: 8px 12px;
-            white-space: nowrap;
-            transition: background-color 0.3s;
             display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: #333;
+            transition: background-color 0.3s;
         }
 
         nav ul li a:hover {
             background-color: #4CAF50;
-            border-radius: 4px;
-        }
-
-        .content {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            padding: 20px;
-            margin-top: 20px;
-            overflow-x: auto;
-        }
-
-        .table-container {
-            width: 100%;
-            overflow-x: auto;
-            margin-top: 15px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 600px;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 12px 8px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-            position: sticky;
-            top: 0;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        tr:hover {
-            background-color: #f5f5f5;
-        }
-
-        .btn {
-            background-color: #4CAF50;
-            border: none;
             color: white;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 14px;
-            margin: 4px 2px;
-            cursor: pointer;
             border-radius: 4px;
-            transition: background-color 0.3s;
         }
-
-        .btn:hover {
-            background-color: #45a049;
+        thead {
+            background-color: #16a34a; /* Light green background */
         }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
+        
+        thead th {
+            border: 1px solid #e5e7eb; /* Light gray border */
+            padding: 0.5rem 1rem; /* Vertical padding 0.5rem, horizontal padding 1rem */
+            color: #374151; /* Medium gray text color */
+            font-weight: bold; /* Bold text */
+            font-size: 0.875rem; /* Small text size (14px) */
+            text-transform: uppercase; /* Uppercase text */
+            letter-spacing: 0.05em; /* Slight letter spacing for readability */
+            text-align: left; /* Align text to the left */
         }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 90%;
-            max-width: 500px;
-            border-radius: 8px;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.3s;
-        }
-
-        .close:hover {
-            color: #333;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        form input, form select {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-
-        .alert {
-            padding: 12px 15px;
-            margin-bottom: 15px;
-            border-radius: 4px;
-            color: white;
-            font-size: 14px;
-        }
-
-        .expiring {
-            background-color: #ff9800;
-        }
-
-        .low-stock {
-            background-color: #2196F3;
-        }
-
-        @media screen and (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-
-            nav ul {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            nav ul li a {
-                text-align: center;
-            }
-
-            .content {
-                padding: 15px 10px;
-            }
-
-            .btn {
-                width: 100%;
-                margin: 5px 0;
-            }
-
-            td .btn {
-                padding: 8px;
-                font-size: 12px;
-            }
-
-            .modal-content {
-                margin: 10% auto;
-                padding: 15px;
-            }
-
-            /* Responsive table pour très petits écrans */
-            @media screen and (max-width: 480px) {
-                table {
-                    display: block;
-                }
-
-                thead {
-                    display: none;
-                }
-
-                tbody tr {
-                    display: block;
-                    margin-bottom: 15px;
-                    border: 1px solid #ddd;
-                }
-
-                td {
-                    display: block;
-                    text-align: right;
-                    padding: 10px;
-                    position: relative;
-                    padding-left: 50%;
-                }
-
-                td:before {
-                    content: attr(data-label);
-                    position: absolute;
-                    left: 0;
-                    width: 45%;
-                    padding-left: 15px;
-                    font-weight: bold;
-                    text-align: left;
-                }
-            }
-        }
+        
     </style>
 </head>
-<body>
-    <header>
-        <h1>Pharmacie de Cession - Gestion du Stock</h1>
-    </header>
-    <div id="header-placeholder"></div>
 
-    <script>
-    fetch('header.html')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('header-placeholder').innerHTML = data;
-    
-            // Après l'insertion du header, réexécuter le script pour marquer la page active
-            const currentPage = window.location.pathname.split('/').pop();
-            const links = document.querySelectorAll('.nav-list a');
-    
-            links.forEach(link => {
-                const href = link.getAttribute('href');
-                if (href === currentPage || (currentPage === "" && href === "index.html")) {
-                    link.classList.add('active');
-                }
-            });
-        })
-        .catch(error => console.error('Erreur lors du chargement du header:', error));
-    </script>
-    
-    
+<body>
+    <header class="bg-green-600 text-white py-4">
+        <h1 class="text-center text-2xl font-bold">Pharmacie de Cession - Stock des Produits</h1>
+    </header>
+
+    <!-- Hover Trigger Area -->
+    <div id="hover-trigger"></div>
+
+    <!-- Side Menu -->
     <div class="container">
-        <div id="alertsContainer"></div>
-        <div class="content">
-            <h2>Fiche de Stock</h2>
-            <button class="btn">Imprimer</button>
-            <div id="search-bar-container"></div>
-<script>
-    fetch('search-bar.html')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('search-bar-container').innerHTML = data;
-        });
-</script>
-            <div class="table-container">
-                <table>
-                    <thead>
+        <div id="side-menu" class="fixed top-0 left-0 h-full bg-white shadow-lg transform -translate-x-full transition-transform duration-300 ease-in-out z-50 w-64 hover:opacity-100 group">
+            <div class="absolute top-0 right-0 m-4 cursor-pointer hover:text-red-500">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </div>
+            <nav class="p-6 pt-16">
+                <h2 class="text-2xl font-bold text-green-600 mb-6">Menu</h2>
+                <ul class="space-y-4">
+                    <li><a href="index.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="home" class="w-5 h-5 mr-3"></i>Accueil</a></li>
+                    <li><a href="stock2.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="package" class="w-5 h-5 mr-3"></i>Stock</a></li>
+                    <li><a href="commande.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="shopping-cart" class="w-5 h-5 mr-3"></i>Commandes</a></li>
+                    <li><a href="sorties.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="log-out" class="w-5 h-5 mr-3"></i>Sorties</a></li>
+                    <li><a href="produit.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="box" class="w-5 h-5 mr-3"></i>Produits</a></li>
+                    <li><a href="categorie.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="layers" class="w-5 h-5 mr-3"></i>Catégories</a></li>
+                    <li><a href="fournisseurs.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="truck" class="w-5 h-5 mr-3"></i>Fournisseurs</a></li>
+                </ul>
+            </nav>
+        </div> 
+         <div><div class="flex justify-end space-x-4">
+            <button hidden id="btnAjouterEntree" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 focus:outline-none">
+                Ajouter un Produit
+            </button>
+            <button class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 focus:outline-none">
+                Imprimer
+            </button>
+        </div>
+             
+    <!-- Main Content -->
+    <main class="p-6 ml-64">
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 focus:outline-none">Fiche de Stock</h2>
+            <div class="overflow-x-auto">
+                <table class="table-auto w-full border border-gray-200 rounded-lg">
+                    <thead class="bg-green-100">
                         <tr>
-                            <th>Nom du Produit</th>
-                            <th>Prix Unitaire</th>
-                            <th>Quantité</th>
-                            <th>Montant</th>
-                            <th>Date d'Expiration</th>
-                            <th>Date d'Ajout</th>
-                            <th>Fournisseur</th>
-                            <th>Actions</th>
+                            <th class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 focus:outline-none">Nom du Produit</th>
+                            <th class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 focus:outline-none">Prix Unitaire</th>
+                            <th class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 focus:outline-none">Quantité</th>
+                            <th class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 focus:outline-none">Montant</th>
+                            <th class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 focus:outline-none">Date d'Expiration</th>
+                            <th class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 focus:outline-none">Date d'Ajout</th>
+                            <th class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 focus:outline-none">Fournisseur</th>
+                            <th class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 focus:outline-none">Actions</th>
                         </tr>
-                    </thead>
+                    </thead>                    
                     <tbody>
-                        <tr>
-                            <td data-label="Nom du Produit">Paracétamol</td>
-                            <td data-label="Prix Unitaire">2</td>
-                            <td data-label="Quantité">5000</td>
-                            <td data-label="Montant">10000</td>
-                            <td data-label="Date d'Expiration">2024-06-01</td>
-                            <td data-label="Date d'Ajout">2024-06-01</td>
-                            <td data-label="Fournisseur">Fournisseur A</td>
-                            <td data-label="Actions">
-                                <button class="btn btnModifier">Modifier</button>
-                                <button class="btn">Supprimer</button>
+                        <tr class="hover:bg-gray-100">
+                            <td class="border px-4 py-2">Paracétamol</td>
+                            <td class="border px-4 py-2">2</td>
+                            <td class="border px-4 py-2">5000</td>
+                            <td class="border px-4 py-2">10000</td>
+                            <td class="border px-4 py-2">2024-06-01</td>
+                            <td class="border px-4 py-2">2024-06-01</td>
+                            <td class="border px-4 py-2">Fournisseur A</td>
+                            <td class="border px-4 py-2 text-center">
+                                <button class="text-blue-600 hover:text-blue-800 flex items-center">
+                                    <i data-lucide="edit" class="mr-1"></i> Modifier
+                                </button>
+                                <button class="text-red-600 hover:text-red-800 flex items-center mt-2">
+                                    <i data-lucide="trash" class="mr-1"></i> Supprimer
+                                </button>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            
-            <!-- Section pour afficher le montant total -->
-            <div id="totalContainer" style="margin-top: 20px;">
-                <h3>Montant Total du Stock : <span id="totalStock">0.00 F CFA</span></h3>
-            </div>
         </div>
-    </div>
-
- <!-- Modal pour ajouter un produit -->
- <div id="modalAjouterProduit" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2>Ajouter un Produit</h2>
-        <form id="produitForm">
-            <input type="text" name="code" placeholder="Code du Produit" id="code" hidden>
-            <input type="text" name="nom" placeholder="Nom du Produit" id="nom" required>
-            <input type="number" name="quantite" placeholder="Quantité" id="quantite" required>
-            <input type="number" name="prix_unitaire" placeholder="Prix Unitaire" id="prix_unitaire" required>
-            <input type="number" name="prix_total" placeholder="Montant Total" id="prix_total" readonly>
-            <input type="date" name="date_ajout" placeholder="Date d'Ajout" id="date_ajout" required>
-            <input type="date" name="date_expiration" placeholder="Date d'Expiration" id="date_expiration" required>
-            <input type="text" name="fournisseur" placeholder="Fournisseur" id="fournisseur" required>
-            <input type="text" name="categorie" placeholder="Catégorie" id="categorie" required>
-        </form>
-        <button type="button" class="btn" id="btn_enregistrer_produit">Enregistrer</button>
-        <div id="message_produit"></div>
-    </div>
-</div>
-
-<script>
-    // Variables et fonctions JavaScript ici
-
-    // Vérifiez si toutes les dépendances sont correctement incluses et que tous les identifiants sont uniques.
-    $(document).ready(function() {
-        // Ouvrir le modal pour ajouter un produit
-        $('#btnAjouterProduit').on('click', function() {
-            $('#produitForm')[0].reset();
-            $('#modalAjouterProduit').show();
-        });
-
-        // Fermer le modal
-        $('.close').on('click', function() {
-            $('#modalAjouterProduit').hide();
-        });
-
-        // Calcul automatique du prix total
-        $('#quantite, #prix_unitaire').on('input', function() {
-            var quantite = parseFloat($('#quantite').val()) || 0;
-            var prix_unitaire = parseFloat($('#prix_unitaire').val()) || 0;
-            $('#prix_total').val((quantite * prix_unitaire).toFixed(2));
-        });
-
-        // Soumettre le formulaire
-        $('#btn_enregistrer_produit').on('click', function() {
-            var formData = {
-                nom: $('#nom').val(),
-                quantite: $('#quantite').val(),
-                prix_unitaire: $('#prix_unitaire').val(),
-                date_ajout: $('#date_ajout').val(),
-                date_expiration: $('#date_expiration').val(),
-                fournisseur: $('#fournisseur').val(),
-                categorie: $('#categorie').val()
-            };
-        
-            $.ajax({
-                type: 'POST',
-                url: 'stock_ajout_nouveau.php',
-                data: formData,
-                dataType: 'json',
-                success: function(response) {
-                    if (response.status === 'success') {
-                        $('#message_produit').html('<p style="color: green;">' + response.message + '</p>');
-                        $('#produitForm')[0].reset();
-                        getListeProduits();
-                        $('#modalAjouterProduit').hide();
-                    } else {
-                        $('#message_produit').html('<p style="color: red;">' + response.message + '</p>');
-                    }
-                },
-                error: function(xhr, status, error) {
-                    $('#message_produit').html('<p style="color: red;">Erreur lors de l\'enregistrement.</p>');
-                    console.log(xhr.responseText);
-                }
-            });
-        });
-        
-        $('.close').on('click', function() {
-            $('#modalAjouterProduit').hide();
-        });
-        
-        $('#quantite, #prix_unitaire').on('input', function() {
-            var quantite = parseFloat($('#quantite').val()) || 0;
-            var prix_unitaire = parseFloat($('#prix_unitaire').val()) || 0;
-            $('#prix_total').val(quantite * prix_unitaire);
-        });
-        
-
-        // Actualiser le stock après chaque ajout
-        function getListeProduits() {
-            $.ajax({
-                url: 'stock_get_liste.php', // Chemin vers le script PHP
-                type: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    $('tbody').empty(); // Vide le tableau avant d'ajouter de nouvelles lignes
-                    
-                    if (response.status === 'success' && response.donnees && response.donnees.length > 0) {
-                        response.donnees.forEach(function(produit) {
-                            var row = `<tr>
-                                <td>${produit.nom || ''}</td>
-                                <td>${produit.prix_unitaire || ''}</td>
-                                <td>${produit.quantite || ''}</td>
-                                <td>${produit.valeur_totale || ''}</td>
-                                <td>${produit.date_expiration || ''}</td>
-                                <td>${produit.date_ajout || ''}</td>
-                                <td>${produit.nom_fournisseurs || ''}</td>
-                                <td>
-                                    <button class="btn btnModifier">Modifier</button>
-                                    <button class="btn btnSupprimer">Supprimer</button>
-                                </td>
-                            </tr>`;
-                            $('tbody').append(row); // Ajoute la ligne au tableau
-                        });
-                    } else {
-                        $('tbody').append('<tr><td colspan="7">Aucun produit en stock trouvé.</td></tr>');
-                    }
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    // Gère les erreurs de requête AJAX
-                    $('tbody').append(`<tr><td colspan="7" style="color:red;">
-                        Erreur lors de la récupération des produits en stock : ${textStatus} - ${errorThrown}
-                    </td></tr>`);
-                }
-            });
+    </main>
+    
+    <!-- Include Lucide Icons -->
+    <script>
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
         }
-  // Charger les produits au chargement de la page
- $(document).ready(function() {
-          getListeProduits(); // Appelle la fonction lors du chargement de la page
-    });
-        
-      
-        getListeProduits();
-    });
+
+        $(document).ready(function () {
+            // Initialize Lucide icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+    
+            // Handle sidebar
+            const sideMenu = $('#side-menu');
+            const hoverTrigger = $('#hover-trigger');
+            const closeMenu = $('#close-menu');
+    
+            hoverTrigger.on('mouseenter', function () {
+                sideMenu.addClass('open');
+            });
+    
+            sideMenu.on('mouseleave', function () {
+                sideMenu.removeClass('open');
+            });
+    
+            closeMenu.on('click', function () {
+                sideMenu.removeClass('open');
+            });
+    
+            // Function to fetch the product list
+            function getListeProduits() {
+                $.ajax({
+                    url: 'stock_get_liste.php',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (response) {
+                        const tbody = $('tbody');
+                        tbody.empty();
+    
+                        if (response.status === 'success' && Array.isArray(response.donnees) && response.donnees.length > 0) {
+                            response.donnees.forEach(function (produit) {
+                                const row = `
+                                    <tr>
+                                        <td>${produit.nom || ''}</td>
+                                        <td>${produit.prix_unitaire || ''}</td>
+                                        <td>${produit.quantite || ''}</td>
+                                        <td>${produit.valeur_totale || ''}</td>
+                                        <td>${produit.date_expiration || ''}</td>
+                                        <td>${produit.date_ajout || ''}</td>
+                                        <td>${produit.nom_fournisseurs || ''}</td>
+                                        <td>
+                                            <button class="btn btnModifier text-blue-600 hover:text-blue-800">Modifier</button>
+                                            <button class="btn btnSupprimer text-red-600 hover:text-red-800">Supprimer</button>
+                                        </td>
+                                    </tr>
+                                `;
+                                tbody.append(row);
+                            });
+                        } else {
+                            tbody.append('<tr><td colspan="8" class="text-center">Aucun produit en stock trouvé.</td></tr>');
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $('tbody').append(`
+                            <tr>
+                                <td colspan="8" class="text-center text-red-600">
+                                    Erreur lors de la récupération des produits en stock : ${textStatus} - ${errorThrown}
+                                </td>
+                            </tr>
+                        `);
+                    }
+                });
+            }
+    
+            // Initial load of product list
+            getListeProduits();
+        });
     </script>
     
+                 
 </body>
 </html>

@@ -214,7 +214,31 @@
         }
         #side-menu:hover {
             opacity: 1;
-        }        
+        }
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+}
+.hidden {
+    display: none;
+}
+        
     </style>
 </head>
 
@@ -297,205 +321,200 @@
         </div>
     </div>
 
-    <!-- Modal pour ajouter un produit -->
     <div id="modalAjouterProduit" class="modal hidden">
-        <div class="modal-content relative">
-            <span class="close">&times;</span>
-            <h2 class="text-xl font-semibold text-green-700 mb-4">Ajouter un produit</h2>
-            <form id="formAjouterCategorie" class="space-y-4">
-                <input type="text" placeholder="Code du produit" id="code" hidden>
-                <input type="text" placeholder="Nom du produit" id="nom" required>
-                <input type="text" placeholder="Seuil du produit" id="seuil_produit" required>
-                <div class="form-group">
-                    <label for="categorie" class="block mb-2">Catégorie:</label>
-                    <div class="combo-container">
-                        <select id="categorie" required>
-                            <option value="">Sélectionner une catégorie</option>
-                        </select>
-                        <button type="button" class="btn-add" onclick="toggleNewCategoryForm()">+</button>
-                    </div>
-                    <div id="newCategoryForm" class="mt-2" style="display:none;">
-                        <input type="text" id="newCategoryName" placeholder="Nouvelle catégorie" class="mb-2">
-                        <button type="button" class="btn" onclick="addNewCategory()">Ajouter Catégorie</button>
-                    </div>
-                </div>    
-            </form>
-            <button type="submit" class="btn mt-4" id="btnNouveauProduit">Ajouter le produit</button>
-            <div id="message" class="mt-2"></div>
-        </div>
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 class="text-xl font-semibold text-green-700 mb-4">Ajouter un produit</h2>
+        <form id="formAjouterCategorie" class="space-y-4">
+            <input type="text" placeholder="Code du produit" id="code" hidden>
+            <input type="text" placeholder="Nom du produit" id="nom" required>
+            <input type="text" placeholder="Seuil du produit" id="seuil_produit" required>
+            <div class="form-group">
+                <label for="categorie" class="block mb-2">Catégorie</label>
+                <select id="categorie" required>
+                    <option value="">Sélectionnez une catégorie</option>
+                    <option value="1">Catégorie 1</option>
+                    <option value="2">Catégorie 2</option>
+                </select>
+            </div>
+            <button type="submit" class="btn">Ajouter</button>
+        </form>
     </div>
+</div>
 
-    <script>
-        $(document).ready(function() {
-            const sideMenu = $('#side-menu');
-            const menuTriggerWidth = 50; // Width of the trigger area
-        
-            // Create an invisible trigger area
-            $('<div>')
-                .css({
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    bottom: 0,
-                    width: `${menuTriggerWidth}px`,
-                    zIndex: 40
-                })
-                .on('mouseenter', function() {
-                    sideMenu.removeClass('-translate-x-full');
-                })
-                .appendTo('body');
-        
-            // Close menu when mouse leaves menu area
-            sideMenu.on('mouseleave', function() {
-                $(this).addClass('-translate-x-full');
-            });
-        
-            // Initialize Lucide icons
-            lucide.createIcons();
-        
-            const modalProduit = $('#modalProduit'); // Utilisation d'une seule modal
-            const formTitle = $('#formTitle'); // Titre dynamique du formulaire
-            const btnSubmit = $('#btnSubmit'); // Bouton pour soumettre le formulaire
-            const message = $('#message'); // Zone d'affichage des messages
-            const btnAjouterProduit = $('#btnAjouterProduit'); // Bouton Ajouter
-            const btnClose = $('.close'); // Bouton de fermeture de la modal
-        
-            // Ouvrir la modal pour ajouter un produit
-            btnAjouterProduit.on('click', function() {
-                formTitle.text('Ajouter un produit'); // Changer le titre
-                btnSubmit.text('Enregistrer'); // Modifier le texte du bouton
-                $('#code, #nom, #seuil_produit, #categorie').val(''); // Réinitialiser les champs
-                modalProduit.show(); // Afficher la modal
-            });
-        
-            // Ouvrir la modal pour modifier un produit
-            $(document).on('click', '.btnModifier', function() {
-                const row = $(this).closest('tr'); // Récupérer la ligne associée
-                const produit = {
-                    code: row.find('td:eq(0)').text(),
-                    nom: row.find('td:eq(1)').text(),
-                    seuil_produit: row.find('td:eq(2)').text(),
-                    categorie: row.find('td:eq(3)').text(),
-                };
-        
-                formTitle.text('Modifier un produit'); // Changer le titre
-                btnSubmit.text('Modifier'); // Modifier le texte du bouton
-                $('#code').val(produit.code);
-                $('#nom').val(produit.nom);
-                $('#seuil_produit').val(produit.seuil_produit);
-                $('#categorie').val(produit.categorie);
-        
-                modalProduit.show(); // Afficher la modal
-            });
-        
-            // Fermer la modal
-            btnClose.on('click', function() {
-                modalProduit.hide(); // Cacher la modal
-                message.empty(); // Réinitialiser les messages
-            });
-        
-            // Fermer la modal en cliquant à l'extérieur
-            $(window).on('click', function(event) {
-                if (event.target.id === modalProduit.attr('id')) {
-                    modalProduit.hide();
+<script>
+    // Récupérer les éléments nécessaires
+    const btnAjouterProduit = document.getElementById('btnAjouterProduit');
+    const modalAjouterProduit = document.getElementById('modalAjouterProduit');
+    const closeBtn = modalAjouterProduit.querySelector('.close');
+
+    // Ouvrir le modal
+    btnAjouterProduit.addEventListener('click', () => {
+        modalAjouterProduit.classList.remove('hidden');
+    });
+
+    // Fermer le modal en cliquant sur le bouton "X"
+    closeBtn.addEventListener('click', () => {
+        modalAjouterProduit.classList.add('hidden');
+    });
+
+    // Fermer le modal en cliquant en dehors de son contenu
+    window.addEventListener('click', (event) => {
+        if (event.target === modalAjouterProduit) {
+            modalAjouterProduit.classList.add('hidden');
+        }
+    });
+    $(document).ready(function() {
+            // Side Menu Functionality
+            function initializeSideMenu() {
+                const sideMenu = $('#side-menu');
+                const menuTriggerWidth = 50;
+    
+                $('<div>')
+                    .css({
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        bottom: 0,
+                        width: `${menuTriggerWidth}px`,
+                        zIndex: 40,
+                    })
+                    .on('mouseenter', function() {
+                        sideMenu.removeClass('-translate-x-full');
+                    })
+                    .appendTo('body');
+    
+                sideMenu.on('mouseleave', function() {
+                    $(this).addClass('-translate-x-full');
+                });
+            }
+    
+            // Modal Management
+            function initializeModal() {
+                const modalAjouterProduit = $('#modalAjouterProduit');
+                const btnAjouterProduit = $('#btnAjouterProduit');
+                const btnClose = $('.close');
+                const message = $('#message');
+                const form = $('#formAjouterCategorie');
+    
+                // Open modal for adding product
+                btnAjouterProduit.on('click', function() {
+                    resetModalForm();
+                    modalAjouterProduit.removeClass('hidden');
+                });
+    
+                // Close modal
+                btnClose.on('click', function() {
+                    closeModal();
+                });
+    
+                // Close modal when clicking outside
+                $(window).on('click', function(event) {
+                    if ($(event.target).hasClass('modal')) {
+                        closeModal();
+                    }
+                });
+    
+                // Reset modal form
+                function resetModalForm() {
+                    form[0].reset(); // Reset form fields
+                    $('#code').val(''); // Ensure hidden code field is cleared
+                    message.empty(); // Clear any previous messages
+                }
+    
+                // Close modal function
+                function closeModal() {
+                    modalAjouterProduit.addClass('hidden');
                     message.empty();
                 }
-            });
-        
-            // Soumission du formulaire (ajout ou modification)
-            btnSubmit.on('click', function() {
-                const action = btnSubmit.text() === 'Enregistrer' ? 'ajouter' : 'modifier';
-                const formData = {
-                    code: $('#code').val(),
-                    nom: $('#nom').val(),
-                    seuil_produit: $('#seuil_produit').val(),
-                    categorie: $('#categorie').val(),
-                };
-        
-                $.ajax({
-                    type: 'POST',
-                    url: action === 'ajouter' ? 'produit_ajout_nouveau.php' : 'produit_modifier.php',
-                    data: formData,
-                    dataType: 'json',
-                    success: function(response) {
-                        if (response.status === 'success') {
-                            message.html(`<p style="color: green;">${response.message}</p>`);
-                            getListe(); // Rafraîchir la liste des produits
-                            setTimeout(() => modalProduit.hide(), 1000); // Cacher la modal après un délai
-                        } else {
-                            message.html(`<p style="color: red;">Erreur: ${response.message}</p>`);
+    
+                // Product Addition/Modification Handler
+                $('#btnNouveauProduit').on('click', function() {
+                    const formData = {
+                        code: $('#code').val(),
+                        nom: $('#nom').val(),
+                        seuil_produit: $('#seuil_produit').val(),
+                        categorie: $('#categorie').val(),
+                    };
+    
+                    // Determine action based on whether code exists
+                    const action = formData.code ? 'modifier' : 'ajouter';
+                    const url = action === 'ajouter' ? 'produit_ajout_nouveau.php' : 'produit_modifier.php';
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: url,
+                        data: formData,
+                        dataType: 'json',
+                        success: function(response) {
+                            handleSubmissionResponse(response, action);
+                        },
+                        error: function(jqXHR) {
+                            displayErrorMessage(jqXHR.responseText);
                         }
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        const errorMessage = jqXHR.responseText || textStatus;
-                        message.html(`<p style="color: red;">Erreur: ${errorMessage}</p>`);
-                    },
+                    });
                 });
-            });
-        
-            // Charger la liste des produits
-            function getListe() {
-                $.ajax({
-                    url: 'produit_get_liste.php',
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function(response) {
-                        const tbody = $('tbody').empty();
-                        if (response.donnees && response.donnees.length > 0) {
-                            response.donnees.forEach(function(produit) {
-                                tbody.append(`
-                                    <tr>
-                                        <td>${produit.code || ''}</td>
-                                        <td>${produit.nom || ''}</td>
-                                        <td>${produit.seuil_produit || ''}</td>
-                                        <td>${produit.nom_cat || ''}</td>
-                                        <td>
-                                            <button class="btn btnModifier">Modifier</button>
-                                            <button class="btn btnSupprimer">Supprimer</button>
-                                        </td>
-                                    </tr>
-                                `);
+    
+                // Handle product submission response
+                function handleSubmissionResponse(response, action) {
+                    if (response.status === 'success') {
+                        displaySuccessMessage(response.message);
+                        getListe(); // Refresh product list
+                        setTimeout(closeModal, 1000); // Close modal after success
+                    } else {
+                        displayErrorMessage(response.message);
+                    }
+                }
+    
+                // Display success message
+                function displaySuccessMessage(msg) {
+                    message.html(`<p class="text-green-600">${msg}</p>`);
+                }
+    
+                // Display error message
+                function displayErrorMessage(msg) {
+                    message.html(`<p class="text-red-600">Erreur: ${msg}</p>`);
+                }
+            }
+    
+            // Category Management
+            function initializeCategoryManagement() {
+                const message = $('#message');
+    
+                // Load categories in the select dropdown
+                function loadCategories() {
+                    $.ajax({
+                        url: 'get_categories.php',
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(data) {
+                            const select = $('#categorie');
+                            select.html('<option value="">Sélectionner une catégorie</option>');
+    
+                            data.forEach(category => {
+                                select.append(new Option(category.nom, category.code));
                             });
-                        } else {
-                            tbody.append('<tr><td colspan="5">Aucun produit trouvé.</td></tr>');
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            console.error("Erreur lors du chargement des catégories : ", errorThrown);
                         }
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        $('tbody').html(`<tr><td colspan="5" style="color:red;">Erreur lors de la récupération des produits: ${textStatus}</td></tr>`);
-                    },
+                    });
+                }
+    
+                // Toggle new category form
+                $('#toggleNewCategoryForm').on('click', function() {
+                    $('#newCategoryForm').toggle();
                 });
-            }
-        
-            // Charger les catégories dans le formulaire de sélection
-            function loadCategories() {
-                $.ajax({
-                    url: 'get_categories.php',
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function(data) {
-                        const select = $('#categorie');
-                        select.html('<option value="">Sélectionner une catégorie</option>'); // Réinitialiser les options
-        
-                        data.forEach(category => {
-                            select.append(new Option(category.nom, category.code));
-                        });
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        console.error("Erreur lors du chargement des catégories : ", errorThrown);
-                    },
-                });
-            }
-        
-            // Afficher/masquer le champ de nouvelle catégorie
-            $('#toggleNewCategoryForm').on('click', function() {
-                $('#newCategoryForm').toggle();
-            });
-        
-            // Ajouter une nouvelle catégorie si elle n'existe pas
-            $('#addNewCategory').on('click', function() {
-                const newCategoryName = $('#newCategoryName').val();
-        
-                if (newCategoryName) {
+    
+                // Add new category
+                $('#addNewCategory').on('click', function() {
+                    const newCategoryName = $('#newCategoryName').val();
+    
+                    if (!newCategoryName) {
+                        message.html('<p class="text-red-600">Veuillez entrer un nom de catégorie.</p>');
+                        return;
+                    }
+    
                     $.ajax({
                         type: 'POST',
                         url: 'add_categories.php',
@@ -503,28 +522,78 @@
                         dataType: 'json',
                         success: function(response) {
                             if (response.status === 'success') {
-                                message.html('<p style="color: green;">' + response.message + '</p>');
-                                loadCategories(); // Recharge la liste des catégories
-                                $('#newCategoryName').val(''); // Vide le champ
-                                $('#newCategoryForm').hide(); // Cache le formulaire de nouvelle catégorie
+                                message.html(`<p class="text-green-600">${response.message}</p>`);
+                                loadCategories();
+                                $('#newCategoryName').val('');
+                                $('#newCategoryForm').hide();
                             } else {
-                                message.html('<p style="color: red;">' + response.message + '</p>');
+                                message.html(`<p class="text-red-600">${response.message}</p>`);
                             }
                         },
-                        error: function(jqXHR, textStatus, errorThrown) {
-                            message.html('<p style="color: red;">Erreur lors de l\'ajout de la catégorie.</p>');
-                        },
+                        error: function() {
+                            message.html('<p class="text-red-600">Erreur lors de l\'ajout de la catégorie.</p>');
+                        }
                     });
-                } else {
-                    message.html('<p style="color: red;">Veuillez entrer un nom de catégorie.</p>');
+                });
+    
+                return { loadCategories };
+            }
+    
+            // Product List Management
+            function initializeProductList() {
+                function getListe() {
+                    $.ajax({
+                        url: 'produit_get_liste.php',
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(response) {
+                            const tbody = $('#produitsTableBody').empty();
+    
+                            if (response.donnees && response.donnees.length > 0) {
+                                response.donnees.forEach(function(produit) {
+                                    tbody.append(`
+                                        <tr>
+                                            <td hidden>${produit.code || ''}</td>
+                                            <td>${produit.nom || ''}</td>
+                                            <td>${produit.seuil_produit || ''}</td>
+                                            <td>${produit.nom_cat || ''}</td>
+                                            <td>
+                                                <button class="btn btnModifier mr-2">Modifier</button>
+                                                <button class="btn btnSupprimer">Supprimer</button>
+                                            </td>
+                                        </tr>
+                                    `);
+                                });
+                            } else {
+                                tbody.append('<tr><td colspan="5">Aucun produit trouvé.</td></tr>');
+                            }
+                        },
+                        error: function(jqXHR, textStatus) {
+                            $('#produitsTableBody').html(`<tr><td colspan="5" class="text-red-600">Erreur lors de la récupération des produits: ${textStatus}</td></tr>`);
+                        }
+                    });
                 }
-            });
-        
-            // Charger la liste des produits et des catégories au démarrage
-            getListe();
-            loadCategories();
+    
+                return { getListe };
+            }
+    
+            // Initialize all functionalities
+            function init() {
+                lucide.createIcons(); // Ensure Lucide icons are loaded
+                initializeSideMenu();
+                initializeModal();
+                const categoryModule = initializeCategoryManagement();
+                const productListModule = initializeProductList();
+    
+                // Initial data load
+                categoryModule.loadCategories();
+                productListModule.getListe();
+            }
+    
+            // Run initialization
+            init();
         });
-        
     </script>
+    
 </body>
 </html>
