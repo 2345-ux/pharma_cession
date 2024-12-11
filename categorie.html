@@ -99,13 +99,13 @@
     <div id="modalAjouterCategorie" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
         <div class="bg-white rounded-lg shadow-xl p-6 w-96">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-semibold">Ajouter une Catégorie</h2>
+                <h2 class="text-xl font-semibold " id="modalTitle">Ajouter une Catégorie</h2>
                 <button id="closeModalAjouterCategorie" class="text-gray-500 hover:text-gray-700">
                     <i data-lucide="x" class="w-6 h-6"></i>
                 </button>
             </div>
             <form id="formAjouterCategorie">
-                <input type="text" id="code" class="hidden">
+                <input type="text" id="code" class="w-full p-2 border rounded mb-4 ">
                 <input type="text" id="nom" placeholder="Nom de la catégorie" required 
                     class="w-full p-2 border rounded mb-4">
                 <button type="submit" id="btnAjouterCategorie" 
@@ -114,26 +114,6 @@
                 </button>
             </form>
             <div id="message" class="mt-4"></div>
-        </div>
-    </div>
-
-    <div id="modalModifierCategorie" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
-        <div class="bg-white rounded-lg shadow-xl p-6 w-96">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-semibold">Modifier une Catégorie</h2>
-                <button id="closeModalModifierCategorie" class="text-gray-500 hover:text-gray-700">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-            </div>
-            <form id="formModifierCategorie">
-                <input type="text" placeholder="Code de la Catégorie" class="hidden">
-                <input type="text" placeholder="Nom de la Catégorie" required 
-                    class="w-full p-2 border rounded mb-4">
-                <button type="submit" 
-                    class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
-                    Modifier
-                </button>
-            </form>
         </div>
     </div>
 
@@ -167,20 +147,34 @@
 
         $('#btnOuvrirModalAjouterCategorie').on('click', function() {
             modalAjouterCategorie.removeClass('hidden').addClass('flex');
+            $('#modalTitle').html('Ajouter une Catégorie');
+            $('#btnAjouterCategorie').html('Ajouter');
         });
 
-        $('.btnModifier').on('click', function() {
-            modalModifierCategorie.removeClass('hidden').addClass('flex');
+        $(document).on('click', '.btnModifier', function() {
+            var $row = $(this).closest('tr');
+            //modalModifierCategorie.removeClass('hidden').addClass('flex');
+            modalAjouterCategorie.removeClass('hidden').addClass('flex');
+            $('#modalTitle').html('Modifier une Catégorie');
+            $('#btnAjouterCategorie').html('Modifier');
+            $('#code').val($row.find('td').eq(0).text());
+            $('#nom').val($row.find('td').eq(1).text());
         });
 
         $('#closeModalAjouterCategorie, #closeModalModifierCategorie').on('click', function() {
+            $('#code').val('');
+            $('#nom').val('');
             modalAjouterCategorie.addClass('hidden').removeClass('flex');
             modalModifierCategorie.addClass('hidden').removeClass('flex');
         });
 
         // Close modals when clicking outside
         $(window).on('click', function(event) {
+            //$('#code').val('');
+            //$('#nom').val('');
             if ($(event.target).is(modalAjouterCategorie)) {
+                    $('#code').val('');
+                    $('#nom').val('');
                 modalAjouterCategorie.addClass('hidden').removeClass('flex');
             }
             if ($(event.target).is(modalModifierCategorie)) {
@@ -191,6 +185,18 @@
         // Your existing AJAX scripts for adding and listing categories remain the same
         $('#btnAjouterCategorie').on('click', function(e) {
             e.preventDefault();
+            //verification du contenu du code: si le code est vide on fait un ajout sinon on fait une modification
+            var xcode = $('#code').val();
+            var xurl= '';
+            if(xcode==''){
+                // ici on est en mode nouveau
+                xurl= 'categorie_ajout.php';
+            }else{
+                // ici on est en mode modif
+                xurl= 'categorie_modif.php';
+            };
+
+            // recupération des données saisies dans les formulaires pour envois
             var formData = {
                 code: $('#code').val(),
                 nom: $('#nom').val(),
@@ -198,7 +204,7 @@
 
             $.ajax({
                 type: 'POST',
-                url: 'categorie_ajout_nouveau.php',
+                url: xurl,
                 data: formData,
                 dataType: 'json',
                 success: function(response) {
@@ -206,6 +212,9 @@
                         $('#message').html('<p class="text-green-500">' + response.message + '</p>');
                         getListe();
                         modalAjouterCategorie.addClass('hidden').removeClass('flex');
+                        $('#code').val('');
+                        $('#nom').val('');
+                        $('#message').html('');
                     } else {
                         $('#message').html('<p class="text-red-500">' + response.message + '</p>');
                     }
