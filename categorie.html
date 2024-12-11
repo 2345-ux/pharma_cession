@@ -4,484 +4,252 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pharmacie de Cession - Categories</title>
-    <!--script src="https://code.jquery.com/jquery-3.6.0.min.js"></script-->
     <script src="js/jquery-3.6.0.min.js"></script>
+    <script src="assets\js\chart.j@4.js"></script>
+    <script src="assets\js\lucide@04680.min.js"></script>
+    <link href="assets\css\tailwind.min.css" rel="stylesheet">
+    <link href="assets\css\all.min.css" rel="stylesheet">
     <style>
-        body {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        #sidebar {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
         }
-
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            line-height: 1.6;
+        #sidebar.open {
+            transform: translateX(0);
         }
-
-        .container {
-            width: 95%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 15px;
-        }
-
-        header {
-            background-color: #4CAF50;
-            color: white;
-            text-align: center;
-            padding: 1em;
-        }
-
-        header h1 {
-            font-size: clamp(1.5rem, 4vw, 2rem);
-        }
-
-        /* Hamburger Button Styles - Updated */
-        .hamburger {
-            display: none;
-            font-size: 30px;
-            cursor: pointer;
-            background: none;
-            border: none;
-            color: white;
-            padding: 10px;
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 100;
-        }
-
-        nav {
-            background-color: #333;
-            color: white;
-            padding: 10px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        nav ul {
-            list-style-type: none;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        nav ul li a {
-            color: white;
-            text-decoration: none;
-            padding: 8px 12px;
-            white-space: nowrap;
-            transition: background-color 0.3s;
-        }
-
-        nav ul li a:hover {
-            background-color: #4CAF50;
-            border-radius: 4px;
-        }
-
-        .content {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            padding: 20px;
-            margin-top: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 600px;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 12px 8px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-            position: sticky;
-            top: 0;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        tr:hover {
-            background-color: #f5f5f5;
-        }
-
-        .btn {
-            background-color: #4CAF50;
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 14px;
-            margin: 4px 2px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
-
-        .btn:hover {
-            background-color: #45a049;
-        }
-
-        .modal {
-            display: none;
+        #hover-trigger {
             position: fixed;
-            z-index: 1;
             left: 0;
             top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 90%;
-            max-width: 500px;
-            border-radius: 8px;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.3s;
-        }
-
-        .close:hover {
-            color: #333;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        form input {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-
-        /* Updated Media Queries */
-        @media screen and (max-width: 768px) {
-            .hamburger {
-                display: block;
-            }
-
-            nav ul {
-                flex-direction: column;
-                display: none;
-                width: 100%;
-                padding-top: 20px;
-            }
-
-            nav ul.show {
-                display: flex;
-            }
-
-            .container {
-                padding: 10px;
-            }
-
-            .content {
-                padding: 15px 10px;
-            }
-
-            .btn {
-                width: 100%;
-                margin: 5px 0;
-            }
-
-            td .btn {
-                padding: 8px;
-                font-size: 12px;
-            }
-
-            .modal-content {
-                margin: 10% auto;
-                padding: 15px;
-            }
-        }
-
-        @media screen and (min-width: 769px) {
-            .hamburger {
-                display: none;
-            }
-
-            nav ul {
-                display: flex !important;
-                flex-direction: row;
-            }
-        }
-
-        @media screen and (max-width: 480px) {
-            table {
-                display: block;
-            }
-
-            thead {
-                display: none;
-            }
-
-            tbody tr {
-                display: block;
-                margin-bottom: 15px;
-                border: 1px solid #ddd;
-            }
-
-            td {
-                display: block;
-                text-align: right;
-                padding: 10px;
-                position: relative;
-                padding-left: 50%;
-            }
-
-            td:before {
-                content: attr(data-label);
-                position: absolute;
-                left: 0;
-                width: 45%;
-                padding-left: 15px;
-                font-weight: bold;
-                text-align: left;
-            }
+            bottom: 0;
+            width: 20px;
+            z-index: 40;
         }
     </style>
 </head>
-<body>
-    <header>
-        <h1>Pharmacie de Cession - Gestion des Categories</h1>
-    </header>
-   
-    <div id="header-placeholder"></div>
+<body class="bg-gray-100">
+    <!-- Hover Trigger for Sidebar -->
+    <div id="hover-trigger"></div>
 
-<script>
-fetch('header.html')
-    .then(response => response.text())
-    .then(data => {
-        document.getElementById('header-placeholder').innerHTML = data;
-
-        // Après l'insertion du header, réexécuter le script pour marquer la page active
-        const currentPage = window.location.pathname.split('/').pop();
-        const links = document.querySelectorAll('.nav-list a');
-
-        links.forEach(link => {
-            const href = link.getAttribute('href');
-            if (href === currentPage || (currentPage === "" && href === "index.html")) {
-                link.classList.add('active');
-            }
-        });
-    })
-    .catch(error => console.error('Erreur lors du chargement du header:', error));
-</script>
-
-    
-    <!-- Hamburger Button - Moved before nav -->
-    <button class="hamburger" id="hamburgerBtn">&#9776;</button>
-
-    <div class="container">
-        <div class="content">
-            <h2>Liste des Catégories</h2>
-            <button class="btn" id="btnOuvrirModalAjouterCategorie">Ajouter une Catégorie</button>
-            <table>
-                <thead>
-                    <tr>
-                        <th hidden>Code</th>
-                        <th>Nom de la Catégorie</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="categoriesTableBody">
-                    <tr>
-                        <td hidden data-label="Code">C001</td>
-                        <td data-label="Nom de la Catégorie">Catégorie A</td>
-                        <td data-label="Actions">
-                            <button class="btn btnModifier">Modifier</button>
-                            <button class="btn">Supprimer</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td hidden data-label="Code">C002</td>
-                        <td data-label="Nom de la Catégorie">Catégorie B</td>
-                        <td data-label="Actions">
-                            <button class="btn btnModifier">Modifier</button>
-                            <button class="btn">Supprimer</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+    <!-- Sidebar Navigation -->
+    <div id="sidebar" class="fixed left-0 top-0 h-full w-64 bg-white shadow-lg z-50">
+        <div class="p-6">
+            <button id="close-sidebar" class="absolute top-4 right-4 text-gray-600 hover:text-red-500">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            <h2 class="text-2xl font-bold text-green-600 mb-6">Menu</h2>
+            <nav>
+                <ul class="space-y-4">
+                    <li><a href="index.html" class="flex items-center text-gray-700 hover:text-green-600">
+                        <i data-lucide="home" class="mr-2"></i>Accueil</a></li>
+                    <li><a href="stock2.html" class="flex items-center text-gray-700 hover:text-green-600">
+                        <i data-lucide="package" class="mr-2"></i>Stock</a></li>
+                    <li><a href="commande.html" class="flex items-center text-gray-700 hover:text-green-600">
+                        <i data-lucide="shopping-cart" class="mr-2"></i>Commandes</a></li>
+                    <li><a href="sorties.html" class="flex items-center text-gray-700 hover:text-green-600">
+                        <i data-lucide="log-out" class="mr-2"></i>Sorties</a></li>
+                    <li><a href="produit.html" class="flex items-center text-gray-700 hover:text-green-600">
+                        <i data-lucide="box" class="mr-2"></i>Produits</a></li>
+                    <li><a href="categorie.html" class="flex items-center text-gray-700 hover:text-green-600">
+                        <i data-lucide="layers" class="mr-2"></i>Catégories</a></li>
+                    <li><a href="fournisseurs.html" class="flex items-center text-gray-700 hover:text-green-600">
+                        <i data-lucide="truck" class="mr-2"></i>Fournisseurs</a></li>
+                </ul>
+            </nav>
         </div>
     </div>
 
-    <!-- Modal pour ajouter une catégorie -->
-<div id="modalAjouterCategorie" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2>Ajouter une Catégorie</h2>
-        <form id="formAjouterCategorie">
-            <input type="text" placeholder="code de la catégorie" id="code" hidden>
-            <input type="text" placeholder="Nom de la catégorie" id="nom" required>
-            <button type="submit" class="btn" id="btnAjouterCategorie">Ajouter</button>
-        </form>
+    <header class="bg-green-600 text-white py-4 shadow-md">
+        <div class="container mx-auto">
+            <h1 class="text-center text-2xl font-bold">Pharmacie de Cession - Gestion des Categories</h1>
+        </div>
+    </header>
 
-        <div id="message"></div>
+    <div class="container mx-auto px-4 py-6">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-4">Liste des Catégories</h2>
+            <button class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mb-4" id="btnOuvrirModalAjouterCategorie">
+                Ajouter une Catégorie
+            </button>
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="border p-2 hidden">Code</th>
+                            <th class="border p-2">Nom de la Catégorie</th>
+                            <th class="border p-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="categoriesTableBody">
+                        <tr class="hover:bg-gray-50">
+                            <td class="border p-2 hidden" data-label="Code">C001</td>
+                            <td class="border p-2" data-label="Nom de la Catégorie">Catégorie A</td>
+                            <td class="border p-2 text-center" data-label="Actions">
+                                <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded mr-2 btnModifier">Modifier</button>
+                                <button class="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-2 rounded">Supprimer</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-</div>
 
+    <!-- Modals (Styled with Tailwind) -->
+    <div id="modalAjouterCategorie" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-96">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Ajouter une Catégorie</h2>
+                <button id="closeModalAjouterCategorie" class="text-gray-500 hover:text-gray-700">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <form id="formAjouterCategorie">
+                <input type="text" id="code" class="hidden">
+                <input type="text" id="nom" placeholder="Nom de la catégorie" required 
+                    class="w-full p-2 border rounded mb-4">
+                <button type="submit" id="btnAjouterCategorie" 
+                    class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+                    Ajouter
+                </button>
+            </form>
+            <div id="message" class="mt-4"></div>
+        </div>
+    </div>
 
-    <!-- Modal pour modifier une catégorie -->
-    <div id="modalModifierCategorie" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Modifier une Catégorie</h2>
+    <div id="modalModifierCategorie" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-96">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Modifier une Catégorie</h2>
+                <button id="closeModalModifierCategorie" class="text-gray-500 hover:text-gray-700">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
             <form id="formModifierCategorie">
-                <input type="text" placeholder="Code de la Catégorie" hidden>
-                <input type="text" placeholder="Nom de la Catégorie" required>
-                <button type="submit" class="btn">Modifier</button>
+                <input type="text" placeholder="Code de la Catégorie" class="hidden">
+                <input type="text" placeholder="Nom de la Catégorie" required 
+                    class="w-full p-2 border rounded mb-4">
+                <button type="submit" 
+                    class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                    Modifier
+                </button>
             </form>
         </div>
     </div>
 
     <script>
-        // Gestion des modals pour l'ajout et la modification
-        const modalAjouterCategorie = document.getElementById("modalAjouterCategorie");
-        const modalModifierCategorie = document.getElementById("modalModifierCategorie");
-        const btnOuvrirModalAjouterCategorie = document.getElementById("btnOuvrirModalAjouterCategorie");
-        const btnsModifier = document.querySelectorAll(".btnModifier");
-        const spans = document.getElementsByClassName("close");
+    $(document).ready(function() {
+        // Initialize Lucide icons
+        lucide.createIcons();
 
-        // Ouvrir la modal pour ajouter une catégorie
-        btnOuvrirModalAjouterCategorie.onclick = function() {
-            modalAjouterCategorie.style.display = "block";
-        }
+        const sidebar = $('#sidebar');
+        const hoverTrigger = $('#hover-trigger');
+        const closeSidebarBtn = $('#close-sidebar');
 
-        // Ouvrir la modal pour modifier une catégorie
-        btnsModifier.forEach(btn => {
-            btn.onclick = function() {
-                modalModifierCategorie.style.display = "block";
+        // Open sidebar on hover trigger
+        hoverTrigger.on('mouseenter', function() {
+            sidebar.addClass('open');
+        });
+
+        // Close sidebar when mouse leaves sidebar
+        sidebar.on('mouseleave', function() {
+            sidebar.removeClass('open');
+        });
+
+        // Close sidebar button
+        closeSidebarBtn.on('click', function() {
+            sidebar.removeClass('open');
+        });
+
+        // Modal handling
+        const modalAjouterCategorie = $('#modalAjouterCategorie');
+        const modalModifierCategorie = $('#modalModifierCategorie');
+
+        $('#btnOuvrirModalAjouterCategorie').on('click', function() {
+            modalAjouterCategorie.removeClass('hidden').addClass('flex');
+        });
+
+        $('.btnModifier').on('click', function() {
+            modalModifierCategorie.removeClass('hidden').addClass('flex');
+        });
+
+        $('#closeModalAjouterCategorie, #closeModalModifierCategorie').on('click', function() {
+            modalAjouterCategorie.addClass('hidden').removeClass('flex');
+            modalModifierCategorie.addClass('hidden').removeClass('flex');
+        });
+
+        // Close modals when clicking outside
+        $(window).on('click', function(event) {
+            if ($(event.target).is(modalAjouterCategorie)) {
+                modalAjouterCategorie.addClass('hidden').removeClass('flex');
+            }
+            if ($(event.target).is(modalModifierCategorie)) {
+                modalModifierCategorie.addClass('hidden').removeClass('flex');
             }
         });
 
-        // Fermer les modals
-        for (let span of spans) {
-            span.onclick = function() {
-                modalAjouterCategorie.style.display = "none";
-                modalModifierCategorie.style.display = "none";
-            }
-        }
+        // Your existing AJAX scripts for adding and listing categories remain the same
+        $('#btnAjouterCategorie').on('click', function(e) {
+            e.preventDefault();
+            var formData = {
+                code: $('#code').val(),
+                nom: $('#nom').val(),
+            };
 
-        // Fermer les modals en cliquant à l'extérieur
-        window.onclick = function(event) {
-            if (event.target == modalAjouterCategorie) {
-                modalAjouterCategorie.style.display = "none";
-            }
-            if (event.target == modalModifierCategorie) {
-                modalModifierCategorie.style.display = "none";
-            }
-        }
-
-        //-------- Ajout categories ----------------
-        $('#btnAjouterCategorie').on('click', function() {
-           
-            //alert("Ajout");
-             
-             var formData = {
-                 code: $('#code').val(),
-                 nom: $('#nom').val(),
-             };
- 
-             $.ajax({
-                 type: 'POST',
-                 url: 'categorie_ajout_nouveau.php',
-                 data: formData,
-                 dataType: 'json',
-                 success: function(response) {
-                     //--- Ajax a eu une reponse du script PHP ; categories_ajout_nouveau.php
-                     if(response.status === 'success') { //---- Verification du status de la reponse, soit success ou error
-                         $('#message').html('<p style="color: green;">' + response.message + '</p>');
- 
-                         //---- Raffraichir la liste des categories apres ajout du nouveau
-                         getListe();
-                         modalAjouterCategorie.style.display = "none";
- 
-                         
-                     } else {
-                         $('#message').html('<p style="color: red;">' + response.message + '</p>');
-                     }
-                 },
-                 error: function(jqXHR, textStatus, errorThrown) {
-                     // Affichez l'erreur exacte
-                     var errorMessage = jqXHR.responseText + textStatus;
-                     $('#message').html('<p style="color: red;">' + errorMessage + '</p>');
-                 }
-             });
-         });
- 
-
-        //---- Creons la fonction qui va remplir la liste des fcategories 
-        function getListe() {
             $.ajax({
-                url: 'categorie_get_liste.php', // Chemin vers le script PHP
-                type: 'GET',
+                type: 'POST',
+                url: 'categorie_ajout_nouveau.php',
+                data: formData,
                 dataType: 'json',
                 success: function(response) {
-                    // Vider le corps de la table avant d'ajouter de nouvelles lignes
-                    $('tbody').empty();
-                    
-                    if (response.donnees.length > 0) {
-                        response.donnees.forEach(function(categorie) {
-                            var row = '<tr>' +
-                    '<td>' + (categorie.nom || '') + '</td>' + // Affiche une chaîne vide si categorie.nom est null ou vide
-                    '<button class="btn btnModifier">Modifier</button> ' +
-                    '<button class="btn btnSupprimer">Supprimer</button>' +
-                    '<td>' +
-            '<button class="btn btnModifier">Modifier</button> ' +
-            '<button class="btn btnSupprimer">Supprimer</button>' +
-            '</td>' +
-            '</tr>';
-                $('tbody').append(row); // Ajouter la ligne à la table
-                        });
+                    if(response.status === 'success') {
+                        $('#message').html('<p class="text-green-500">' + response.message + '</p>');
+                        getListe();
+                        modalAjouterCategorie.addClass('hidden').removeClass('flex');
                     } else {
-                        $('tbody').append('<tr><td colspan="5">Aucun categorie trouvé.</td></tr>');
+                        $('#message').html('<p class="text-red-500">' + response.message + '</p>');
                     }
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     var errorMessage = jqXHR.responseText + textStatus;
-                    //console.error("Erreur lors de la récupération des fournisseurs : " + textStatus);
-                    $('tbody').append('<tr><td colspan="5" style="color:red;">Erreur lors de la récupération des categories.'+ errorMessage+'</td></tr>');
-                    // Affichez l'erreur exacte
+                    $('#message').html('<p class="text-red-500">' + errorMessage + '</p>');
+                }
+            });
+        });
+
+        function getListe() {
+            $.ajax({
+                url: 'categorie_get_liste.php',
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    $('tbody').empty();
                     
-                           // $('#message').html('<p style="color: red;">' + errorMessage + '</p>');
+                    if (response.donnees.length > 0) {
+                        response.donnees.forEach(function(categorie) {
+                            var row = '<tr class="hover:bg-gray-50">' +
+                                '<td class="border p-2 hidden">' + (categorie.code || '') + '</td>' +
+                                '<td class="border p-2">' + (categorie.nom || '') + '</td>' +
+                                '<td class="border p-2 text-center">' +
+                                '<button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded mr-2 btnModifier">Modifier</button> ' +
+                                '<button class="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-2 rounded btnSupprimer">Supprimer</button>' +
+                                '</td></tr>';
+                            $('tbody').append(row);
+                        });
+                    } else {
+                        $('tbody').append('<tr><td colspan="3" class="text-center p-4">Aucune catégorie trouvée.</td></tr>');
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    var errorMessage = jqXHR.responseText + textStatus;
+                    $('tbody').append('<tr><td colspan="3" class="text-center p-4 text-red-500">Erreur lors de la récupération des categories: ' + errorMessage + '</td></tr>');
                 }
             });
         }
         
-        // Appeler la fonction pour charger les fournisseurs au chargement de la page
-        $(document).ready(function() {
-            getListe();
-        });
+        // Charger les catégories au chargement de la page
+        getListe();
+    });
     </script>
- 
 </body>
 </html>
