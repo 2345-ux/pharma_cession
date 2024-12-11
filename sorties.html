@@ -95,7 +95,7 @@ body {
 /* Header Styles */
 .header {
     background: linear-gradient(135deg, #f7a205 0%, #ff9800 100%);
-    color: white;
+    color: rgb(7, 143, 91);
     padding: 1.5rem;
     text-align: center;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -110,7 +110,7 @@ body {
 /* Container Styles */
 .container {
     width: 95%;
-    max-width: 1200px;
+    max-width: 1500px;
     margin: 2rem auto;
     padding: 1rem;
     background-color: white;
@@ -188,45 +188,6 @@ body {
     width: 20px;
     height: 20px;
     margin-right: 8px;
-}
-
-/* Bouton Modifier */
-.btnModifier {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem; /* Espacement entre les icônes et le texte */
-    background-color: #facc15; /* Jaune vif (bg-yellow-500) */
-    color: #ffffff; /* Texte en blanc */
-    padding: 0.25rem 0.75rem; /* Espacement intérieur */
-    border-radius: 0.25rem; /* Coins arrondis */
-    transition: background-color 0.3s ease; /* Effet de transition pour le hover */
-    margin-right: 0.5rem; /* Espacement à droite */
-}
-
-.btnModifier:hover {
-    background-color: #eab308; /* Jaune foncé (bg-yellow-600) */
-}
-
-/* Bouton Supprimer */
-button.flex {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem; /* Espacement entre les icônes et le texte */
-    background-color: #ef4444; /* Rouge vif (bg-red-500) */
-    color: #ffffff; /* Texte en blanc */
-    padding: 0.25rem 0.75rem; /* Espacement intérieur */
-    border-radius: 0.25rem; /* Coins arrondis */
-    transition: background-color 0.3s ease; /* Effet de transition pour le hover */
-}
-
-button.flex:hover {
-    background-color: #dc2626; /* Rouge foncé (bg-red-600) */
-}
-
-/* Icônes dans les boutons */
-button i {
-    width: 1rem; /* Taille de l'icône */
-    height: 1rem;
 }
 
 /* Search and Filter Section */
@@ -328,14 +289,13 @@ button i {
     border: 1px solid #ced4da;
     border-radius: 6px;
 }
-
     </style>
 </head>
 <body class="bg-gray-100">
-    <header class="bg-orange-500 text-white text-center p-4">
-        <h1 class="text-2xl font-bold">Pharmacie de Cession - Sorties de Produits</h1>
+    <header class="bg-green-600 text-white py-4">
+        <h1 class="text-center text-2xl font-bold">Pharmacie de Cession - Sorties des Produits</h1>
     </header>
-    <div class="container">
+    <div class="container mx-auto p-6">
         <div id="side-menu" class="fixed top-0 left-0 h-full bg-white shadow-lg transform -translate-x-full transition-transform duration-300 ease-in-out z-50 w-64 hover:opacity-100 group">
             <div class="absolute top-0 right-0 m-4 cursor-pointer hover:text-red-500">
                 <i data-lucide="x" class="w-6 h-6"></i>
@@ -360,87 +320,89 @@ button i {
                 </ul>
             </nav>
         </div>
-    <div class="container mx-auto p-6">
-        <div class="bg-white shadow-md rounded-lg p-6">
-            <h2 class="text-xl font-semibold mb-4">Sorties de Produits</h2>
-            
-            <div class="flex space-x-4 mb-6">
-                <button id="btnAjouterSortie" class="flex items-center space-x-2 bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
-                    <i data-lucide="plus-circle" class="w-5 h-5 mr-2"></i>
-                    Enregistrer une Sortie
-                </button>
-                <button class="flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                    <i data-lucide="printer" class="w-5 h-5 mr-2"></i>
-                    Imprimer
-                </button>
-            </div>
 
-            <div class="flex space-x-4 mb-6">
-                <input type="text" placeholder="Produit" class="flex-1 p-2 border rounded">
-                <input type="date" placeholder="Date de début" class="p-2 border rounded">
-                <input type="date" placeholder="Date de fin" class="p-2 border rounded">
-                <button class="flex items-center space-x-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-                    <i data-lucide="search" class="w-5 h-5 mr-2"></i>
-                    Rechercher
-                </button>
-            </div>
+        <div class="container mx-auto p-6">
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <h2 class="text-xl font-semibold mb-4">Sorties de Produits</h2>
+                
+                <div class="flex space-x-4 mb-6">
+                    <button id="btnAjouterSortie" class="flex items-center space-x-2 bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+                        <i data-lucide="plus-circle" class="w-5 h-5 mr-2"></i>
+                        Enregistrer une Sortie
+                    </button>
+                    <button class="flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        <i data-lucide="printer" class="w-5 h-5 mr-2"></i>
+                        Imprimer
+                    </button>
+                </div>
 
-            <table class="w-full border-collapse">
-                <thead>
-                    <tr class="bg-gray-200">
-                        <th class="p-3 border">Nom du Produit</th>
-                        <th class="p-3 border">Quantité Sortie</th>
-                        <th class="p-3 border">Prix Unitaire</th>
-                        <th class="p-3 border">Montant Total</th>
-                        <th class="p-3 border">Date de Sortie</th>
-                        <th class="p-3 border">Date de Expiration</th>
-                        <th class="p-3 border">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="p-3 border">Produit A</td>
-                        <td class="p-3 border">50</td>
-                        <td class="p-3 border">12.00 €</td>
-                        <td class="p-3 border">600.00 €</td>
-                        <td class="p-3 border">2023-06-01</td>
-                        <td class="p-3 border">Service Pédiatrie</td>
-                        <td class="p-3 border">
-                            <button class="btnModifier flex items-center space-x-1 bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 mr-2">
-                                <i data-lucide="edit-2" class="w-4 h-4"></i>
-                                Modifier
-                            </button>
-                            <button class="flex items-center space-x-1 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                Supprimer
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="p-3 border">Produit B</td>
-                        <td class="p-3 border">75</td>
-                        <td class="p-3 border">18.00 €</td>
-                        <td class="p-3 border">1350.00 €</td>
-                        <td class="p-3 border">2023-06-02</td>
-                        <td class="p-3 border">Service Urgences</td>
-                        <td class="p-3 border">
-                            <button class="btnModifier flex items-center space-x-1 bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 mr-2">
-                                <i data-lucide="edit-2" class="w-4 h-4"></i>
-                                Modifier
-                            </button>
-                            <button class="flex items-center space-x-1 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                Supprimer
-                            </button>
-                        </td>
-                    </tr>
-                    <tr class="bg-gray-100 font-bold">
-                        <td colspan="3" class="p-3 border text-right">Total</td>
-                        <td class="p-3 border">1950.00 €</td>
-                        <td colspan="4"></td>
-                    </tr>
-                </tbody>
-            </table>
+                <div class="flex space-x-4 mb-6">
+                    <input type="text" placeholder="Produit" class="flex-1 p-2 border rounded">
+                    <input type="date" placeholder="Date de début" class="p-2 border rounded">
+                    <input type="date" placeholder="Date de fin" class="p-2 border rounded">
+                    <button class="flex items-center space-x-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                        <i data-lucide="search" class="w-5 h-5 mr-2"></i>
+                        Rechercher
+                    </button>
+                </div>
+
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="p-3 border">Nom du Produit</th>
+                            <th class="p-3 border">Quantité Sortie</th>
+                            <th class="p-3 border">Prix Unitaire</th>
+                            <th class="p-3 border">Montant Total</th>
+                            <th class="p-3 border">Date de Sortie</th>
+                            <th class="p-3 border">Date de Expiration</th>
+                            <th class="p-3 border">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="p-3 border">Produit A</td>
+                            <td class="p-3 border">50</td>
+                            <td class="p-3 border">12.00 €</td>
+                            <td class="p-3 border">600.00 €</td>
+                            <td class="p-3 border">2023-06-01</td>
+                            <td class="p-3 border">Service Pédiatrie</td>
+                            <td class="p-3 border">
+                                <button class="btnModifier flex items-center space-x-1 bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 mr-2">
+                                    <i data-lucide="edit-2" class="w-4 h-4"></i>
+                                    Modifier
+                                </button>
+                                <button class="flex items-center space-x-1 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    Supprimer
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border">Produit B</td>
+                            <td class="p-3 border">75</td>
+                            <td class="p-3 border">18.00 €</td>
+                            <td class="p-3 border">1350.00 €</td>
+                            <td class="p-3 border">2023-06-02</td>
+                            <td class="p-3 border">Service Urgences</td>
+                            <td class="p-3 border">
+                                <button class="btnModifier flex items-center space-x-1 bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 mr-2">
+                                    <i data-lucide="edit-2" class="w-4 h-4"></i>
+                                    Modifier
+                                </button>
+                                <button class="flex items-center space-x-1 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    Supprimer
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="bg-gray-100 font-bold">
+                            <td colspan="3" class="p-3 border text-right">Total</td>
+                            <td class="p-3 border">1950.00 €</td>
+                            <td colspan="4"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -634,8 +596,8 @@ $(document).ready(function() {
                             <td>${sortie.date_sortie || ''}</td>
                             <td>${sortie.date_expiration || ''}</td>
                             <td>
-                                <button class="btn btnModifier">Modifier</button>
-                                <button class="btn btnSupprimer">Supprimer</button>
+                                <button class="btn btnModifier text-blue-600 hover:text-blue-800">Modifier</button>
+                                <button class="btn btnSupprimer text-red-600 hover:text-red-800">Supprimer</button>
                             </td>
                         </tr>`;
                         $('tbody').append(row);
