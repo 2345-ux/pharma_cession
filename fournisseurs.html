@@ -108,7 +108,7 @@
                 <i data-lucide="x" class="w-6 h-6"></i>
             </button>
 
-            <h2 class="text-xl font-semibold text-gray-800 mb-4">Ajouter un Fournisseur</h2>
+            <h2 class="text-xl font-semibold text-gray-800 mb-4" id="modalTitle">Ajouter un Fournisseur</h2>
 
             <form id="formAjouterFournisseur" class="space-y-4">
                 <div>
@@ -138,152 +138,181 @@
         $(document).ready(function() {
             // Initialize Lucide icons
             lucide.createIcons();
-    
+        
+            // Cache jQuery selectors
             const sidebar = $('#sidebar');
             const hoverTrigger = $('#hover-trigger');
             const closeSidebarBtn = $('#close-sidebar');
-    
-            // Open sidebar on hover trigger
+            const modalAjouterFournisseur = $('#modalAjouterFournisseur');
+            const formAjouterFournisseur = $('#formAjouterFournisseur');
+            
+            // Sidebar handling
             hoverTrigger.on('mouseenter', function() {
                 sidebar.addClass('open');
             });
-    
-            // Close sidebar when mouse leaves sidebar
+        
             sidebar.on('mouseleave', function() {
                 sidebar.removeClass('open');
             });
-    
-            // Close sidebar button
+        
             closeSidebarBtn.on('click', function() {
                 sidebar.removeClass('open');
             });
-    
-            // Rest of the previous script remains the same
-            const modalAjouterFournisseur = $('#modalAjouterFournisseur');
-            const formAjouterFournisseur = $('#formAjouterFournisseur');
-    
-            // ... (previous script for form handling, supplier management remains unchanged)
-        });
-    $(document).ready(function() {
-        // Initialize Lucide icons
-        lucide.createIcons();
 
-        const modalAjouterFournisseur = $('#modalAjouterFournisseur');
-        const formAjouterFournisseur = $('#formAjouterFournisseur');
+        // Modal handling
 
-        // Open Add Supplier Modal
+        const modalModifierFournisseur = $('#modalModifierFournisseur');
+
         $('#btnAjouterFournisseur').on('click', function() {
             modalAjouterFournisseur.removeClass('hidden').addClass('flex');
+            $('#modalTitle').html('Ajouter un Fournisseur');
+            $('#btn_enregitrer_nouveau').html('Ajouter');
         });
 
-        // Close Add Supplier Modal
-        $('#closeAjouterFournisseur').on('click', function() {
+        $(document).on('click', '.btnModifier', function() {
+            var $row = $(this).closest('tr');
+            //modalModifierCategorie.removeClass('hidden').addClass('flex');
+            modalAjouterFournisseur.removeClass('hidden').addClass('flex');
+            $('#modalTitle').html('Modifier un Fournisseur');
+            $('#btn_enregitrer_nouveau').html('Modifier');
+            $('#code').val($row.find('td').eq(0).text());
+            $('#nom').val($row.find('td').eq(1).text());
+            $('#email').val($row.find('td').eq(2).text());
+            $('#tel').val($row.find('td').eq(3).text());
+            $('#adresse').val($row.find('td').eq(4).text());
+        });
+
+        $('#closeAjouterFournisseur, #closeModifierFournisseur').on('click', function() {
+            $('#code').val('');
+            $('#nom').val('');
+            $('#email').val('');
+            $('#tel').val('');
+            $('#adresse').val('');
             modalAjouterFournisseur.addClass('hidden').removeClass('flex');
+            modalModifierFournisseur.addClass('hidden').removeClass('flex');
         });
-
-        // Form Submission
-        formAjouterFournisseur.on('submit', function(e) {
-            e.preventDefault();
             
-            const formData = {
-                nom: $('#nom').val(),
-                email: $('#email').val(),
-                tel: $('#tel').val(),
-                adresse: $('#adresse').val()
+            // Close modal handlers
+            $('#closeAjouterFournisseur').on('click', function() {
+                clearModalFields();
+                modalAjouterFournisseur.addClass('hidden').removeClass('flex');
+            });
+                // Your existing AJAX scripts for adding and listing categories remain the same
+        $('#btn_enregitrer_nouveau').on('click', function(e) {
+            e.preventDefault();
+            //verification du contenu du code: si le code est vide on fait un ajout sinon on fait une modification
+            var xcode = $('#code').val();
+            var xurl= '';
+            if(xcode==''){
+                // ici on est en mode nouveau
+                xurl= 'fournisseurs_nouveau.php';
+            }else{
+                // ici on est en mode modif
+                xurl= 'fournisseurs_modifier.php';
             };
-
-            $.ajax({
-                type: 'POST',
-                url: 'fournisseurs_ajout_nouveau.php',
-                data: formData,
-                dataType: 'json',
-                success: function(response) {
-                    if (response.status === 'success') {
-                        alert('Fournisseur ajouté avec succès');
-                        modalAjouterFournisseur.addClass('hidden').removeClass('flex');
-                        loadFournisseurs();
-                    } else {
-                        alert('Erreur : ' + response.message);
+        // recupération des données saisies dans les formulaires pour envoi
+                var formData = {
+                    code: $('#code').val(),
+                    nom: $('#nom').val(),
+                    email: $('#email').val(),
+                    tel: $('#tel').val(),
+                    adresse: $('#adresse').val()
+                };
+        
+                $.ajax({
+                    type: 'POST',
+                    url: xurl,
+                    data: formData,
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            alert('Opération réussie');
+                            modalAjouterFournisseur.addClass('hidden').removeClass('flex');
+                            clearModalFields();
+                            loadFournisseurs();
+                        } else {
+                            alert('Erreur : ' + response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('Erreur lors de l\'opération');
                     }
-                },
-                error: function() {
-                    alert('Erreur lors de l\'ajout du fournisseur');
+                });
+            });
+        
+            // Helper function to clear modal fields
+            function clearModalFields() {
+                $('#code, #nom, #email, #tel, #adresse').val('');
+            }
+        
+            // Load and display suppliers
+            function loadFournisseurs() {
+                $.ajax({
+                    url: 'fournisseurs_get_liste.php',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        const liste = $('#fournisseursList');
+                        liste.empty();
+        
+                        if (response.donnees && response.donnees.length) {
+                            response.donnees.forEach(function(fournisseur) {
+                                const row = `
+                                    <tr class="border-b">
+                                        <td class="p-3" hidden>${fournisseur.code || ''}</td>
+                                        <td class="p-3">${fournisseur.nom || ''}</td>
+                                        <td class="p-3">${fournisseur.email || ''}</td>
+                                        <td class="p-3">${fournisseur.tel || ''}</td>
+                                        <td class="p-3">${fournisseur.adresse || ''}</td>
+                                        <td class="p-3">
+                                            <button class="bg-blue-500 text-white px-3 py-1 rounded mr-2 btnModifier" data-id="${fournisseur.id}">Modifier</button>
+                                            <button class="bg-red-500 text-white px-3 py-1 rounded btnSupprimer" data-id="${fournisseur.id}">Supprimer</button>
+                                        </td>
+                                    </tr>`;
+                                liste.append(row);
+                            });
+                        } else {
+                            liste.html('<tr><td colspan="6" class="text-center p-4">Aucun fournisseur trouvé</td></tr>');
+                        }
+                    },
+                    error: function() {
+                        $('#fournisseursList').html('<tr><td colspan="6" class="text-center text-red-500 p-4">Erreur de chargement</td></tr>');
+                    }
+                });
+            }
+        
+            // Delete supplier function
+            function supprimerFournisseur(id) {
+                $.ajax({
+                    url: 'fournisseurs_supprimer.php',
+                    type: 'POST',
+                    data: { id: id },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            alert('Fournisseur supprimé avec succès');
+                            loadFournisseurs();
+                        } else {
+                            alert('Erreur : ' + response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('Erreur lors de la suppression du fournisseur');
+                    }
+                });
+            }
+        
+            // Delete button handler
+            $(document).on('click', '.btnSupprimer', function() {
+                const id = $(this).data('id');
+                if(confirm('Voulez-vous vraiment supprimer ce fournisseur ?')) {
+                    supprimerFournisseur(id);
                 }
             });
+        
+            // Initial load
+            loadFournisseurs();
         });
-
-        // Load Suppliers
-        function loadFournisseurs() {
-            $.ajax({
-                url: 'fournisseurs_get_liste.php',
-                type: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    const liste = $('#fournisseursList');
-                    liste.empty();
-
-                    if (response.donnees && response.donnees.length) {
-                        response.donnees.forEach(function(fournisseur) {
-                            const row = `
-                                <tr class="border-b">
-                                    <td class="p-3">${fournisseur.nom || ''}</td>
-                                    <td class="p-3">${fournisseur.email || ''}</td>
-                                    <td class="p-3">${fournisseur.tel || ''}</td>
-                                    <td class="p-3">${fournisseur.adresse || ''}</td>
-                                    <td class="p-3">
-                                        <button class="bg-blue-500 text-white px-3 py-1 rounded mr-2 btnModifier" data-id="${fournisseur.id}">Modifier</button>
-                                        <button class="bg-red-500 text-white px-3 py-1 rounded btnSupprimer" data-id="${fournisseur.id}">Supprimer</button>
-                                    </td>
-                                </tr>`;
-                            liste.append(row);
-                        });
-
-                        // Bind action buttons
-                        $('.btnModifier').on('click', function() {
-                            const id = $(this).data('id');
-                            // Implement modify logic
-                        });
-
-                        $('.btnSupprimer').on('click', function() {
-                            const id = $(this).data('id');
-                            if(confirm('Voulez-vous vraiment supprimer ce fournisseur ?')) {
-                                supprimerFournisseur(id);
-                            }
-                        });
-                    } else {
-                        liste.html('<tr><td colspan="5" class="text-center p-4">Aucun fournisseur trouvé</td></tr>');
-                    }
-                },
-                error: function() {
-                    $('#fournisseursList').html('<tr><td colspan="5" class="text-center text-red-500 p-4">Erreur de chargement</td></tr>');
-                }
-            });
-        }
-
-        // Delete Supplier
-        function supprimerFournisseur(id) {
-            $.ajax({
-                url: 'fournisseurs_supprimer.php',
-                type: 'POST',
-                data: { id: id },
-                dataType: 'json',
-                success: function(response) {
-                    if (response.status === 'success') {
-                        alert('Fournisseur supprimé avec succès');
-                        loadFournisseurs();
-                    } else {
-                        alert('Erreur : ' + response.message);
-                    }
-                },
-                error: function() {
-                    alert('Erreur lors de la suppression du fournisseur');
-                }
-            });
-        }
-
-        // Initial load
-        loadFournisseurs();
-    });
     </script>
 </body>
 </html>

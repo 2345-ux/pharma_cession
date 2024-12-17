@@ -320,280 +320,279 @@
             </div>
         </div>
     </div>
+<!-- Modal: Ajouter Produit -->
+<div id="modalAjouterProduit" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6 relative">
+        <button id="closeAjouterProduit" class="absolute top-4 right-4 text-gray-500 hover:text-red-500">
+            <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
 
-    <div id="modalAjouterProduit" class="modal hidden">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2 class="text-xl font-semibold text-green-700 mb-4">Ajouter un produit</h2>
-        <form id="formAjouterCategorie" class="space-y-4">
-            <input type="text" placeholder="Code du produit" id="code" hidden>
-            <input type="text" placeholder="Nom du produit" id="nom" required>
-            <input type="text" placeholder="Seuil du produit" id="seuil_produit" required>
-            <div class="form-group">
-                <label for="categorie" class="block mb-2">Catégorie</label>
-                <select id="categorie" required>
-                    <option value="">Sélectionnez une catégorie</option>
-                    <option value="1">Catégorie 1</option>
-                    <option value="2">Catégorie 2</option>
+        <h2 class="text-xl font-semibold text-gray-800 mb-4" id="modalTitle">Ajouter un Produit</h2>
+
+        <form id="formAjouterProduit" class="space-y-4">
+            <input type="hidden" id="code">
+            
+            <div>
+                <label for="nom" class="block text-sm font-medium text-gray-700">Nom du Produit</label>
+                <input type="text" id="nom" required class="mt-1 w-full px-3 py-2 border rounded-md">
+            </div>
+            
+            <div>
+                <label for="seuil_produit" class="block text-sm font-medium text-gray-700">Seuil</label>
+                <input type="number" id="seuil_produit" class="mt-1 w-full px-3 py-2 border rounded-md">
+            </div>
+            
+            <div>
+                <label for="categorie" class="block text-sm font-medium text-gray-700">Catégorie</label>
+                <select id="categorie" class="mt-1 w-full px-3 py-2 border rounded-md">
+                    <!-- Your category options here -->
                 </select>
             </div>
-            <button type="submit" class="btn">Ajouter</button>
+
+            <button type="submit" id="btn_enregistrer_produit" class="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700">
+                Enregistrer
+            </button>
         </form>
+        
+        <div id="message"></div>
     </div>
 </div>
-
-<script>
-    // Récupérer les éléments nécessaires
-    const btnAjouterProduit = document.getElementById('btnAjouterProduit');
-    const modalAjouterProduit = document.getElementById('modalAjouterProduit');
-    const closeBtn = modalAjouterProduit.querySelector('.close');
-
-    // Ouvrir le modal
-    btnAjouterProduit.addEventListener('click', () => {
-        modalAjouterProduit.classList.remove('hidden');
-    });
-
-    // Fermer le modal en cliquant sur le bouton "X"
-    closeBtn.addEventListener('click', () => {
-        modalAjouterProduit.classList.add('hidden');
-    });
-
-    // Fermer le modal en cliquant en dehors de son contenu
-    window.addEventListener('click', (event) => {
-        if (event.target === modalAjouterProduit) {
-            modalAjouterProduit.classList.add('hidden');
-        }
-    });
+<<script>
     $(document).ready(function() {
-            // Side Menu Functionality
-            function initializeSideMenu() {
-                const sideMenu = $('#side-menu');
-                const menuTriggerWidth = 50;
-    
-                $('<div>')
-                    .css({
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        bottom: 0,
-                        width: `${menuTriggerWidth}px`,
-                        zIndex: 40,
-                    })
-                    .on('mouseenter', function() {
-                        sideMenu.removeClass('-translate-x-full');
-                    })
-                    .appendTo('body');
-    
-                sideMenu.on('mouseleave', function() {
-                    $(this).addClass('-translate-x-full');
-                });
-            }
-    
-            // Modal Management
-            function initializeModal() {
-                const modalAjouterProduit = $('#modalAjouterProduit');
-                const btnAjouterProduit = $('#btnAjouterProduit');
-                const btnClose = $('.close');
-                const message = $('#message');
-                const form = $('#formAjouterCategorie');
-    
-                // Open modal for adding product
-                btnAjouterProduit.on('click', function() {
-                    resetModalForm();
-                    modalAjouterProduit.removeClass('hidden');
-                });
-    
-                // Close modal
-                btnClose.on('click', function() {
+        // Cache frequently used elements
+        const elements = {
+            sideMenu: $('#side-menu'),
+            modal: $('#modalAjouterProduit'),
+            form: $('#formAjouterProduit'),
+            message: $('#message'),
+            productTable: $('#produitsTableBody'),
+            categorySelect: $('#categorie')
+        };
+
+        // Initialize all modules
+        initializeSideMenu();
+        initializeModal();
+        const categoryModule = initializeCategoryManagement();
+        const productModule = initializeProductModule();
+
+        // Load initial data
+        categoryModule.loadCategories();
+        productModule.loadProducts();
+
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Side Menu Implementation
+        function initializeSideMenu() {
+            const menuTriggerWidth = 50;
+
+            $('<div>')
+                .css({
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    width: `${menuTriggerWidth}px`,
+                    zIndex: 40
+                })
+                .on('mouseenter', () => elements.sideMenu.removeClass('-translate-x-full'))
+                .appendTo('body');
+
+            elements.sideMenu.on('mouseleave', () => elements.sideMenu.addClass('-translate-x-full'));
+        }
+
+        // Modal Management
+        function initializeModal() {
+            $('#btnAjouterProduit').on('click', function() {
+                elements.modal.removeClass('hidden').addClass('flex');
+                $('#modalTitle').html('Ajouter un Produit');
+                $('#btn_enregistrer_produit').html('Ajouter');
+            });
+
+            $(document).on('click', '.btnModifier', function() {
+                var $row = $(this).closest('tr');
+                elements.modal.removeClass('hidden').addClass('flex');
+                $('#modalTitle').html('Modifier un Produit');
+                $('#btn_enregistrer_produit').html('Modifier');
+                $('#code').val($row.find('td').eq(0).text());
+                $('#nom').val($row.find('td').eq(1).text());
+                $('#seuil_produit').val($row.find('td').eq(2).text());
+                $('#categorie').val($row.find('td').eq(3).text());
+            });
+
+            $('#closemodalAjouterProduit, #closeModalModifierCategorie').on('click', closeModal);
+
+            $('#closeAjouterProduit').on('click', function() {
+                clearModalFields();
+                closeModal();
+            });
+
+            $(window).on('click', function(event) {
+                if ($(event.target).is(elements.modal)) {
                     closeModal();
-                });
-    
-                // Close modal when clicking outside
-                $(window).on('click', function(event) {
-                    if ($(event.target).hasClass('modal')) {
-                        closeModal();
-                    }
-                });
-    
-                // Reset modal form
-                function resetModalForm() {
-                    form[0].reset(); // Reset form fields
-                    $('#code').val(''); // Ensure hidden code field is cleared
-                    message.empty(); // Clear any previous messages
                 }
-    
-                // Close modal function
-                function closeModal() {
-                    modalAjouterProduit.addClass('hidden');
-                    message.empty();
-                }
-    
-                // Product Addition/Modification Handler
-                $('#btnNouveauProduit').on('click', function() {
-                    const formData = {
-                        code: $('#code').val(),
-                        nom: $('#nom').val(),
-                        seuil_produit: $('#seuil_produit').val(),
-                        categorie: $('#categorie').val(),
-                    };
-    
-                    // Determine action based on whether code exists
-                    const action = formData.code ? 'modifier' : 'ajouter';
-                    const url = action === 'ajouter' ? 'produit_ajout_nouveau.php' : 'produit_modifier.php';
-    
-                    $.ajax({
-                        type: 'POST',
-                        url: url,
-                        data: formData,
-                        dataType: 'json',
-                        success: function(response) {
-                            handleSubmissionResponse(response, action);
-                        },
-                        error: function(jqXHR) {
-                            displayErrorMessage(jqXHR.responseText);
+            });
+
+            function closeModal() {
+                clearModalFields();
+                elements.modal.addClass('hidden').removeClass('flex');
+            }
+
+            function clearModalFields() {
+                $('#code').val('');
+                $('#nom').val('');
+                $('#seuil_produit').val('');
+                $('#categorie').val('');
+            }
+        }
+
+        // Category Management
+        function initializeCategoryManagement() {
+            function loadCategories() {
+                $.ajax({
+                    url: 'categories_get_liste.php',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: (response) => {
+                        if (response.status === 'success') {
+                            updateCategoryDropdown(response.donnees);
+                        } else {
+                            showError('Erreur lors du chargement des catégories');
                         }
-                    });
+                    },
+                    error: () => showError('Erreur de communication avec le serveur')
                 });
-    
-                // Handle product submission response
-                function handleSubmissionResponse(response, action) {
+            }
+
+            function updateCategoryDropdown(categories) {
+                elements.categorySelect
+                    .empty()
+                    .append('<option value="">Sélectionner une catégorie</option>');
+
+                categories.forEach(category => {
+                    elements.categorySelect.append(new Option(category.nom, category.code));
+                });
+            }
+
+            return { loadCategories };
+        }
+
+        // Product List Management
+        function initializeProductModule() {
+            function loadProducts() {
+                $.ajax({
+                    url: 'produit_get_liste.php',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: (response) => {
+                        if (response.status === 'success') {
+                            updateProductTable(response.donnees || []);
+                        } else {
+                            showError('Erreur lors du chargement des produits');
+                        }
+                    },
+                    error: () => showError('Erreur de communication avec le serveur')
+                });
+            }
+
+            function updateProductTable(products) {
+                elements.productTable.empty();
+
+                if (products.length) {
+                    products.forEach(product => {
+                        elements.productTable.append(`
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="p-3" hidden>${product.code || ''}</td>
+                                <td class="p-3">${product.nom || ''}</td>
+                                <td class="p-3">${product.seuil_produit || ''}</td>
+                                <td class="p-3" data-category-id="${product.categorie_code || ''}">${product.nom_cat || ''}</td>
+                                <td class="p-3 flex gap-2">
+                                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded btnModifier">
+                                        Modifier
+                                    </button>
+                                    <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded btnSupprimer" 
+                                            data-id="${product.code}">
+                                        Supprimer
+                                    </button>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                } else {
+                    elements.productTable.html(`
+                        <tr>
+                            <td colspan="5" class="text-center p-4 text-gray-500">
+                                Aucun produit trouvé
+                            </td>
+                        </tr>
+                    `);
+                }
+            }
+
+            $(document).on('click', '.btnSupprimer', function() {
+                const code = $(this).data('id');
+                if (confirm('Voulez-vous vraiment supprimer ce produit ?')) {
+                    deleteProduct(code);
+                }
+            });
+
+            return { loadProducts };
+        }
+
+        // Delete Product
+        function deleteProduct(code) {
+            $.ajax({
+                url: 'produit_supprimer.php',
+                type: 'POST',
+                data: { code },
+                dataType: 'json',
+                success: (response) => {
                     if (response.status === 'success') {
-                        displaySuccessMessage(response.message);
-                        getListe(); // Refresh product list
-                        setTimeout(closeModal, 1000); // Close modal after success
+                        showSuccess('Produit supprimé avec succès');
+                        productModule.loadProducts();
                     } else {
-                        displayErrorMessage(response.message);
+                        showError(response.message || 'Erreur lors de la suppression');
                     }
-                }
-    
-                // Display success message
-                function displaySuccessMessage(msg) {
-                    message.html(`<p class="text-green-600">${msg}</p>`);
-                }
-    
-                // Display error message
-                function displayErrorMessage(msg) {
-                    message.html(`<p class="text-red-600">Erreur: ${msg}</p>`);
-                }
-            }
-    
-            // Category Management
-            function initializeCategoryManagement() {
-                const message = $('#message');
-    
-                // Load categories in the select dropdown
-                function loadCategories() {
-                    $.ajax({
-                        url: 'get_categories.php',
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function(data) {
-                            const select = $('#categorie');
-                            select.html('<option value="">Sélectionner une catégorie</option>');
-    
-                            data.forEach(category => {
-                                select.append(new Option(category.nom, category.code));
-                            });
-                        },
-                        error: function(jqXHR, textStatus, errorThrown) {
-                            console.error("Erreur lors du chargement des catégories : ", errorThrown);
-                        }
-                    });
-                }
-    
-                // Toggle new category form
-                $('#toggleNewCategoryForm').on('click', function() {
-                    $('#newCategoryForm').toggle();
-                });
-    
-                // Add new category
-                $('#addNewCategory').on('click', function() {
-                    const newCategoryName = $('#newCategoryName').val();
-    
-                    if (!newCategoryName) {
-                        message.html('<p class="text-red-600">Veuillez entrer un nom de catégorie.</p>');
-                        return;
+                },
+                error: () => showError('Erreur de communication avec le serveur')
+            });
+        }
+
+        $('#btn_enregistrer_produit').on('click', function(e) {
+            e.preventDefault();
+
+            const xcode = $('#code').val();
+            const xurl = xcode === '' ? 'produit_ajout.php' : 'produit_modifier.php';
+
+            const formData = {
+                code: $('#code').val(),
+                nom: $('#nom').val(),
+                seuil_produit: $('#seuil_produit').val(),
+                categorie: $('#categorie').val(),
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: xurl,
+                data: formData,
+                dataType: 'json',
+                success: (response) => {
+                    if (response.status === 'success') {
+                        showSuccess(response.message || 'Opération réussie');
+                        productModule.loadProducts();
+                        setTimeout(() => closeModal(), 1500);
+                    } else {
+                        showError(response.message || 'Une erreur est survenue');
                     }
-    
-                    $.ajax({
-                        type: 'POST',
-                        url: 'add_categories.php',
-                        data: { nom: newCategoryName },
-                        dataType: 'json',
-                        success: function(response) {
-                            if (response.status === 'success') {
-                                message.html(`<p class="text-green-600">${response.message}</p>`);
-                                loadCategories();
-                                $('#newCategoryName').val('');
-                                $('#newCategoryForm').hide();
-                            } else {
-                                message.html(`<p class="text-red-600">${response.message}</p>`);
-                            }
-                        },
-                        error: function() {
-                            message.html('<p class="text-red-600">Erreur lors de l\'ajout de la catégorie.</p>');
-                        }
-                    });
-                });
-    
-                return { loadCategories };
-            }
-    
-            // Product List Management
-            function initializeProductList() {
-                function getListe() {
-                    $.ajax({
-                        url: 'produit_get_liste.php',
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function(response) {
-                            const tbody = $('#produitsTableBody').empty();
-    
-                            if (response.donnees && response.donnees.length > 0) {
-                                response.donnees.forEach(function(produit) {
-                                    tbody.append(`
-                                        <tr>
-                                            <td hidden>${produit.code || ''}</td>
-                                            <td>${produit.nom || ''}</td>
-                                            <td>${produit.seuil_produit || ''}</td>
-                                            <td>${produit.nom_cat || ''}</td>
-                                            <td>
-                                                <button class="btn btnModifier mr-2">Modifier</button>
-                                                <button class="btn btnSupprimer">Supprimer</button>
-                                            </td>
-                                        </tr>
-                                    `);
-                                });
-                            } else {
-                                tbody.append('<tr><td colspan="5">Aucun produit trouvé.</td></tr>');
-                            }
-                        },
-                        error: function(jqXHR, textStatus) {
-                            $('#produitsTableBody').html(`<tr><td colspan="5" class="text-red-600">Erreur lors de la récupération des produits: ${textStatus}</td></tr>`);
-                        }
-                    });
+                },
+                error: (xhr) => {
+                    showError('Erreur de communication avec le serveur');
+                    console.error(xhr.responseText);
                 }
-    
-                return { getListe };
-            }
-    
-            // Initialize all functionalities
-            function init() {
-                lucide.createIcons(); // Ensure Lucide icons are loaded
-                initializeSideMenu();
-                initializeModal();
-                const categoryModule = initializeCategoryManagement();
-                const productListModule = initializeProductList();
-    
-                // Initial data load
-                categoryModule.loadCategories();
-                productListModule.getListe();
-            }
-    
-            // Run initialization
-            init();
+            });
         });
-    </script>
-    
+    });
+</script>
+
 </body>
 </html>

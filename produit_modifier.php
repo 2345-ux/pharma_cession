@@ -20,30 +20,9 @@ try {
     $seuil_produit = $_POST['seuil_produit'] ?? '';
     $categorie = $_POST['categorie'] ?? '';
 
-    // Validation des données
-    if (empty($code)) {
-        throw new Exception("Le code du produit est requis pour la modification.");
-    }
-    if (empty($nom)) {
-        throw new Exception("Le nom du produit est requis.");
-    }
-    if (empty($seuil_produit)) {
-        throw new Exception("Le seuil du produit est requis.");
-    }
-    if (empty($categorie)) {
-        throw new Exception("La catégorie est requise.");
-    }
-
-    // Vérification si le produit existe
-    $stmtCheck = $pdo->prepare("SELECT * FROM t_produits WHERE code = :code");
-    $stmtCheck->execute([':code' => $code]);
-    if (!$stmtCheck->fetch()) {
-        throw new Exception("Produit non trouvé pour le code fourni : $code.");
-    }
 
     // Mise à jour du produit
-    $stmt = $pdo->prepare("
-        UPDATE t_produits
+    $stmt = $pdo->prepare(" UPDATE t_produits
         SET nom = :nom, seuil_produit = :seuil_produit, categorie = :categorie
         WHERE code = :code
     ");
