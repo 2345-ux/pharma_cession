@@ -295,7 +295,7 @@
                                         <td>${produit.date_ajout || ''}</td>
                                         <td>${produit.nom_fournisseurs || ''}</td>
                                         <td>
-                                            <button class="btn btnModifier text-blue-600 hover:text-blue-800">Modifier</button>
+                                            <button class="btn btnModifier text-blue-600 hover:text-blue-800" hidden >Modifier</button>
                                             <button class="btn btnSupprimer text-red-600 hover:text-red-800">Supprimer</button>
                                         </td>
                                     </tr>
@@ -321,8 +321,6 @@
             // Initial load of product list
             getListeProduits();
         });
-    </script>
-    
-                 
+    </script>            
 </body>
 </html>

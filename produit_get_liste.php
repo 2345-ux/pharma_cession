@@ -1,5 +1,5 @@
 <?php
-// add_fournisseur.php
+// produit_get_liste.php
 header('Content-Type: application/json');
 
 try {

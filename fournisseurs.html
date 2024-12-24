@@ -112,6 +112,10 @@
 
             <form id="formAjouterFournisseur" class="space-y-4">
                 <div>
+                    <label for="code" class="block text-sm font-medium text-gray-700">Code</label>
+                    <input type="text" id="code" class="mt-1 w-full px-3 py-2 border rounded-md">
+                </div>
+                <div>
                     <label for="nom" class="block text-sm font-medium text-gray-700">Nom du Fournisseur</label>
                     <input type="text" id="nom" required class="mt-1 w-full px-3 py-2 border rounded-md">
                 </div>
@@ -218,7 +222,7 @@
                     tel: $('#tel').val(),
                     adresse: $('#adresse').val()
                 };
-        
+               // alert(xurl)
                 $.ajax({
                     type: 'POST',
                     url: xurl,
@@ -226,7 +230,8 @@
                     dataType: 'json',
                     success: function(response) {
                         if (response.status === 'success') {
-                            alert('Opération réussie');
+                           // alert('Opération réussie');
+                            alert('Response serveur: ' + response.message);
                             modalAjouterFournisseur.addClass('hidden').removeClass('flex');
                             clearModalFields();
                             loadFournisseurs();

@@ -415,13 +415,14 @@ body {
             <h2 class="text-xl font-semibold mb-4 text-center">Ajouter une nouvelle Sortie</h2>
             
             <form id="formAjouterSortie" class="space-y-4">
+                <input type="text" placeholder="Code de sortie" id="code" hidden>
                 <select id="id_produit" class="w-full p-2 border rounded">
                     <option>Sélectionner un produit</option>
                 </select>
-                <input type="number" placeholder="Quantité" class="w-full p-2 border rounded">
-                <input type="number" placeholder="Prix Unitaire" class="w-full p-2 border rounded">
-                <input type="date" placeholder="Date de Sortie" class="w-full p-2 border rounded">
-                <input type="date" placeholder="Date d'Expiration" class="w-full p-2 border rounded">
+                <input type="number" placeholder="Quantité" id="quantite"class="w-full p-2 border rounded">
+                <input type="number" placeholder="Prix Unitaire" id="prix_unitaire "class="w-full p-2 border rounded">
+                <input type="date" placeholder="Date de Sortie" id="date_sortie" class="w-full p-2 border rounded">
+                <input type="date" placeholder="Date d'Expiration"  id="date_expiration" class="w-full p-2 border rounded">
                 
                 <button class="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600">
                     Ajouter
@@ -430,82 +431,83 @@ body {
         </div>
     </div>
 <script>
-
-   // Initialize Lucide icons
-lucide.createIcons();
-
-$(document).ready(function() {
-    // Side Menu Functionality
-    function initializeSideMenu() {
-        const sideMenu = $('#side-menu');
-        const menuTriggerWidth = 50;
-
-        $('<div>')
-            .css({
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                bottom: 0,
-                width: `${menuTriggerWidth}px`,
-                zIndex: 40,
-            })
-            .on('mouseenter', function() {
-                sideMenu.removeClass('-translate-x-full');
-            })
-            .appendTo('body');
-
-        sideMenu.on('mouseleave', function() {
-            $(this).addClass('-translate-x-full');
-        });
-    }
-
-    initializeSideMenu(); // Ensure side menu initialization is called
-
-    // Variables globales pour les modals
-    const btnAjouterSortie = document.getElementById("btnAjouterSortie");
-    const modalAjouterSortie = document.getElementById("modalAjouterSortie");
-    const modalModifierSortie = document.getElementById("modalModifierSortie");
-    const closeButtons = document.querySelectorAll(".close");
-
-    // Gestion des modals
-    if (btnAjouterSortie) {
-        btnAjouterSortie.addEventListener("click", function() {
-            modalAjouterSortie.style.display = "block";
-        });
-    }
-
-    function openModalModifierSortie(code, nom, quantite, prixUnitaire, prixTotal, dateSortie, dateExpiration) {
-        document.getElementById("code_sortie_modifier").value = code;
-        document.getElementById("produit_id_modifier").value = nom;
-        document.getElementById("quantite_modifier").value = quantite;
-        document.getElementById("prix_unitaire_modifier").value = prixUnitaire;
-        document.getElementById("prix_total_modifier").value = prixTotal;
-        document.getElementById("date_sortie_modifier").value = dateSortie;
-        document.getElementById("date_expiration_modifier").value = dateExpiration;
-        modalModifierSortie.style.display = "block";
-    }
-
-    // Fermeture des modals
-    closeButtons.forEach(btn => {
-        btn.addEventListener("click", function() {
-            modalAjouterSortie.style.display = "none";
-            modalModifierSortie.style.display = "none";
-        });
-    });
-
-    window.addEventListener("click", function(event) {
-        if (event.target === modalAjouterSortie) {
-            modalAjouterSortie.style.display = "none";
-        }
-        if (event.target === modalModifierSortie) {
-            modalModifierSortie.style.display = "none";
-        }
-    });
-
-    // Stocker les données des produits
-    let productsData = [];
-
-    // Fonction pour charger les produits
+    // Initialize Lucide icons
+    document.addEventListener('DOMContentLoaded', function() {
+        lucide.createIcons();
+    
+        $(document).ready(function() {
+            // Initialize side menu functionality
+            function initializeSideMenu() {
+                const sideMenu = $('#side-menu');
+                const menuTriggerWidth = 50;
+    
+                $('<div>')
+                    .css({
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        bottom: 0,
+                        width: `${menuTriggerWidth}px`,
+                        zIndex: 40,
+                    })
+                    .on('mouseenter', function() {
+                        sideMenu.removeClass('-translate-x-full');
+                    })
+                    .appendTo('body');
+    
+                sideMenu.on('mouseleave', function() {
+                    $(this).addClass('-translate-x-full');
+                });
+            }
+    
+            initializeSideMenu();
+    
+            // Modal management
+            const btnAjouterSortie = $('#btnAjouterSortie');
+            const modalAjouterSortie = $('#modalAjouterSortie');
+            const closeModal = $('#closeModal');
+            const closeAjouterSortie = $('#closeAjouterSortie');
+            const formAjoutSortie = $('#FormajoutSortie');
+    
+            // Set current date for date inputs
+            const today = new Date().toISOString().split('T')[0];
+            $('#date_sortie').val(today);
+    
+            // Show modal
+            btnAjouterSortie.on('click', function() {
+                modalAjouterSortie.removeClass('hidden');
+                modalAjouterSortie.css('display', 'flex');
+                $('#modalTitle').text('Ajouter une Sortie');
+                clearModalFields();
+            });
+    
+            // Close modal functions
+            function closeModalFunction() {
+                modalAjouterSortie.addClass('hidden');
+                modalAjouterSortie.css('display', 'none');
+                clearModalFields();
+            }
+    
+            closeModal.on('click', closeModalFunction);
+            closeAjouterSortie.on('click', closeModalFunction);
+    
+            // Close when clicking outside
+            modalAjouterSortie.on('click', function(e) {
+                if (e.target === this) {
+                    closeModalFunction();
+                }
+            });
+    
+            // Calculate total price automatically
+            function calculateTotal() {
+                const quantite = parseFloat($('#quantite').val()) || 0;
+                const prixUnitaire = parseFloat($('#prix_unitaire').val()) || 0;
+                $('#prix_total').val((quantite * prixUnitaire).toFixed(2));
+            }
+    
+            $('#quantite, #prix_unitaire').on('input', calculateTotal);
+    
+            // Fonction pour charger les produits
     function loadProducts() {
         $.ajax({
             url: 'get_products.php',
@@ -529,95 +531,186 @@ $(document).ready(function() {
             }
         });
     }
-
-    // Gestion des sorties
-    $('#btn_enregistrer_sortie').on('click', function() {
-        const formData = {
-            code: $('#code_sortie').val(),
-            id_produit: $('#id_produit').val(),
-            quantite: parseFloat($('#quantite').val()) || 0,
-            prix_unitaire: parseFloat($('#prix_unitaire').val()) || 0,
-            prix_total: parseFloat($('#quantite').val()) * parseFloat($('#prix_unitaire').val()),
-            date_sortie: $('#date_sortie').val(),
-            date_expiration: $('#date_expiration').val()
-        };
-
-        if (!formData.id_produit || !formData.quantite || !formData.prix_unitaire || !formData.date_sortie || !formData.date_expiration) {
-            $('#message_sortie').html('<p style="color: red;">Veuillez remplir tous les champs requis</p>');
-            return;
-        }
-
-        $.ajax({
-            type: 'POST',
-            url: 'sortie_magazin.php',
-            data: formData,
-            dataType: 'json',
-            success: function(response) {
-                if (response.status === 'success') {
-                    $('#message_sortie').html('<p style="color: green;">' + response.message + '</p>');
-                    $('#formAjouterSortie')[0].reset();
-                    getListeSorties();
-                    setTimeout(function() {
-                        modalAjouterSortie.style.display = "none";
-                        $('#message_sortie').html('');
-                    }, 2000);
-                } else {
-                    $('#message_sortie').html('<p style="color: red;">' + response.message + '</p>');
+            // Handle product selection to auto-fill price and check stock
+            $('#id_produit').on('change', function() {
+                const selectedOption = $(this).find('option:selected');
+                const price = selectedOption.data('price');
+                const stock = selectedOption.data('stock');
+                
+                if (price) {
+                    $('#prix_unitaire').val(price).trigger('input');
                 }
-            },
-            error: function(error) {
-                $('#message_sortie').html('<p style="color: red;">Erreur lors de l\'enregistrement: ' + error.responseText + '</p>');
+                
+                $('#stock_disponible').val(stock || 0);
+            });
+    
+            // Load Outputs table
+            function loadSorties() {
+                $.ajax({
+                    url: 'sortie_get_liste.php',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        const tbody = $('tbody');
+                        tbody.empty();
+    
+                        if (response.status === 'success' && Array.isArray(response.donnees)) {
+                            response.donnees.forEach(function(sortie) {
+                                tbody.append(`
+                                    <tr class="bg-white hover:bg-gray-50" data-id="${sortie.id}">
+                                        <td class="border border-gray-300 px-4 py-2">${sortie.nom || ''}</td>
+                                        <td class="border border-gray-300 px-4 py-2">${sortie.quantite || ''}</td>
+                                        <td class="border border-gray-300 px-4 py-2">${sortie.prix_unitaire || ''}</td>
+                                        <td class="border border-gray-300 px-4 py-2">${sortie.prix_total || ''}</td>
+                                        <td class="border border-gray-300 px-4 py-2">${sortie.date_sortie || ''}</td>
+                                        <td class="border border-gray-300 px-4 py-2">${sortie.date_expiration || ''}</td>
+                                        <td class="border border-gray-300 px-4 py-2">
+                                            <button class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 btnModifier">
+                                                Modifier
+                                            </button>
+                                            <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 btnSupprimer">
+                                                Supprimer
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `);
+                            });
+                        } else {
+                            tbody.append('<tr><td colspan="7" class="text-center py-4">Aucune sortie trouvée.</td></tr>');
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Error loading outputs:', xhr);
+                        alert("Erreur lors du chargement des sorties.");
+                    }
+                });
             }
-        });
-    });
-
-    $('#quantite, #prix_unitaire').on('input', function() {
-        const quantite = parseFloat($('#quantite').val()) || 0;
-        const prix_unitaire = parseFloat($('#prix_unitaire').val()) || 0;
-        $('#prix_total').val(quantite * prix_unitaire);
-    });
-
-    // Fonction pour remplir la liste des sorties
-    function getListeSorties() {
-        $.ajax({
-            url: 'sortie_get_liste.php',
-            type: 'GET',
-            dataType: 'json',
-            success: function(response) {
-                $('tbody').empty();
-
-                if (response.donnees && response.donnees.length > 0) {
-                    response.donnees.forEach(function(sortie) {
-                        const row = `<tr>
-                            <td>${sortie.nom || ''}</td>
-                            <td>${sortie.quantite || ''}</td>
-                            <td>${sortie.prix_unitaire || ''}</td>
-                            <td>${sortie.prix_total || ''}</td>
-                            <td>${sortie.date_sortie || ''}</td>
-                            <td>${sortie.date_expiration || ''}</td>
-                            <td>
-                                <button class="btn btnModifier text-blue-600 hover:text-blue-800">Modifier</button>
-                                <button class="btn btnSupprimer text-red-600 hover:text-red-800">Supprimer</button>
-                            </td>
-                        </tr>`;
-                        $('tbody').append(row);
+    
+            // Handle form submission
+            $('#btn_enregistrer_sortie').on('click', function(e) {
+                e.preventDefault();
+                
+                const quantite = parseFloat($('#quantite').val());
+                const stockDisponible = parseFloat($('#stock_disponible').val());
+                
+                if (quantite > stockDisponible) {
+                    alert('Quantité demandée supérieure au stock disponible!');
+                    return;
+                }
+    
+                const code = $('#code').val();
+                const url = code ? 'sortie_modifier.php' : 'sortie_nouveau.php';
+    
+                const formData = {
+                    code: code,
+                    id_produit: $('#id_produit').val(),
+                    quantite: $('#quantite').val(),
+                    prix_unitaire: $('#prix_unitaire').val(),
+                    prix_total: $('#prix_total').val(),
+                    date_sortie: $('#date_sortie').val(),
+                    date_expiration: $('#date_expiration').val()
+                };
+    
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: formData,
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            closeModalFunction();
+                            loadSorties();
+                            loadProducts(); // Refresh products to update stock quantities
+                            alert(code ? 'Sortie modifiée avec succès!' : 'Sortie enregistrée avec succès!');
+                        } else {
+                            alert("Erreur: " + (response.message || "Une erreur est survenue"));
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Error:', xhr);
+                        alert("Erreur lors de l'opération.");
+                    }
+                });
+            });
+    
+            // Handle edit button clicks
+            $(document).on('click', '.btnModifier', function() {
+                const row = $(this).closest('tr');
+                $('#modalTitle').text('Modifier une Sortie');
+                
+                const cells = row.find('td');
+                $('#code').val(row.data('id'));
+                $('#id_produit').val(row.data('product-id'));
+                $('#quantite').val(cells.eq(1).text());
+                $('#prix_unitaire').val(cells.eq(2).text());
+                $('#prix_total').val(cells.eq(3).text());
+                $('#date_sortie').val(cells.eq(4).text());
+                $('#date_expiration').val(cells.eq(5).text());
+    
+                modalAjouterSortie.removeClass('hidden').css('display', 'flex');
+            });
+    
+            // Handle delete button clicks
+            $(document).on('click', '.btnSupprimer', function() {
+                if (confirm('Êtes-vous sûr de vouloir supprimer cette sortie?')) {
+                    const id = $(this).closest('tr').data('id');
+                    $.ajax({
+                        url: 'sortie_supprimer.php',
+                        type: 'POST',
+                        data: { code: id },
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                loadSorties();
+                                loadProducts(); // Refresh products to update stock quantities
+                                alert('Sortie supprimée avec succès!');
+                            } else {
+                                alert("Erreur lors de la suppression: " + (response.message || "Une erreur est survenue"));
+                            }
+                        },
+                        error: function(xhr) {
+                            console.error('Error:', xhr);
+                            alert("Erreur lors de la suppression.");
+                        }
                     });
-                } else {
-                    $('tbody').append('<tr><td colspan="8">Aucune sortie trouvée.</td></tr>');
                 }
-            },
-            error: function(error) {
-                $('tbody').append('<tr><td colspan="8" style="color:red;">Erreur lors de la récupération des sorties: ' + error + '</td></tr>');
+            });
+    
+            // Search functionality
+            $('#search_product, #date_debut, #date_fin').on('input', function() {
+                const searchProduct = $('#search_product').val().toLowerCase();
+                const dateDebut = $('#date_debut').val();
+                const dateFin = $('#date_fin').val();
+    
+                $('tbody tr').each(function() {
+                    const row = $(this);
+                    const productName = row.find('td:first').text().toLowerCase();
+                    const dateOutput = row.find('td:eq(4)').text();
+    
+                    const matchesProduct = !searchProduct || productName.includes(searchProduct);
+                    const matchesDate = (!dateDebut || dateOutput >= dateDebut) && 
+                                      (!dateFin || dateOutput <= dateFin);
+    
+                    row.toggle(matchesProduct && matchesDate);
+                });
+            });
+    
+            function clearModalFields() {
+                $('#code').val('');
+                $('#id_produit').val('');
+                $('#quantite').val('');
+                $('#prix_unitaire').val('');
+                $('#prix_total').val('');
+                $('#stock_disponible').val('');
+                $('#date_sortie').val(today);
+                $('#date_expiration').val('');
             }
+    
+            // Initial data load
+            loadProducts();
+            loadSorties();
         });
-    }
-
-    // Charger les produits et les sorties au chargement de la page
-    loadProducts();
-    getListeSorties();
-});
-
+    });
     </script> 
-
 </body>
 </html>
