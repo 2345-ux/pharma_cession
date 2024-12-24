@@ -640,7 +640,7 @@ body {
                 
                 const cells = row.find('td');
                 $('#code').val(row.data('id'));
-                $('#id_produit').val(row.data('product-id'));
+                $('#id_produit').val(row.data('product-id')).trigger('change'); // Set the selected value and trigger change event
                 $('#quantite').val(cells.eq(1).text());
                 $('#prix_unitaire').val(cells.eq(2).text());
                 $('#prix_total').val(cells.eq(3).text());
