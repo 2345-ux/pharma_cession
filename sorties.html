@@ -359,7 +359,7 @@ body {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                        <tr data-id="1" data-product-id="1">
                             <td class="p-3 border">Produit A</td>
                             <td class="p-3 border">50</td>
                             <td class="p-3 border">12.00 €</td>
@@ -415,7 +415,7 @@ body {
             <h2 class="text-xl font-semibold mb-4 text-center">Ajouter une nouvelle Sortie</h2>
             
             <form id="formAjouterSortie" class="space-y-4">
-                <input type="text" placeholder="Code de sortie" id="code" hidden>
+                <input type="text" placeholder="Code de sortie" id="code" class="w-full p-2 border rounded">
                 <select id="id_produit" class="w-full p-2 border rounded">
                     <option>Sélectionner un produit</option>
                 </select>
@@ -520,6 +520,7 @@ body {
                     productSelect.innerHTML = '<option value="">Sélectionner un produit</option>';
                     productsData.forEach(product => {
                         const option = new Option(product.nom, product.id);
+                        option.setAttribute('data-price', product.prix_unitaire); // Set data-price attribute
                         productSelect.add(option);
                     });
                 } else {
@@ -557,7 +558,7 @@ body {
                         if (response.status === 'success' && Array.isArray(response.donnees)) {
                             response.donnees.forEach(function(sortie) {
                                 tbody.append(`
-                                    <tr class="bg-white hover:bg-gray-50" data-id="${sortie.id}">
+                                    <tr class="bg-white hover:bg-gray-50" data-id="${sortie.id}" data-product-id="${sortie.id_produit}">
                                         <td class="border border-gray-300 px-4 py-2">${sortie.nom || ''}</td>
                                         <td class="border border-gray-300 px-4 py-2">${sortie.quantite || ''}</td>
                                         <td class="border border-gray-300 px-4 py-2">${sortie.prix_unitaire || ''}</td>
@@ -642,8 +643,8 @@ body {
                 $('#code').val(row.data('id'));
                 $('#id_produit').val(row.data('product-id')).trigger('change'); // Set the selected value and trigger change event
                 $('#quantite').val(cells.eq(1).text());
-                $('#prix_unitaire').val(cells.eq(2).text());
-                $('#prix_total').val(cells.eq(3).text());
+                $('#prix_unitaire').val(cells.eq(2).text().replace(' F cfa', '')); // Remove currency symbol and set value
+                //$('#prix_total').val(cells.eq(3).text().replace(' F cfa', '')); // Remove currency symbol and set value
                 $('#date_sortie').val(cells.eq(4).text());
                 $('#date_expiration').val(cells.eq(5).text());
     

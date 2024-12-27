@@ -140,12 +140,11 @@
             }
         }
         #modalAjouterEntree {
-            display: none; /* Initially hidden */
             position: fixed; /* Fixed to the viewport */
             inset: 0; /* Full-screen overlay */
             background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
             z-index: 1000; /* Ensure it appears on top of other content */
-            display: flex; /* Flexbox to center content */
+            display: none; /* Only one display property */
             align-items: center; /* Vertically center */
             justify-content: center; /* Horizontally center */
         }
@@ -224,7 +223,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="bg-white hover:bg-gray-50">
+                        <tr data-id="1" data-product-id="1" data-supplier-id="1" class="bg-white hover:bg-gray-50">
                             <td class="border border-gray-300 px-4 py-2">Produit A</td>
                             <td class="border border-gray-300 px-4 py-2">100</td>
                             <td class="border border-gray-300 px-4 py-2">10.00 €</td>
@@ -233,8 +232,8 @@
                             <td class="border border-gray-300 px-4 py-2">2024-06-01</td>
                             <td class="border border-gray-300 px-4 py-2">Fournisseur A</td>
                             <td class="border border-gray-300 px-4 py-2">
-                                <button class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">Modifier</button>
-                                <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Supprimer</button>
+                                <button class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 btnModifier">Modifier</button>
+                                <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 btnSupprimer">Supprimer</button>
                             </td>
                         </tr>
                         <!-- Répétez pour d'autres lignes -->
@@ -254,7 +253,7 @@
             </button>
         </div>
         <form id="FormajoutProduit" class="space-y-4">
-            <input type="text" id="code" hidden>
+            <input type="text" id="code" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
 
             <div class="space-y-2">
                 <label for="id_produit" class="block text-sm font-medium">Produit:</label>
@@ -286,18 +285,12 @@
             </div>
 
             <div class="space-y-2">
-                <label for="prix_fournis" class="block text-sm font-medium">Prix d'achat:</label>
-                <input type="number" id="prix_fournis" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
+                <input type="number" placeholder="prix_fournis" id="prix_fournis" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
             </div>
 
             <div class="space-y-2">
-                <label for="prix_unitaire" class="block text-sm font-medium">Prix de vente:</label>
-                <input type="number" id="prix_unitaire" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
-            </div>
-
-            <div class="space-y-2">
-                <label for="prix_total" class="block text-sm font-medium">Montant Total:</label>
-                <input type="number" id="prix_total" class="w-full border rounded-lg px-3 py-2 bg-gray-100 focus:outline-none" readonly>
+                <!--label for="prix_unitaire" class="block text-sm font-medium">Prix de vente:</label-->
+                <input type="number" placeholder="prix_unitaire" id="prix_unitaire" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
             </div>
 
             <div class="space-y-2">
@@ -306,7 +299,7 @@
             </div>
 
             <div class="space-y-2">
-                <label for="date_expiration" class="block text-sm font-medium">Date d'Expiration:</label>
+                <!--label for="date_expiration" class="block text-sm font-medium">Date d'Expiration:</label-->
                 <input type="date" id="date_expiration" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
             </div>
 
@@ -450,7 +443,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (response.status === 'success' && Array.isArray(response.donnees)) {
                         response.donnees.forEach(function(entry) {
                             tbody.append(`
-                                <tr class="bg-white hover:bg-gray-50">
+                                <tr class="bg-white hover:bg-gray-50" data-id="${entry.id}" data-product-id="${entry.product_id}" data-supplier-id="${entry.supplier_id}">
                                     <td class="border border-gray-300 px-4 py-2">${entry.nom || ''}</td>
                                     <td class="border border-gray-300 px-4 py-2">${entry.prix_fournis || ''}</td>
                                     <td class="border border-gray-300 px-4 py-2">${entry.prix_unitaire || ''}</td>
@@ -516,25 +509,28 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
 
-        // Handle edit button clicks
-        $(document).on('click', '.btnModifier', function() {
-            const row = $(this).closest('tr');
-            $('#modalTitle').text('Modifier un Produit');
-            
-            // Get data from the row
-            const cells = row.find('td');
-            $('#code').val(row.data('id'));
-            $('#id_produit').val(row.data('product-id'));
-            $('#id_fournisseur').val(row.data('supplier-id'));
-            $('#quantite').val(cells.eq(3).text());
-            $('#prix_fournis').val(cells.eq(1).text());
-            $('#prix_unitaire').val(cells.eq(2).text());
-            $('#prix_total').val(cells.eq(4).text());
-            $('#date_ajout').val(cells.eq(5).text());
-            $('#date_expiration').val(cells.eq(6).text());
+       // Handle edit button clicks
+$(document).on('click', '.btnModifier', function() {
+    const row = $(this).closest('tr');
+    $('#modalTitle').text('Modifier un Produit');
+    
+    // Get data from the row
+    const cells = row.find('td');
+    const id = row.data('id');
+    console.log("Editing entry with ID:", id); // Add this for debugging
+    
+    $('#code').val(id);  // This line is crucial - explicitly set the code value
+    $('#id_produit').val(row.data('product-id'));
+    $('#id_fournisseur').val(row.data('supplier-id'));
+    $('#quantite').val(cells.eq(3).text().trim());
+    $('#prix_fournis').val(cells.eq(1).text().trim().replace(' €', '').replace(/\s/g, '')); 
+    $('#prix_unitaire').val(cells.eq(2).text().trim().replace(' €', '').replace(/\s/g, '')); 
+    $('#prix_total').val(cells.eq(4).text().trim().replace(' €', '').replace(/\s/g, '')); 
+    $('#date_ajout').val(cells.eq(5).text().trim());
+    $('#date_expiration').val(cells.eq(6).text().trim());
 
-            modalAjouterEntree.removeClass('hidden').css('display', 'flex');
-        });
+    modalAjouterEntree.removeClass('hidden').css('display', 'flex');
+});
 
         // Handle delete button clicks
         $(document).on('click', '.btnSupprimer', function() {
