@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pharmacie de Cession - entrées des produits</title>
-    <script src="assets\js\chart.j@4.js"></script>
-    <script src="assets\js\lucide@04680.min.js"></script>
-    <link href="assets\css\tailwind.min.css" rel="stylesheet">
-    <link href="assets\css\all.min.css" rel="stylesheet">
+    <title>Pharmacie de Cession - Entrées des produits</title>
+    <script src="assets/js/chart.j@4.js"></script>
+    <script src="assets/js/lucide@04680.min.js"></script>
+    <link href="assets/css/tailwind.min.css" rel="stylesheet">
+    <link href="assets/css/all.min.css" rel="stylesheet">
     <script src="js/jquery-3.6.0.min.js"></script>
     <style>
         * {
@@ -40,7 +40,7 @@
             padding-top: 2rem;
             padding-bottom: 2rem;
         }
-    
+
         .content {
             background-color: white;
             border-radius: 0.75rem;
@@ -49,12 +49,11 @@
             padding: 1.5rem;
             border-left: 4px solid #047857;
         }
-    
+
         .content:hover {
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
-        
-        /* Table Container */
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -64,19 +63,17 @@
             background-color: #ffffff;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
-        
-        /* Table Header */
+
         thead {
-            background-color: #047857; /* bg-green-600 */
-            color: white; /* text-white */
-            transition: background-color 0.3s ease; /* Smooth hover effect */
+            background-color: #047857;
+            color: white;
+            transition: background-color 0.3s ease;
         }
-        
+
         thead:hover {
-            background-color: #065f46; /* hover:bg-green-700 */
+            background-color: #065f46;
         }
-        
-        /* Header Cells */
+
         thead th {
             padding: 1rem;
             text-align: left;
@@ -84,46 +81,42 @@
             font-size: 1rem;
             border-bottom: 2px solid #d1d5db;
         }
-        
-        /* Body Rows */
+
         tbody tr {
             background-color: #ffffff;
             transition: background-color 0.3s ease;
         }
-        
+
         tbody tr:nth-child(even) {
             background-color: #f9fafb;
         }
-        
+
         tbody tr:hover {
             background-color: #f0fdf4;
         }
-        
-        /* Body Cells */
+
         tbody td {
             border: 1px solid #d1d5db;
             padding: 1rem;
             text-align: left;
             font-size: 0.875rem;
         }
-        
-        /* Action Buttons */
+
         .btn {
             display: inline-block;
             padding: 0.5rem 1rem;
             font-size: 1rem;
             color: #ffffff;
-            background-color: #16a34a; /* bg-green-600 */
+            background-color: #16a34a;
             border-radius: 0.5rem;
             text-decoration: none;
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
-        
+
         .btn:hover {
-            background-color: #15803d; /* hover:bg-green-700 */
+            background-color: #15803d;
         }
-        
 
         @media (max-width: 768px) {
             .container {
@@ -139,442 +132,469 @@
                 text-align: center;
             }
         }
+
         #modalAjouterEntree {
-            position: fixed; /* Fixed to the viewport */
-            inset: 0; /* Full-screen overlay */
-            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
-            z-index: 1000; /* Ensure it appears on top of other content */
-            display: none; /* Only one display property */
-            align-items: center; /* Vertically center */
-            justify-content: center; /* Horizontally center */
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
         }
-        
+
         #modalAjouterEntree .modal-content {
-            background: white; /* Modal box background */
-            border-radius: 8px; /* Rounded corners */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow */
-            padding: 24px; /* Spacing inside the modal */
-            width: 100%; /* Full width by default */
-            max-width: 600px; /* Limit width to prevent oversized modal */
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            padding: 24px;
+            width: 100%;
+            max-width: 600px;
         }
- 
+
         .hidden {
-            display: none; /* Utility class to hide elements */
-        }      
+            display: none;
+        }
+
+        .tab-button.active {
+            border-bottom-color: #059669; /* Green-600 */
+            color: #059669; /* Green-600 */
+        }
     </style>
 </head>
-        <body class="bg-gray-100 text-gray-800">
-            <header class="bg-green-600 text-white py-4">
-                <h1 class="text-center text-2xl font-bold">Pharmacie de Cession - Entrées de Produits</h1>
-            </header>
-            <div class="container">
-                <div id="side-menu" class="fixed top-0 left-0 h-full bg-white shadow-lg transform -translate-x-full transition-transform duration-300 ease-in-out z-50 w-64 hover:opacity-100 group">
-                    <div class="absolute top-0 right-0 m-4 cursor-pointer hover:text-red-500">
-                        <i data-lucide="x" class="w-6 h-6"></i>
-                    </div>
-                    <nav class="p-6 pt-16">
-                        <h2 class="text-2xl font-bold text-green-600 mb-6">Menu</h2>
-                        <ul class="space-y-4">
-                            <li><a href="index.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
-                                <i data-lucide="home" class="w-5 h-5 mr-3"></i>Accueil</a></li>
-                            <li><a href="stock2.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
-                                <i data-lucide="package" class="w-5 h-5 mr-3"></i>Stock</a></li>
-                            <li><a href="commande.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
-                                <i data-lucide="shopping-cart" class="w-5 h-5 mr-3"></i>Commandes</a></li>
-                            <li><a href="sorties.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
-                                <i data-lucide="log-out" class="w-5 h-5 mr-3"></i>Sorties</a></li>
-                            <li><a href="produit.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
-                                <i data-lucide="box" class="w-5 h-5 mr-3"></i>Produits</a></li>
-                            <li><a href="categorie.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
-                                <i data-lucide="layers" class="w-5 h-5 mr-3"></i>Catégories</a></li>
-                            <li><a href="fournisseurs.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
-                                <i data-lucide="truck" class="w-5 h-5 mr-3"></i>Fournisseurs</a></li>
-                        </ul>
-                    </nav>
-                </div>        
-            <div class="container mx-auto mt-8 p-4 bg-white shadow-md rounded-lg">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-semibold">Entrées de Produits</h2>
-                    <div>
-                        <button id="btnAjouterEntree" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 focus:outline-none">Ajouter un Produit</button>
-                        <button class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 focus:outline-none">Imprimer</button>
-                    </div>
-                </div>
-        
-                <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                    <input type="text" placeholder="Produit" class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-green-600">
-                    <input type="date" placeholder="Date de début" class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-green-600">
-                    <input type="date" placeholder="Date de fin" class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-green-600">
-                    <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 focus:outline-none">Rechercher</button>
-                </div>
-        
-                <table class="mt-8 w-full border-collapse border border-gray-200 rounded-lg overflow-hidden">
-                    <thead class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 focus:outline-none">
-                        <tr>
-                            <th class="border border-gray-300 px-4 py-2">Produit</th>
-                            <th class="border border-gray-300 px-4 py-2">Prix Achat</th>
-                            <th class="border border-gray-300 px-4 py-2">Prix Vente</th>
-                            <th class="border border-gray-300 px-4 py-2">Quantité</th>
-                            <th class="border border-gray-300 px-4 py-2">Prix Total</th>
-                            <th class="border border-gray-300 px-4 py-2">Date d'Ajout</th>
-                            <th class="border border-gray-300 px-4 py-2">Date d'Expiration</th>
-                            <th class="border border-gray-300 px-4 py-2">Fournisseur</th>
-                            <th class="border border-gray-300 px-4 py-2">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr data-id="1" data-product-id="1" data-supplier-id="1" class="bg-white hover:bg-gray-50">
-                            <td class="border border-gray-300 px-4 py-2">Produit A</td>
-                            <td class="border border-gray-300 px-4 py-2">100</td>
-                            <td class="border border-gray-300 px-4 py-2">10.00 €</td>
-                            <td class="border border-gray-300 px-4 py-2">1000.00 €</td>
-                            <td class="border border-gray-300 px-4 py-2">2023-06-01</td>
-                            <td class="border border-gray-300 px-4 py-2">2024-06-01</td>
-                            <td class="border border-gray-300 px-4 py-2">Fournisseur A</td>
-                            <td class="border border-gray-300 px-4 py-2">
-                                <button class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 btnModifier">Modifier</button>
-                                <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 btnSupprimer">Supprimer</button>
-                            </td>
-                        </tr>
-                        <!-- Répétez pour d'autres lignes -->
-                    </tbody>
-                </table>
-            </div>
-   <!-- Modal pour ajouter un produit -->
-   <div id="modalAjouterEntree" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6 relative">
-        <button id="closeAjouterCommande" class="absolute top-4 right-4 text-gray-500 hover:text-red-500">
-            <i data-lucide="x" class="w-6 h-6"></i>
-        </button>
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4" id="modalTitle">Ajouter un Produit</h2>
-            <button id="closeModal" class="text-gray-400 hover:text-gray-600">
+<body class="bg-gray-100 text-gray-800">
+    <header class="bg-green-600 text-white py-4">
+        <h1 class="text-center text-2xl font-bold">Pharmacie de Cession - Entrées de Produits</h1>
+    </header>
+    <div class="container">
+        <div id="side-menu" class="fixed top-0 left-0 h-full bg-white shadow-lg transform -translate-x-full transition-transform duration-300 ease-in-out z-50 w-64 hover:opacity-100 group">
+            <div class="absolute top-0 right-0 m-4 cursor-pointer hover:text-red-500">
                 <i data-lucide="x" class="w-6 h-6"></i>
-            </button>
+            </div>
+            <nav class="p-6 pt-16">
+                <h2 class="text-2xl font-bold text-green-600 mb-6">Menu</h2>
+                <ul class="space-y-4">
+                    <li><a href="index.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="home" class="w-5 h-5 mr-3"></i>Accueil</a></li>
+                    <li><a href="stock2.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="package" class="w-5 h-5 mr-3"></i>Stock</a></li>
+                    <li><a href="commande.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="shopping-cart" class="w-5 h-5 mr-3"></i>Commandes</a></li>
+                    <li><a href="sorties.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="log-out" class="w-5 h-5 mr-3"></i>Sorties</a></li>
+                    <li><a href="produit.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="box" class="w-5 h-5 mr-3"></i>Produits</a></li>
+                    <li><a href="categorie.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="layers" class="w-5 h-5 mr-3"></i>Catégories</a></li>
+                    <li><a href="fournisseurs.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="truck" class="w-5 h-5 mr-3"></i>Fournisseurs</a></li>
+                </ul>
+            </nav>
         </div>
-        <form id="FormajoutProduit" class="space-y-4">
-            <input type="text" id="code" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
-
-            <div class="space-y-2">
-                <label for="id_produit" class="block text-sm font-medium">Produit:</label>
-                <div class="relative">
-                    <select id="id_produit" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
-                        <option value="">Sélectionner un produit</option>
-                    </select>
-                    <button hidden type="button" onclick="toggleNewProductForm()" class="absolute right-2 top-2">
-                        <i data-lucide="plus-circle" class="w-6 h-6 text-green-600"></i>
-                    </button>
+        <div class="container mx-auto mt-8 p-4 bg-white shadow-md rounded-lg">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-semibold">Entrées de Produits</h2>
+                <div>
+                    <button id="btnAjouterEntree" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 focus:outline-none">Ajouter un Produit</button>
+                    <button class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 focus:outline-none">Imprimer</button>
                 </div>
             </div>
-
-            <div class="space-y-2">
-                <label for="id_fournisseur" class="block text-sm font-medium">Fournisseur:</label>
-                <div class="relative">
-                    <select id="id_fournisseur" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
-                        <option value="">Sélectionner un fournisseur</option>
-                    </select>
-                    <button hidden type="button" onclick="toggleNewSupplierForm()" class="absolute right-2 top-2">
-                        <i data-lucide="plus-circle" class="w-6 h-6 text-green-600"></i>
+            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <input type="text" placeholder="Produit" class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-green-600">
+                <input type="date" placeholder="Date de début" class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-green-600">
+                <input type="date" placeholder="Date de fin" class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-green-600">
+                <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 focus:outline-none">Rechercher</button>
+            </div>
+            <table class="mt-8 w-full border-collapse border border-gray-200 rounded-lg overflow-hidden">
+                <thead class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 focus:outline-none">
+                    <tr>
+                        <th hidden class="border border-gray-300 px-4 py-2">Code</th>
+                        <th class="border border-gray-300 px-4 py-2">Produit</th>
+                        <th class="border border-gray-300 px-4 py-2">Prix Achat</th>
+                        <th class="border border-gray-300 px-4 py-2">Prix Vente</th>
+                        <th class="border border-gray-300 px-4 py-2">Quantité</th>
+                        <th class="border border-gray-300 px-4 py-2">Prix Total</th>
+                        <th class="border border-gray-300 px-4 py-2">Date d'Ajout</th>
+                        <th class="border border-gray-300 px-4 py-2">Date d'Expiration</th>
+                        <th class="border border-gray-300 px-4 py-2">Fournisseur</th>
+                        <th class="border border-gray-300 px-4 py-2">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Example row -->
+                    <tr data-id="1" data-product-id="1" data-supplier-id="1" class="bg-white hover:bg-gray-50">
+                        <td hidden class="border border-gray-300 px-4 py-2">00001</td>
+                        <td class="border border-gray-300 px-4 py-2">Produit A</td>
+                        <td class="border border-gray-300 px-4 py-2">10.00 €</td>
+                        <td class="border border-gray-300 px-4 py-2">15.00 €</td>
+                        <td class="border border-gray-300 px-4 py-2">100</td>
+                        <td class="border border-gray-300 px-4 py-2">1000.00 €</td>
+                        <td class="border border-gray-300 px-4 py-2">2023-06-01</td>
+                        <td class="border border-gray-300 px-4 py-2">2024-06-01</td>
+                        <td class="border border-gray-300 px-4 py-2">Fournisseur A</td>
+                        <td class="border border-gray-300 px-4 py-2">
+                            <button class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 btnModifier">Modifier</button>
+                            <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 btnSupprimer">Supprimer</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!-- Modal pour ajouter un produit -->
+        <div id="modalAjouterEntree" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6 relative">
+                <button id="closeAjouterCommande" class="absolute top-4 right-4 text-gray-500 hover:text-red-500">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4" id="modalTitle">Ajouter un Produit</h2>
+                    <button id="closeModal" class="text-gray-400 hover:text-gray-600">
+                        <i data-lucide="x" class="w-6 h-6"></i>
                     </button>
                 </div>
+                <!-- Tab Navigation -->
+                <div class="flex space-x-4 mb-4 border-b border-gray-200">
+                    <button id="tabGeneral" class="tab-button py-2 px-4 text-sm font-medium text-gray-500 hover:text-green-600 focus:outline-none border-b-2 border-transparent active">Général</button>
+                    <button id="tabDetails" class="tab-button py-2 px-4 text-sm font-medium text-gray-500 hover:text-green-600 focus:outline-none border-b-2 border-transparent">Détails</button>
+                </div>
+                <!-- Tab Content -->
+                <form id="FormajoutProduit" class="space-y-4">
+                    <!-- General Information Tab -->
+                    <div id="generalTab" class="tab-content">
+                        <input type="text" id="code" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+                        <div class="space-y-2">
+                            <label for="id_produit" class="block text-sm font-medium">Produit:</label>
+                            <div class="relative">
+                                <select id="id_produit" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+                                    <option value="">Sélectionner un produit</option>
+                                </select>
+                                <button hidden type="button" onclick="toggleNewProductForm()" class="absolute right-2 top-2">
+                                    <i data-lucide="plus-circle" class="w-6 h-6 text-green-600"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="id_fournisseur" class="block text-sm font-medium">Fournisseur:</label>
+                            <div class="relative">
+                                <select id="id_fournisseur" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+                                    <option value="">Sélectionner un fournisseur</option>
+                                </select>
+                                <button hidden type="button" onclick="toggleNewSupplierForm()" class="absolute right-2 top-2">
+                                    <i data-lucide="plus-circle" class="w-6 h-6 text-green-600"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="quantite" class="block text-sm font-medium">Quantité:</label>
+                            <input type="number" id="quantite" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="prix_fournis" class="block text-sm font-medium">Prix Fournisseur:</label>
+                            <input type="number" id="prix_fournis" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="prix_unitaire" class="block text-sm font-medium">Prix Unitaire:</label>
+                            <input type="number" id="prix_unitaire" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
+                        </div>
+                    </div>
+                    <!-- Additional Details Tab -->
+                    <div id="detailsTab" class="tab-content hidden">
+                        <div class="space-y-2">
+                            <label for="prix_total" class="block text-sm font-medium">Prix Total:</label>
+                            <input type="number" id="prix_total" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" readonly>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="date_ajout" class="block text-sm font-medium">Date d'Ajout:</label>
+                            <input type="date" id="date_ajout" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="date_expiration" class="block text-sm font-medium">Date d'Expiration:</label>
+                            <input type="date" id="date_expiration" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
+                        </div>
+                    </div>
+                    <!-- Save Button -->
+                    <div class="flex justify-end space-x-2">
+                        <button type="button" id="btn_enregitrer_nouveau" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 focus:outline-none">Enregistrer</button>
+                    </div>
+                </form>
             </div>
-
-            <div class="space-y-2">
-                <label for="quantite" class="block text-sm font-medium">Quantité:</label>
-                <input type="number" id="quantite" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
-            </div>
-
-            <div class="space-y-2">
-                <input type="number" placeholder="prix_fournis" id="prix_fournis" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
-            </div>
-
-            <div class="space-y-2">
-                <!--label for="prix_unitaire" class="block text-sm font-medium">Prix de vente:</label-->
-                <input type="number" placeholder="prix_unitaire" id="prix_unitaire" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
-            </div>
-
-            <div class="space-y-2">
-                <label for="date_ajout" class="block text-sm font-medium">Date d'Ajout:</label>
-                <input type="date" id="date_ajout" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
-            </div>
-
-            <div class="space-y-2">
-                <!--label for="date_expiration" class="block text-sm font-medium">Date d'Expiration:</label-->
-                <input type="date" id="date_expiration" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
-            </div>
-
-            <div class="flex justify-end space-x-2">
-                <button type="button" id="btn_enregitrer_nouveau" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 focus:outline-none">Enregistrer</button>
-            </div>
-        </form>
+        </div>
     </div>
-</div>
-<script>
- // Initialize Lucide icons
-document.addEventListener('DOMContentLoaded', function() {
-    lucide.createIcons();
-
-    $(document).ready(function () {
-        // Initialize side menu functionality
-        function initializeSideMenu() {
-            const sideMenu = $('#side-menu');
-            const menuTriggerWidth = 50;
-
-            $('<div>')
-                .css({
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    bottom: 0,
-                    width: `${menuTriggerWidth}px`,
-                    zIndex: 40,
-                })
-                .on('mouseenter', function () {
-                    sideMenu.removeClass('-translate-x-full');
-                })
-                .appendTo('body');
-
-            sideMenu.on('mouseleave', function () {
-                $(this).addClass('-translate-x-full');
-            });
-        }
-
-        initializeSideMenu();
-
-        // Modal management
-        const btnAjouterEntree = $('#btnAjouterEntree');
-        const modalAjouterEntree = $('#modalAjouterEntree');
-        const closeModal = $('#closeModal');
-        const closeAjouterCommande = $('#closeAjouterCommande');
-        const formAjoutProduit = $('#FormajoutProduit');
-
-        // Set current date for date inputs
-        const today = new Date().toISOString().split('T')[0];
-        $('#date_ajout').val(today);
-
-        // Show modal
-        btnAjouterEntree.on('click', function() {
-            modalAjouterEntree.css('display', 'flex');
-            modalAjouterEntree.removeClass('hidden');
-            $('#modalTitle').text('Ajouter un Produit');
-            clearModalFields();
-        });
-
-        // Close modal functions
-        function closeModalFunction() {
-            modalAjouterEntree.css('display', 'none');
-            modalAjouterEntree.addClass('hidden');
-            clearModalFields();
-        }
-
-        closeModal.on('click', closeModalFunction);
-        closeAjouterCommande.on('click', closeModalFunction);
-
-        // Close when clicking outside
-        modalAjouterEntree.on('click', function(e) {
-            if (e.target === this) {
-                closeModalFunction();
-            }
-        });
-
-        // Calculate total price automatically
-        function calculateTotal() {
-            const quantite = parseFloat($('#quantite').val()) || 0;
-            const prixFournis = parseFloat($('#prix_fournis').val()) || 0;
-            $('#prix_total').val((quantite * prixFournis).toFixed(2));
-        }
-
-        $('#quantite, #prix_fournis').on('input', calculateTotal);
-
-        // Load Products
-        function loadProducts() {
-            $.ajax({
-                url: 'get_products.php',
-                type: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    const select = $('#id_produit');
-                    select.empty().append('<option value="">Sélectionner un produit</option>');
-                    
-                    if (response && Array.isArray(response.data)) {
-                        response.data.forEach(function(product) {
-                            select.append(`<option value="${product.id}">${product.nom}</option>`);
-                        });
-                    }
-                },
-                error: function(xhr) {
-                    console.error('Error loading products:', xhr);
-                }
-            });
-        }
-
-        // Load Suppliers
-        function loadSuppliers() {
-            $.ajax({
-                url: 'get_suppliers.php',
-                type: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    const select = $('#id_fournisseur');
-                    select.empty().append('<option value="">Sélectionner un fournisseur</option>');
-                    
-                    if (response && Array.isArray(response)) {
-                        response.forEach(function(supplier) {
-                            select.append(`<option value="${supplier.id}">${supplier.nom}</option>`);
-                        });
-                    }
-                },
-                error: function(xhr) {
-                    console.error('Error loading suppliers:', xhr);
-                }
-            });
-        }
-
-        // Load Entries table
-        function loadEntries() {
-            $.ajax({
-                url: 'commande_get_liste.php',
-                type: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    const tbody = $('tbody');
-                    tbody.empty();
-
-                    if (response.status === 'success' && Array.isArray(response.donnees)) {
-                        response.donnees.forEach(function(entry) {
-                            tbody.append(`
-                                <tr class="bg-white hover:bg-gray-50" data-id="${entry.id}" data-product-id="${entry.product_id}" data-supplier-id="${entry.supplier_id}">
-                                    <td class="border border-gray-300 px-4 py-2">${entry.nom || ''}</td>
-                                    <td class="border border-gray-300 px-4 py-2">${entry.prix_fournis || ''}</td>
-                                    <td class="border border-gray-300 px-4 py-2">${entry.prix_unitaire || ''}</td>
-                                    <td class="border border-gray-300 px-4 py-2">${entry.quantite || ''}</td>
-                                    <td class="border border-gray-300 px-4 py-2">${entry.prix_total || ''}</td>
-                                    <td class="border border-gray-300 px-4 py-2">${entry.date_ajout || ''}</td>
-                                    <td class="border border-gray-300 px-4 py-2">${entry.date_expiration || ''}</td>
-                                    <td class="border border-gray-300 px-4 py-2">${entry.nom_fournisseurs || ''}</td>
-                                    <td class="border border-gray-300 px-4 py-2">
-                                        <button class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 btnModifier">Modifier</button>
-                                        <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 btnSupprimer">Supprimer</button>
-                                    </td>
-                                </tr>
-                            `);
-                        });
-                    } else {
-                        tbody.append('<tr><td colspan="9" class="text-center py-4">Aucune entrée trouvée.</td></tr>');
-                    }
-                },
-                error: function(xhr) {
-                    console.error('Error loading entries:', xhr);
-                    alert("Erreur lors du chargement des entrées.");
-                }
-            });
-        }
-
-        // Handle form submission
-        $('#btn_enregitrer_nouveau').on('click', function(e) {
-            e.preventDefault();
-            const code = $('#code').val();
-            const url = code ? 'commande_modifier.php' : 'commande_nouveau.php';
-
-            const formData = {
-                code: code,
-                id_produit: $('#id_produit').val(),
-                id_fournisseur: $('#id_fournisseur').val(),
-                quantite: $('#quantite').val(),
-                prix_fournis: $('#prix_fournis').val(),
-                prix_unitaire: $('#prix_unitaire').val(),
-                prix_total: $('#prix_total').val(),
-                date_ajout: $('#date_ajout').val(),
-                date_expiration: $('#date_expiration').val()
-            };
-
-            $.ajax({
-                url: url,
-                type: 'POST',
-                data: formData,
-                dataType: 'json',
-                success: function(response) {
-                    if (response.status === 'success') {
-                        closeModalFunction();
-                        loadEntries();
-                        alert(code ? 'Entrée modifiée avec succès!' : 'Entrée ajoutée avec succès!');
-                    } else {
-                        alert("Erreur: " + (response.message || "Une erreur est survenue"));
-                    }
-                },
-                error: function(xhr) {
-                    console.error('Error:', xhr);
-                    alert("Erreur lors de l'opération.");
-                }
-            });
-        });
-
-       // Handle edit button clicks
-$(document).on('click', '.btnModifier', function() {
-    const row = $(this).closest('tr');
-    $('#modalTitle').text('Modifier un Produit');
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
     
-    // Get data from the row
-    const cells = row.find('td');
-    const id = row.data('id');
-    console.log("Editing entry with ID:", id); // Add this for debugging
+            $(document).ready(function () {
+                function initializeSideMenu() {
+                    const sideMenu = $('#side-menu');
+                    $('<div>')
+                        .css({
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            bottom: 0,
+                            width: '50px',
+                            zIndex: 40,
+                        })
+                        .on('mouseenter', () => sideMenu.removeClass('-translate-x-full'))
+                        .appendTo('body');
     
-    $('#code').val(id);  // This line is crucial - explicitly set the code value
-    $('#id_produit').val(row.data('product-id'));
-    $('#id_fournisseur').val(row.data('supplier-id'));
-    $('#quantite').val(cells.eq(3).text().trim());
-    $('#prix_fournis').val(cells.eq(1).text().trim().replace(' €', '').replace(/\s/g, '')); 
-    $('#prix_unitaire').val(cells.eq(2).text().trim().replace(' €', '').replace(/\s/g, '')); 
-    $('#prix_total').val(cells.eq(4).text().trim().replace(' €', '').replace(/\s/g, '')); 
-    $('#date_ajout').val(cells.eq(5).text().trim());
-    $('#date_expiration').val(cells.eq(6).text().trim());
-
-    modalAjouterEntree.removeClass('hidden').css('display', 'flex');
-});
-
-        // Handle delete button clicks
-        $(document).on('click', '.btnSupprimer', function() {
-            if (confirm('Êtes-vous sûr de vouloir supprimer cette entrée?')) {
-                const id = $(this).closest('tr').data('id');
-                $.ajax({
-                    url: 'commande_supprimer.php',
-                    type: 'POST',
-                    data: { code: id },
-                    dataType: 'json',
-                    success: function(response) {
-                        if (response.status === 'success') {
-                            loadEntries();
-                            alert('Entrée supprimée avec succès!');
-                        } else {
-                            alert("Erreur lors de la suppression: " + (response.message || "Une erreur est survenue"));
+                    sideMenu.on('mouseleave', () => sideMenu.addClass('-translate-x-full'));
+                }
+    
+                function initializeTabs() {
+                    const tabButtons = document.querySelectorAll('.tab-button');
+                    const tabContents = document.querySelectorAll('.tab-content');
+    
+                    tabButtons.forEach((button, index) => {
+                        button.addEventListener('click', () => {
+                            tabButtons.forEach(btn => btn.classList.remove('active', 'border-green-600', 'text-green-600'));
+                            tabContents.forEach(content => content.classList.add('hidden'));
+                            button.classList.add('active', 'border-green-600', 'text-green-600');
+                            tabContents[index].classList.remove('hidden');
+                        });
+                    });
+                    tabButtons[0].click();
+                }
+    
+                function calculateTotal() {
+                    const quantite = parseFloat($('#quantite').val()) || 0;
+                    const prixFournis = parseFloat($('#prix_fournis').val()) || 0;
+                    $('#prix_total').val((quantite * prixFournis).toFixed(2));
+                }
+    
+                function loadProducts() {
+                    $.ajax({
+                        url: 'get_products.php',
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(response) {
+                            const select = $('#id_produit');
+                            select.empty().append('<option value="">Sélectionner un produit</option>');
+                            if (response?.data?.length) {
+                                response.data.forEach(product => {
+                                    select.append(`<option value="${product.id}">${product.nom}</option>`);
+                                });
+                            }
+                        },
+                        error: xhr => console.error('Error loading products:', xhr)
+                    });
+                }
+    
+                function loadSuppliers() {
+                    $.ajax({
+                        url: 'get_suppliers.php',
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(response) {
+                            const select = $('#id_fournisseur');
+                            select.empty().append('<option value="">Sélectionner un fournisseur</option>');
+                            if (Array.isArray(response)) {
+                                response.forEach(supplier => {
+                                    select.append(`<option value="${supplier.id}">${supplier.nom}</option>`);
+                                });
+                            }
+                        },
+                        error: xhr => console.error('Error loading suppliers:', xhr)
+                    });
+                }
+    
+                function loadEntries() {
+                    $.ajax({
+                        url: 'commande_get_liste.php',
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(response) {
+                            const tbody = $('tbody');
+                            tbody.empty();
+    
+                            if (response.status === 'success' && Array.isArray(response.donnees)) {
+                                response.donnees.forEach(entry => {
+                                    const prixFournis = parseFloat(entry.prix_fournis || 0).toFixed(2);
+                                    const prixUnitaire = parseFloat(entry.prix_unitaire || 0).toFixed(2);
+                                    const prixTotal = parseFloat(entry.prix_total || 0).toFixed(2);
+    
+                                    tbody.append(`
+                                        <tr class="bg-white hover:bg-gray-50" 
+                                            data-id="${entry.id_commande}" 
+                                            data-product-id="${entry.id_produit}" 
+                                            data-supplier-id="${entry.id_fournisseur}">
+                                            <td hidden>${entry.code || ''}</td>
+                                            <td>${entry.nom || ''}</td>
+                                            <td>${prixFournis} F CFA</td>
+                                            <td>${prixUnitaire} F CFA</td>
+                                            <td>${entry.quantite || ''}</td>
+                                            <td>${prixTotal} F CFA</td>
+                                            <td>${entry.date_ajout || ''}</td>
+                                            <td>${entry.date_expiration || ''}</td>
+                                            <td>${entry.nom_fournisseurs || ''}</td>
+                                            <td>
+                                                <button class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 btnModifier">Modifier</button>
+                                                <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 btnSupprimer">Supprimer</button>
+                                            </td>
+                                        </tr>
+                                    `);
+                                });
+                            } else {
+                                tbody.append('<tr><td colspan="9" class="text-center py-4">Aucune entrée trouvée.</td></tr>');
+                            }
+                        },
+                        error: xhr => {
+                            console.error('Error loading entries:', xhr);
+                            alert("Erreur lors du chargement des entrées.");
                         }
-                    },
-                    error: function(xhr) {
-                        console.error('Error:', xhr);
-                        alert("Erreur lors de la suppression.");
+                    });
+                }
+    
+                function handleModalEvents() {
+                    const modal = $('#modalAjouterEntree');
+                    const today = new Date().toISOString().split('T')[0];
+    
+                    $('#btnAjouterEntree').on('click', function() {
+                        modal.removeClass('hidden').css('display', 'flex');
+                        $('#modalTitle').text('Ajouter un Produit');
+                        clearModalFields(today);
+                    });
+    
+                    $('#closeModal, #closeAjouterCommande').on('click', () => {
+                        modal.addClass('hidden').css('display', 'none');
+                        clearModalFields(today);
+                    });
+    
+                    modal.on('click', function(e) {
+                        if (e.target === this) {
+                            modal.addClass('hidden').css('display', 'none');
+                            clearModalFields(today);
+                        }
+                    });
+                }
+    
+                // Dans le script, remplacez la fonction handleFormSubmission :
+                function handleFormSubmission() {
+                    $('#btn_enregitrer_nouveau').on('click', function(e) {
+                        e.preventDefault();
+                        
+                        const formData = {
+                            id_commande: $('#code').val(),
+                            id_produit: $('#id_produit').val(),
+                            id_fournisseur: $('#id_fournisseur').val(),
+                            quantite: $('#quantite').val(),
+                            prix_fournis: $('#prix_fournis').val(),
+                            prix_unitaire: $('#prix_unitaire').val(),
+                            prix_total: $('#prix_total').val(),
+                            date_ajout: $('#date_ajout').val(),
+                            date_expiration: $('#date_expiration').val()
+                        };
+        
+                        // Debug log
+                        console.log('Envoi des données:', formData);
+                        
+                        const url = formData.id_commande ? 'commande_modifier.php' : 'commande_nouveau.php';
+                        
+                        $.ajax({
+                            url: url,
+                            type: 'POST',
+                            data: formData,
+                            dataType: 'json',
+                            success: function(response) {
+                                console.log('Réponse serveur:', response);
+                                if (response.status === 'success') {
+                                    $('#modalAjouterEntree').addClass('hidden').css('display', 'none');
+                                    loadEntries();
+                                    clearModalFields(new Date().toISOString().split('T')[0]);
+                                    alert(formData.id_commande ? 'Entrée modifiée avec succès!' : 'Entrée ajoutée avec succès!');
+                                } else {
+                                    alert("Erreur: " + (response.message || "Une erreur est survenue"));
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Détails de l\'erreur:', {
+                                    xhr: xhr,
+                                    status: status,
+                                    error: error,
+                                    responseText: xhr.responseText
+                                });
+                                try {
+                                    const response = JSON.parse(xhr.responseText);
+                                    alert("Erreur: " + (response.message || "Une erreur inattendue est survenue"));
+                                } catch(e) {
+                                    alert("Erreur lors de l'opération. Vérifiez la console pour plus de détails.");
+                                }
+                            }
+                        });
+                    });
+                }
+    
+                // Remplacez la fonction de gestion du clic sur btnModifier
+                $(document).on('click', '.btnModifier', function() {
+                    const row = $(this).closest('tr');
+                    const cells = row.find('td');
+                    
+                    // Debug log
+                    console.log('Données de la ligne à modifier:', {
+                        id_commande: row.data('id'),
+                        id_produit: row.data('product-id'),
+                        id_fournisseur: row.data('supplier-id')
+                    });
+                    
+                    // Remplissage du formulaire
+                    $('#code').val(row.data('id'));
+                    $('#id_produit').val(row.data('product-id'));
+                    $('#id_fournisseur').val(row.data('supplier-id'));
+                    $('#quantite').val(cells.eq(4).text().trim());
+                    $('#prix_fournis').val(parseFloat(cells.eq(2).text().replace(/[^\d.,]/g, '')));
+                    $('#prix_unitaire').val(parseFloat(cells.eq(3).text().replace(/[^\d.,]/g, '')));
+                    $('#date_ajout').val(cells.eq(6).text().trim());
+                    $('#date_expiration').val(cells.eq(7).text().trim());
+                    
+                    calculateTotal();
+                    $('#tabGeneral').click();
+                    $('#modalTitle').text('Modifier une Entrée');
+                    $('#modalAjouterEntree').removeClass('hidden').css('display', 'flex');
+                });
+    
+                $(document).on('click', '.btnSupprimer', function() {
+                    if (confirm('Êtes-vous sûr de vouloir supprimer cette entrée?')) {
+                        const id = $(this).closest('tr').data('id');
+                        $.ajax({
+                            url: 'commande_supprimer.php',
+                            type: 'POST',
+                            data: { code: id },
+                            dataType: 'json',
+                            success: function(response) {
+                                if (response.status === 'success') {
+                                    loadEntries();
+                                    alert('Entrée supprimée avec succès!');
+                                } else {
+                                    alert("Erreur lors de la suppression: " + (response.message || "Une erreur est survenue"));
+                                }
+                            },
+                            error: xhr => {
+                                console.error('Error:', xhr);
+                                alert("Erreur lors de la suppression.");
+                            }
+                        });
                     }
                 });
-            }
+    
+                function clearModalFields(today) {
+                    $('#code, #id_produit, #id_fournisseur, #quantite, #prix_fournis, #prix_unitaire, #prix_total').val('');
+                    $('#date_ajout').val(today);
+                    $('#date_expiration').val('');
+                }
+    
+                $('#quantite, #prix_fournis').on('input', calculateTotal);
+    
+                // Initialize everything
+                initializeSideMenu();
+                initializeTabs();
+                handleModalEvents();
+                handleFormSubmission();
+                loadProducts();
+                loadSuppliers();
+                loadEntries();
+            });
         });
-
-        function clearModalFields() {
-            $('#code').val('');
-            $('#id_produit').val('');
-            $('#id_fournisseur').val('');
-            $('#quantite').val('');
-            $('#prix_fournis').val('');
-            $('#prix_unitaire').val('');
-            $('#prix_total').val('');
-            $('#date_ajout').val(today);
-            $('#date_expiration').val('');
-        }
-
-        // Initial data load
-        loadProducts();
-        loadSuppliers();
-        loadEntries();
-    });
-});
-</script>
+    </script>
 </body>
 </html>

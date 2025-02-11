@@ -1,12 +1,19 @@
 <?php
-// Activer l'affichage des erreurs pour le débogage
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-header('Content-Type: application/json'); 
+// commande_modifier.php
+header('Content-Type: application/json');
 
 try {
+    // Log des données reçues
+    error_log("Données reçues : " . print_r($_POST, true));
+
+    // Validation des données requises
+    $required_fields = ['id_commande', 'id_produit', 'id_fournisseur', 'quantite', 'prix_unitaire'];
+    foreach ($required_fields as $field) {
+        if (!isset($_POST[$field]) || empty($_POST[$field])) {
+            throw new Exception("Le champ {$field} est requis");
+        }
+    }
+
     // Connexion à la base de données
     $pdo = new PDO(
         "mysql:host=localhost;dbname=pharma_cession;charset=utf8",
@@ -18,187 +25,61 @@ try {
         ]
     );
 
-    // Vérifier si les données sont envoyées via POST
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        throw new Exception("Méthode HTTP invalide. Utilisez POST.");
-    }
-
-    // Récupérer et nettoyer les données
-    $id_commande = $_POST['id_commande'] ?? null;
-    $id_produit = $_POST['id_produit'] ?? null;
-    $id_fournisseur = $_POST['id_fournisseur'] ?? null;
-    $quantite = $_POST['quantite'] ?? 0;
-    $prix_unitaire = $_POST['prix_unitaire'] ?? 0;
-    $date_ajout = $_POST['date_ajout'] ?? '';
-    $date_expiration = $_POST['date_expiration'] ?? '';
-    $prix_fournis = $_POST['prix_fournis'] ?? '';
-
-    // Valider les données
-    if (empty($id_commande)) {
-        throw new Exception("L'ID de la commande est requis.");
-    }
-
-    if (empty($id_produit)) {
-        throw new Exception("L'ID du produit est requis.");
-    }
-
-    if (empty($id_fournisseur)) {
-        throw new Exception("L'ID du fournisseur est requis.");
-    }
-
-    if (empty($quantite) || $quantite <= 0) {
-        throw new Exception("La quantité est requise et doit être supérieure à zéro.");
-    }
-
-    if (empty($prix_unitaire) || $prix_unitaire <= 0) {
-        throw new Exception("Le prix unitaire est requis et doit être supérieur à zéro.");
-    }
-
-    if (empty($date_ajout)) {
-        throw new Exception("La date d'ajout est requise.");
-    }
-
-    if (empty($date_expiration)) {
-        throw new Exception("La date d'expiration est requise.");
-    }
-
-    if (empty($prix_fournis)) {
-        throw new Exception("Le prix fournisseur est requis.");
-    }
-
-    // Début de la transaction
-    $pdo->beginTransaction();
-
-    // Vérifier si la commande existe
-    $stmtVerifyCommande = $pdo->prepare("SELECT COUNT(*) FROM t_commandes WHERE id = :id_commande");
-    $stmtVerifyCommande->execute([':id_commande' => $id_commande]);
-    if ($stmtVerifyCommande->fetchColumn() == 0) {
-        throw new Exception("La commande avec l'ID $id_commande n'existe pas.");
-    }
-
-    // Vérifier si le produit existe
-    $stmtVerifyProduit = $pdo->prepare("SELECT COUNT(*) FROM t_produits WHERE id = :id_produit");
-    $stmtVerifyProduit->execute([':id_produit' => $id_produit]);
-    if ($stmtVerifyProduit->fetchColumn() == 0) {
-        throw new Exception("Le produit avec l'ID $id_produit n'existe pas.");
-    }
-
-    // Vérifier si le fournisseur existe
-    $stmtVerifyFournisseur = $pdo->prepare("SELECT COUNT(*) FROM t_fournisseurs WHERE id = :id_fournisseur");
-    $stmtVerifyFournisseur->execute([':id_fournisseur' => $id_fournisseur]);
-    if ($stmtVerifyFournisseur->fetchColumn() == 0) {
-        throw new Exception("Le fournisseur avec l'ID $id_fournisseur n'existe pas.");
-    }
-
-    // Mettre à jour la commande dans t_commandes
-    $stmtUpdateCommandes = $pdo->prepare("UPDATE t_commandes SET
-        id_produit = :id_produit,
-        id_fournisseur = :id_fournisseur,
-        quantite = :quantite,
-        prix_unitaire = :prix_unitaire,
-        date_ajout = :date_ajout,
-        date_expiration = :date_expiration,
-        prix_fournis = :prix_fournis
-    WHERE id = :id_commande");
-    $paramsUpdateCommandes = [
-        ':id_produit' => $id_produit,
-        ':id_fournisseur' => $id_fournisseur,
-        ':quantite' => $quantite,
-        ':prix_unitaire' => $prix_unitaire,
-        ':date_ajout' => $date_ajout,
-        ':date_expiration' => $date_expiration,
-        ':prix_fournis' => $prix_fournis,
-        ':id_commande' => $id_commande
-    ];
-    $stmtUpdateCommandes->execute($paramsUpdateCommandes);
-
-    // Mettre à jour ou insérer dans t_stock
-    // Étape 1 : Vérifier si la ligne existe déjà
-    $stmtSelect = $pdo->prepare("
-        SELECT COUNT(*) AS count 
-        FROM t_stock 
-        WHERE id_produit = :id_produit AND date_expiration = :date_expiration AND prix_unitaire = :prix_unitaire
-    ");
-
-    $paramsSelect = [
-        ':id_produit' => $id_produit,
-        ':date_expiration' => $date_expiration,
-        ':prix_unitaire' => $prix_unitaire
+    // Préparation des données sans prix_total
+    $data = [
+        ':id_commande' => $_POST['id_commande'],
+        ':id_produit' => $_POST['id_produit'],
+        ':id_fournisseur' => $_POST['id_fournisseur'],
+        ':quantite' => $_POST['quantite'],
+        ':prix_fournis' => $_POST['prix_fournis'],
+        ':prix_unitaire' => $_POST['prix_unitaire'],
+        ':date_ajout' => $_POST['date_ajout'],
+        ':date_expiration' => $_POST['date_expiration']
     ];
 
-    $stmtSelect->execute($paramsSelect);
-    $result = $stmtSelect->fetch(PDO::FETCH_ASSOC);
+    // Vérification si la commande existe
+    $check = $pdo->prepare("SELECT id_commande FROM t_commandes WHERE id_commande = ?");
+    $check->execute([$_POST['id_commande']]);
+    if (!$check->fetch()) {
+        throw new Exception("La commande n'existe pas");
+    }
 
-    if ($result['count'] > 0) {
-        // Étape 2 : Si la ligne existe, faire un UPDATE
-        $stmtUpdateStock = $pdo->prepare("
-            UPDATE t_stock 
-            SET 
-                quantite = :quantite,
-                prix_unitaire = :prix_unitaire,
-                date_ajout = :date_ajout
-            WHERE 
-                id_produit = :id_produit AND date_expiration = :date_expiration AND prix_unitaire = :prix_unitaire
-        ");
+    // Mise à jour sans prix_total
+    $sql = "UPDATE t_commandes SET 
+            id_produit = :id_produit,
+            id_fournisseur = :id_fournisseur,
+            quantite = :quantite,
+            prix_fournis = :prix_fournis,
+            prix_unitaire = :prix_unitaire,
+            date_ajout = :date_ajout,
+            date_expiration = :date_expiration
+            WHERE id_commande = :id_commande";
 
-        $paramsUpdateStock = [
-            ':quantite' => $quantite,
-            ':prix_unitaire' => $prix_unitaire,
-            ':date_ajout' => $date_ajout,
-            ':id_produit' => $id_produit,
-            ':date_expiration' => $date_expiration
-        ];
+    $stmt = $pdo->prepare($sql);
+    $result = $stmt->execute($data);
 
-        $stmtUpdateStock->execute($paramsUpdateStock);
+    if ($result && $stmt->rowCount() > 0) {
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'Commande modifiée avec succès!',
+            'data' => ['id_commande' => $_POST['id_commande']]
+        ]);
     } else {
-        // Étape 3 : Si la ligne n'existe pas, faire un INSERT
-        $stmtInsert = $pdo->prepare("
-            INSERT INTO t_stock (
-                id_produit, quantite, prix_unitaire, date_ajout, date_expiration, id_commandes
-            ) VALUES (
-                :id_produit, :quantite, :prix_unitaire, :date_ajout, :date_expiration, :id_commandes
-            )
-        ");
-
-        $paramsInsert = [
-            ':id_produit' => $id_produit,
-            ':quantite' => $quantite,
-            ':prix_unitaire' => $prix_unitaire,
-            ':date_ajout' => $date_ajout,
-            ':date_expiration' => $date_expiration,
-            ':id_commandes' => $id_commande,
-        ];
-
-        $stmtInsert->execute($paramsInsert);
+        throw new Exception("Aucune modification n'a été effectuée");
     }
-
-    // Valider la transaction
-    $pdo->commit();
-
-    echo json_encode([
-        'status' => 'success',
-        'message' => 'Commande mise à jour avec succès.',
-        'id' => $id_commande
-    ]);
 
 } catch (PDOException $e) {
-    // Annuler la transaction en cas d'erreur SQL
-    if ($pdo->inTransaction()) {
-        $pdo->rollBack();
-    }
     error_log("Erreur PDO : " . $e->getMessage());
+    http_response_code(500);
     echo json_encode([
         'status' => 'error',
-        'message' => 'Erreur lors de l\'opération en base de données.',
-        'debug' => $e->getMessage()
+        'message' => 'Erreur de base de données: ' . $e->getMessage()
     ]);
 } catch (Exception $e) {
-    // Gestion des autres erreurs
-    error_log("Erreur générale : " . $e->getMessage());
+    error_log("Erreur : " . $e->getMessage());
+    http_response_code(400);
     echo json_encode([
         'status' => 'error',
-        'message' => $e->getMessage(),
-        'debug' => 'Erreur attrapée dans le bloc catch principal'
+        'message' => $e->getMessage()
     ]);
 }
-?>

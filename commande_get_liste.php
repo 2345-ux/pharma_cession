@@ -17,6 +17,7 @@ try {
     // Requête pour récupérer toutes les commandes avec les informations nécessaires
     $query = "SELECT 
     id_commande,
+    t_commandes.code,
     id_produit, 
     t_produits.nom, 
     quantite, 

@@ -337,14 +337,14 @@ body {
                 </div>
 
                 <div class="flex space-x-4 mb-6">
-                    <input type="text" placeholder="Produit" class="flex-1 p-2 border rounded">
-                    <input type="date" placeholder="Date de début" class="p-2 border rounded">
-                    <input type="date" placeholder="Date de fin" class="p-2 border rounded">
-                    <button class="flex items-center space-x-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-                        <i data-lucide="search" class="w-5 h-5 mr-2"></i>
-                        Rechercher
-                    </button>
-                </div>
+    <input type="text" id="search_produit" placeholder="Produit" class="flex-1 p-2 border rounded">
+    <input type="date" id="date_debut" placeholder="Date de début" class="p-2 border rounded">
+    <input type="date" id="date_fin" placeholder="Date de fin" class="p-2 border rounded">
+    <button id="btnRechercher" class="flex items-center space-x-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+        <i data-lucide="search" class="w-5 h-5 mr-2"></i>
+        Rechercher
+    </button>
+</div>
 
                 <table class="w-full border-collapse">
                     <thead>
@@ -414,18 +414,33 @@ body {
             </button>
             <h2 class="text-xl font-semibold mb-4 text-center">Ajouter une nouvelle Sortie</h2>
             
-            <form id="formAjouterSortie" class="space-y-4">
-                <input type="text" placeholder="Code de sortie" id="code" class="w-full p-2 border rounded">
-                <select id="id_produit" class="w-full p-2 border rounded">
-                    <option>Sélectionner un produit</option>
-                </select>
-                <input type="number" placeholder="Quantité" id="quantite"class="w-full p-2 border rounded">
-                <input type="number" placeholder="Prix Unitaire" id="prix_unitaire "class="w-full p-2 border rounded">
-                <input type="date" placeholder="Date de Sortie" id="date_sortie" class="w-full p-2 border rounded">
-                <input type="date" placeholder="Date d'Expiration"  id="date_expiration" class="w-full p-2 border rounded">
+            <form id="formAjouterSortie" class="space-y-4" onsubmit="return false;">
+                <input  class="w-full p-2 border rounded" id="code" name="code">
+                <div class="space-y-2">
+                    <label for="id_produit">Produit</label>
+                    <select id="id_produit" name="id_produit" class="w-full p-2 border rounded" required>
+                        <option value="">Sélectionner un produit</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label for="quantite">Quantité</label>
+                    <input type="number" id="quantite" name="quantite" class="w-full p-2 border rounded" required>
+                </div>
+                <div class="space-y-2">
+                    <label for="prix_unitaire">Prix Unitaire</label>
+                    <input type="number" step="0.01" id="prix_unitaire" name="prix_unitaire" class="w-full p-2 border rounded" required>
+                </div>
+                <div class="space-y-2">
+                    <label for="date_sortie">Date de Sortie</label>
+                    <input type="date" id="date_sortie" name="date_sortie" class="w-full p-2 border rounded" required>
+                </div>
+                <div class="space-y-2">
+                    <label for="date_expiration">Date d'Expiration</label>
+                    <input type="date" id="date_expiration" name="date_expiration" class="w-full p-2 border rounded">
+                </div>
                 
-                <button class="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600">
-                    Ajouter
+                <button type="submit" id="btnSubmitSortie" class="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600">
+                    Enregistrer
                 </button>
             </form>
         </div>
@@ -545,48 +560,69 @@ body {
                 $('#stock_disponible').val(stock || 0);
             });
     
-            // Load Outputs table
-            function loadSorties() {
-                $.ajax({
-                    url: 'sortie_get_liste.php',
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function(response) {
-                        const tbody = $('tbody');
-                        tbody.empty();
-    
-                        if (response.status === 'success' && Array.isArray(response.donnees)) {
-                            response.donnees.forEach(function(sortie) {
-                                tbody.append(`
-                                    <tr class="bg-white hover:bg-gray-50" data-id="${sortie.id}" data-product-id="${sortie.id_produit}">
-                                        <td class="border border-gray-300 px-4 py-2">${sortie.nom || ''}</td>
-                                        <td class="border border-gray-300 px-4 py-2">${sortie.quantite || ''}</td>
-                                        <td class="border border-gray-300 px-4 py-2">${sortie.prix_unitaire || ''}</td>
-                                        <td class="border border-gray-300 px-4 py-2">${sortie.prix_total || ''}</td>
-                                        <td class="border border-gray-300 px-4 py-2">${sortie.date_sortie || ''}</td>
-                                        <td class="border border-gray-300 px-4 py-2">${sortie.date_expiration || ''}</td>
-                                        <td class="border border-gray-300 px-4 py-2">
-                                            <button class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 btnModifier">
-                                                Modifier
-                                            </button>
-                                            <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 btnSupprimer">
-                                                Supprimer
-                                            </button>
-                                        </td>
-                                    </tr>
-                                `);
-                            });
-                        } else {
-                            tbody.append('<tr><td colspan="7" class="text-center py-4">Aucune sortie trouvée.</td></tr>');
-                        }
-                    },
-                    error: function(xhr) {
-                        console.error('Error loading outputs:', xhr);
-                        alert("Erreur lors du chargement des sorties.");
-                    }
+//---- Fonction pour remplir la liste des sorties
+function loadSorties(xsearch='') {
+
+    $.ajax({
+        url: 'sortie_get_liste.php?paramsearch=' + xsearch, // Assurez-vous que l'URL est correcte
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            const tbody = $('tbody');
+            tbody.empty(); // Vide le tableau avant de le remplir
+
+            if (response.donnees && response.donnees.length > 0) {
+                let totalMontant = 0; // Initialisation du total
+                console.log(response.donnees);
+
+                response.donnees.forEach(function(sortie) {
+                    totalMontant += parseFloat(sortie.prix_total) || 0; // Ajoute le prix total de chaque sortie
+
+                    const row = `
+                        <tr class="bg-white hover:bg-gray-50" 
+                            data-id="${sortie.id_sortie}" 
+                            data-product-id="${sortie.id_produit}">
+                            <td class="border border-gray-300 px-4 py-2">${sortie.nom_produit || ''}</td>
+                            <td class="border border-gray-300 px-4 py-2">${sortie.quantite || ''}</td>
+                            <td class="border border-gray-300 px-4 py-2">${sortie.prix_unitaire} €</td>
+                            <td class="border border-gray-300 px-4 py-2">${sortie.prix_total} €</td>
+                            <td class="border border-gray-300 px-4 py-2">${sortie.date_sortie || ''}</td>
+                            <td class="border border-gray-300 px-4 py-2">${sortie.date_expiration || ''}</td>
+                            <td class="border border-gray-300 px-4 py-2">
+                                <button class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 btnModifier">
+                                    Modifier
+                                </button>
+                                <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 btnSupprimer">
+                                    Supprimer
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.append(row); // Ajoute chaque ligne au tableau
                 });
+
+                // Ajoute la ligne du total
+                tbody.append(`
+                    <tr class="bg-gray-100 font-bold">
+                        <td colspan="3" class="p-3 border text-right">Total</td>
+                        <td class="p-3 border">${totalMontant.toFixed(2)} €</td>
+                        <td colspan="3"></td>
+                    </tr>
+                `);
+            } else {
+                // Aucune donnée trouvée
+                tbody.append('<tr><td colspan="7" class="text-center py-4">Aucune sortie trouvée</td></tr>');
             }
-    
+        },
+        error: function(xhr, status, error) {
+            // Gestion des erreurs de la requête AJAX
+            const tbody = $('tbody');
+            tbody.empty();
+            tbody.append('<tr><td colspan="7" class="text-center py-4 text-red-500">Erreur lors du chargement des données</td></tr>');
+            console.error('Erreur serveur:', error);
+        }
+    });
+}
             // Handle form submission
             $('#btn_enregistrer_sortie').on('click', function(e) {
                 e.preventDefault();
@@ -637,20 +673,102 @@ body {
             // Handle edit button clicks
             $(document).on('click', '.btnModifier', function() {
                 const row = $(this).closest('tr');
-                $('#modalTitle').text('Modifier une Sortie');
-                
+                console.log('Ligne sélectionnée:', row);
+            
                 const cells = row.find('td');
-                $('#code').val(row.data('id'));
-                $('#id_produit').val(row.data('product-id')).trigger('change'); // Set the selected value and trigger change event
-                $('#quantite').val(cells.eq(1).text());
-                $('#prix_unitaire').val(cells.eq(2).text().replace(' F cfa', '')); // Remove currency symbol and set value
-                //$('#prix_total').val(cells.eq(3).text().replace(' F cfa', '')); // Remove currency symbol and set value
-                $('#date_sortie').val(cells.eq(4).text());
-                $('#date_expiration').val(cells.eq(5).text());
-    
-                modalAjouterSortie.removeClass('hidden').css('display', 'flex');
+                console.log('Cellules:', cells.map((i, el) => $(el).text()).get());
+            
+                // Remplissage du formulaire
+                const formData = {
+                    id_sortie: row.data('id'), // Changé de 'code' à 'id_sortie'
+                    id_produit: row.data('product-id'),
+                    quantite: cells.eq(1).text().trim(),
+                    prix_unitaire: cells.eq(2).text().replace(/[^\d.,]/g, ''),
+                    date_sortie: cells.eq(4).text().trim(),
+                    date_expiration: cells.eq(5).text().trim()
+                };
+            
+                console.log('Données à charger dans le formulaire:', formData);
+            
+                // Remplir le formulaire
+                $('#code').val(formData.id_sortie);  // Changé de 'code' à 'id_sortie'
+                $('#id_produit').val(formData.id_produit);
+                $('#quantite').val(formData.quantite);
+                $('#prix_unitaire').val(formData.prix_unitaire);
+                $('#date_sortie').val(formData.date_sortie);
+                $('#date_expiration').val(formData.date_expiration);
+            
+                // Afficher le modal
+                $('#modalAjouterSortie').removeClass('hidden').css('display', 'flex');
             });
-    
+            
+            // Gestionnaire de soumission du formulaire
+            $('#formAjouterSortie').on('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = {
+                    id_sortie: $('#code').val(), // Changé de 'code' à 'id_sortie'
+                    id_produit: $('#id_produit').val(),
+                    quantite: $('#quantite').val(),
+                    prix_unitaire: $('#prix_unitaire').val(),
+                    date_sortie: $('#date_sortie').val(),
+                    date_expiration: $('#date_expiration').val()
+                };
+            
+                console.log('Données à envoyer:', formData);
+            
+                // Vérification différente pour nouvelle sortie vs modification
+                const isNewEntry = !formData.id_sortie;
+                if (isNewEntry) {
+                    // Pour une nouvelle sortie, on ne vérifie pas le code
+                    if (!formData.id_produit || !formData.quantite || !formData.prix_unitaire || !formData.date_sortie) {
+                        alert('Veuillez remplir tous les champs obligatoires');
+                        return;
+                    }
+                    // Envoyer vers sortie_nouveau.php
+                    url = 'sortie_nouveau.php';
+                } else {
+                    // Pour une modification, on vérifie tous les champs
+                    if (!formData.id_sortie || !formData.id_produit || !formData.quantite || !formData.prix_unitaire || !formData.date_sortie) {
+                        alert('Veuillez remplir tous les champs obligatoires');
+                        return;
+                    }
+                    // Envoyer vers sortie_modifier.php
+                    url = 'sortie_modifier.php';
+                }
+            
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: formData,
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log('Réponse serveur:', response);
+                        if (response.status === 'success') {
+                            $('#modalAjouterSortie').addClass('hidden');
+                            closeModalFunction();
+                            loadSorties();
+                           // alert(isNewEntry ? 'Sortie ajoutée avec succès!' : 'Sortie modifiée avec succès!');
+                        } else {
+                            alert("Erreur: " + (response.message || "Une erreur est survenue"));
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Détails de l\'erreur:', {
+                            status: status,
+                            error: error,
+                            response: xhr.responseText
+                        });
+                        try {
+                            const errorResponse = JSON.parse(xhr.responseText);
+                            alert(errorResponse.message || "Une erreur est survenue");
+                        } catch(e) {
+                            alert("Erreur lors de l'opération. Consultez la console pour plus de détails.");
+                        }
+                    }
+                });
+            });
+
             // Handle delete button clicks
             $(document).on('click', '.btnSupprimer', function() {
                 if (confirm('Êtes-vous sûr de vouloir supprimer cette sortie?')) {
@@ -658,7 +776,7 @@ body {
                     $.ajax({
                         url: 'sortie_supprimer.php',
                         type: 'POST',
-                        data: { code: id },
+                        data: { id_to_use_inphp: id },
                         dataType: 'json',
                         success: function(response) {
                             if (response.status === 'success') {
@@ -678,8 +796,8 @@ body {
             });
     
             // Search functionality
-            $('#search_product, #date_debut, #date_fin').on('input', function() {
-                const searchProduct = $('#search_product').val().toLowerCase();
+            $('#search_produit, #date_debut, #date_fin').on('input', function() {
+                const searchProduct = $('#search_produit').val().toLowerCase();
                 const dateDebut = $('#date_debut').val();
                 const dateFin = $('#date_fin').val();
     
@@ -712,6 +830,18 @@ body {
             loadSorties();
         });
     });
+
+    // Gestionnaire de recherche
+$('#btnRechercher').on('click', function() {
+    const searchData = {
+        search_produit: $('#search_produit').val(),
+        date_debut: $('#date_debut').val(),
+        date_fin: $('#date_fin').val()
+    };
+
+    // Appeler loadSorties avec les paramètres de recherche
+    loadSorties(searchData);
+});
     </script> 
 </body>
 </html>
