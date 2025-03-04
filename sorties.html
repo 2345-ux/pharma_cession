@@ -584,8 +584,8 @@ function loadSorties(xsearch='') {
                             data-product-id="${sortie.id_produit}">
                             <td class="border border-gray-300 px-4 py-2">${sortie.nom_produit || ''}</td>
                             <td class="border border-gray-300 px-4 py-2">${sortie.quantite || ''}</td>
-                            <td class="border border-gray-300 px-4 py-2">${sortie.prix_unitaire} €</td>
-                            <td class="border border-gray-300 px-4 py-2">${sortie.prix_total} €</td>
+                            <td class="border border-gray-300 px-4 py-2">${sortie.prix_unitaire} F CFA</td>
+                            <td class="border border-gray-300 px-4 py-2">${sortie.prix_total} F CFA</td>
                             <td class="border border-gray-300 px-4 py-2">${sortie.date_sortie || ''}</td>
                             <td class="border border-gray-300 px-4 py-2">${sortie.date_expiration || ''}</td>
                             <td class="border border-gray-300 px-4 py-2">
@@ -605,7 +605,7 @@ function loadSorties(xsearch='') {
                 tbody.append(`
                     <tr class="bg-gray-100 font-bold">
                         <td colspan="3" class="p-3 border text-right">Total</td>
-                        <td class="p-3 border">${totalMontant.toFixed(2)} €</td>
+                        <td class="p-3 border">${totalMontant.toFixed(2)} F CFA</td>
                         <td colspan="3"></td>
                     </tr>
                 `);
@@ -805,6 +805,7 @@ function loadSorties(xsearch='') {
                     const row = $(this);
                     const productName = row.find('td:first').text().toLowerCase();
                     const dateOutput = row.find('td:eq(4)').text();
+                    console.log('colonne: '+dateOutput);
     
                     const matchesProduct = !searchProduct || productName.includes(searchProduct);
                     const matchesDate = (!dateDebut || dateOutput >= dateDebut) && 
@@ -842,6 +843,131 @@ $('#btnRechercher').on('click', function() {
     // Appeler loadSorties avec les paramètres de recherche
     loadSorties(searchData);
 });
-    </script> 
+
+// Ajouter dans la section script, avant la fin du $(document).ready()
+function handlePrint() {
+    $.ajax({
+        url: 'sortie_get_liste.php',
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === 'success' && response.donnees && response.donnees.length > 0) {
+                const printWindow = window.open('', '_blank');
+                
+                let printContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Sorties de Stock - Pharmacie de Cession</title>
+                        <style>
+                            body { 
+                                font-family: Arial, sans-serif; 
+                                margin: 20px;
+                                line-height: 1.6;
+                            }
+                            table { 
+                                width: 100%; 
+                                border-collapse: collapse; 
+                                margin-top: 20px;
+                                margin-bottom: 20px;
+                            }
+                            th, td { 
+                                border: 1px solid #ddd; 
+                                padding: 12px 8px; 
+                                text-align: left; 
+                            }
+                            th { 
+                                background-color: #047857; 
+                                color: white;
+                                font-weight: bold;
+                            }
+                            tr:nth-child(even) { background-color: #f9fafb; }
+                            .header { 
+                                text-align: center; 
+                                margin-bottom: 30px;
+                                padding-bottom: 20px;
+                                border-bottom: 2px solid #047857;
+                            }
+                            .date { 
+                                text-align: right;
+                                margin-bottom: 20px;
+                                color: #666;
+                            }
+                            .footer {
+                                margin-top: 30px;
+                                text-align: right;
+                                border-top: 2px solid #047857;
+                                padding-top: 20px;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="header">
+                            <h1>Pharmacie de Cession</h1>
+                            <h2>État des Sorties</h2>
+                        </div>
+                        <div class="date">Date d'impression: ${new Date().toLocaleDateString()}</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Produit</th>
+                                    <th>Quantité</th>
+                                    <th>Prix Unitaire</th>
+                                    <th>Montant Total</th>
+                                    <th>Date de Sortie</th>
+                                    <th>Date d'Expiration</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+
+                let totalQuantite = 0;
+                let totalMontant = 0;
+
+                response.donnees.forEach(sortie => {
+                    const montant = parseFloat(sortie.prix_total || 0);
+                    totalQuantite += parseInt(sortie.quantite || 0);
+                    totalMontant += montant;
+
+                    printContent += `
+                        <tr>
+                            <td>${sortie.nom_produit || ''}</td>
+                            <td>${sortie.quantite || '0'}</td>
+                            <td>${parseFloat(sortie.prix_unitaire || 0).toFixed(2)} F CFA</td>
+                            <td>${parseFloat(sortie.prix_total || 0).toFixed(2)} F CFA</td>
+                            <td>${sortie.date_sortie || ''}</td>
+                            <td>${sortie.date_expiration || ''}</td>
+                        </tr>`;
+                });
+
+                printContent += `
+                            </tbody>
+                        </table>
+                        <div class="footer">
+                            <p><strong>Quantité totale sortie:</strong> ${totalQuantite}</p>
+                            <p><strong>Montant total:</strong> ${totalMontant.toFixed(2)} F CFA</p>
+                        </div>
+                    </body>
+                    </html>`;
+
+                printWindow.document.write(printContent);
+                printWindow.document.close();
+
+                printWindow.onload = function() {
+                    printWindow.print();
+                };
+            } else {
+                alert('Aucune donnée à imprimer');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Erreur:', error);
+            alert('Erreur lors de la récupération des données pour l\'impression');
+        }
+    });
+}
+
+// Ajouter l'événement sur le bouton d'impression
+$('.bg-blue-500.text-white').on('click', handlePrint);
+</script> 
 </body>
 </html>

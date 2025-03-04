@@ -258,6 +258,41 @@
         
         // Charger les catégories au chargement de la page
         getListe();
+
+        // Ajouter ce code dans le script jQuery existant, juste après getListe() :
+        $(document).on('click', '.btnSupprimer', function() {
+            const $row = $(this).closest('tr');
+            const code = $row.find('td:first').text(); // Prend le premier td qui contient le code
+            
+            console.log('Code à supprimer:', code); // Pour debug
+            
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?')) {
+                $.ajax({
+                    url: 'categorie_supprimer.php',
+                    type: 'POST',
+                    data: { code: code },
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log('Réponse du serveur:', response); // Pour debug
+                        if (response.status === 'success') {
+                            $row.remove(); // Supprime la ligne du tableau
+                            getListe(); // Recharge la liste
+                            alert('Catégorie supprimée avec succès');
+                        } else {
+                            alert(response.message || 'Erreur lors de la suppression');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Détails de l\'erreur:', {
+                            xhr: xhr.responseText,
+                            status: status,
+                            error: error
+                        });
+                        alert('Erreur lors de la suppression : ' + xhr.responseText);
+                    }
+                });
+            }
+        });
     });
     </script>
 </body>

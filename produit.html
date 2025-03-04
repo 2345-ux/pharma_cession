@@ -510,6 +510,33 @@
                     }
                 });
             }
+
+            $(document).on('click', '.btnSupprimer', function() {
+                const row = $(this).closest('tr');
+                const code = row.find('td:first').text();
+                
+                if (confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
+                    $.ajax({
+                        url: 'produit_supprimer.php',
+                        type: 'POST',
+                        data: { code: code },
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                alert('Produit supprimé avec succès !');
+                                // Recharger la liste des produits
+                                getListe();
+                            } else {
+                                alert('Erreur : ' + response.message);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Erreur:', error);
+                            alert('Une erreur est survenue lors de la suppression');
+                        }
+                    });
+                }
+            });
     
             return { getListe };
         }

@@ -240,8 +240,8 @@
                 </tbody>
             </table>
         </div>
-        <!-- Modal pour ajouter un produit -->
-        <div id="modalAjouterEntree" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <!-- Modal pour Modifier un produit -->
+        <div id="modalModifierEntree" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
             <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6 relative">
                 <button id="closeAjouterCommande" class="absolute top-4 right-4 text-gray-500 hover:text-red-500">
                     <i data-lucide="x" class="w-6 h-6"></i>
@@ -320,10 +320,183 @@
             </div>
         </div>
     </div>
+     <!-- Modal pour ajouter un produit -->
+        <div id="modalAjouterEntree" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50" style="display: none;">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl p-6 relative">
+                <button id="closeAjouterCommande" class="absolute top-4 right-4 text-gray-500 hover:text-red-500">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+
+                <!-- Formulaire d'ajout -->
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4" id="modalTitleAjout">Ajouter un Produit</h2>
+                    <button id="closeModalAjout" class="text-gray-400 hover:text-gray-600">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                            <div>
+                                <label for="id_produit" class="block text-sm font-medium">Produit:</label>
+                                <select id="id_produit" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+                                    <option value="">Sélectionner un produit</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="id_fournisseur" class="block text-sm font-medium">Fournisseur:</label>
+                                <select id="id_fournisseur" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+                                    <option value="">Sélectionner un fournisseur</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="quantite" class="block text-sm font-medium">Quantité:</label>
+                                <input type="number" id="quantite" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+                            </div>
+                            <div>
+                                <label for="prix_fournis" class="block text-sm font-medium">Prix Fournisseur:</label>
+                                <input type="number" id="prix_fournis" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+                            </div>
+                            <div>
+                                <label for="prix_unitaire" class="block text-sm font-medium">Prix Unitaire:</label>
+                                <input type="number" id="prix_unitaire" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+                            </div>
+                            <div class="space-y-2">
+                                <label for="prix_total" class="block text-sm font-medium">Prix Total:</label>
+                                <input type="number" id="prix_total" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" readonly>
+                            </div>
+                            <div class="space-y-2">
+                                <label for="date_ajout" class="block text-sm font-medium">Date d'Ajout:</label>
+                                <input type="date" id="date_ajout" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
+                            </div>
+                            <div class="space-y-2">
+                                <label for="date_expiration" class="block text-sm font-medium">Date d'Expiration:</label>
+                                <input type="date" id="date_expiration" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
+                            </div>
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="button" id="btnAjouterListe" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 focus:outline-none">
+                                Ajouter à la liste
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Tableau des commandes temporaires -->
+                <div class="mt-6">
+                    <h3 class="text-lg font-medium mb-2">Commandes en attente</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse">
+                            <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="border p-2 text-left">Produit</th>
+                                    <th class="border p-2 text-left">Fournisseur</th>
+                                    <th class="border p-2 text-left">Quantité</th>
+                                    <th class="border p-2 text-left">Prix Four.</th>
+                                    <th class="border p-2 text-left">Prix Unit.</th>
+                                    <th class="border p-2 text-left">Prix Total</th>
+                                    <th class="border p-2 text-left">Date d'ajout</th>
+                                    <th class="border p-2 text-left">Date d'expiration</th>
+                                    <th class="border p-2 text-left">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="commandesTableBody">
+                                <!-- Les commandes seront insérées ici dynamiquement -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Boutons d'action -->
+                <div class="mt-6 flex justify-end space-x-2">
+                    <button id="btnEnregistrerTout" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none" disabled>
+                        Enregistrer toutes les commandes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+            <!-- Modal pour Modifier un produit -->
+        <div id="modalModifierEntree" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6 relative">
+                <button id="closeAjouterCommande" class="absolute top-4 right-4 text-gray-500 hover:text-red-500">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4" id="modalTitleModifier">Modifier un Produit</h2>
+                    <button id="closeModal" class="text-gray-400 hover:text-gray-600">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                <!-- Tab Navigation -->
+                <div class="flex space-x-4 mb-4 border-b border-gray-200">
+                    <button id="tabGeneral" class="tab-button py-2 px-4 text-sm font-medium text-gray-500 hover:text-green-600 focus:outline-none border-b-2 border-transparent active">Général</button>
+                    <button id="tabDetails" class="tab-button py-2 px-4 text-sm font-medium text-gray-500 hover:text-green-600 focus:outline-none border-b-2 border-transparent">Détails</button>
+                </div>
+                <!-- Tab Content -->
+                <form id="FormajoutProduit" class="space-y-4">
+                    <!-- General Information Tab -->
+                    <div id="generalTab" class="tab-content">
+                        <input type="text" id="code" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+                        <div class="space-y-2">
+                            <label for="id_produit" class="block text-sm font-medium">Produit:</label>
+                            <div class="relative">
+                                <select id="id_produit" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+                                    <option value="">Sélectionner un produit</option>
+                                </select>
+                                <button hidden type="button" onclick="toggleNewProductForm()" class="absolute right-2 top-2">
+                                    <i data-lucide="plus-circle" class="w-6 h-6 text-green-600"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="id_fournisseur" class="block text-sm font-medium">Fournisseur:</label>
+                            <div class="relative">
+                                <select id="id_fournisseur" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+                                    <option value="">Sélectionner un fournisseur</option>
+                                </select>
+                                <button hidden type="button" onclick="toggleNewSupplierForm()" class="absolute right-2 top-2">
+                                    <i data-lucide="plus-circle" class="w-6 h-6 text-green-600"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="quantite" class="block text-sm font-medium">Quantité:</label>
+                            <input type="number" id="quantite" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="prix_fournis" class="block text-sm font-medium">Prix Fournisseur:</label>
+                            <input type="number" id="prix_fournis" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="prix_unitaire" class="block text-sm font-medium">Prix Unitaire:</label>
+                            <input type="number" id="prix_unitaire" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
+                        </div>
+                    </div>
+                    <!-- Additional Details Tab -->
+                    <div id="detailsTab" class="tab-content hidden">
+                        <div class="space-y-2">
+                            <label for="prix_total" class="block text-sm font-medium">Prix Total:</label>
+                            <input type="number" id="prix_total" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" readonly>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="date_ajout" class="block text-sm font-medium">Date d'Ajout:</label>
+                            <input type="date" id="date_ajout" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
+                        </div>
+                        <div class="space-y-2">
+                            <label for="date_expiration" class="block text-sm font-medium">Date d'Expiration:</label>
+                            <input type="date" id="date_expiration" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600" required>
+                        </div>
+                    </div>
+                    <!-- Save Button -->
+                    <div class="flex justify-end space-x-2">
+                        <button type="button" id="btn_enregitrer_nouveau" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 focus:outline-none">Enregistrer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             lucide.createIcons();
-    
+        
             $(document).ready(function () {
                 function initializeSideMenu() {
                     const sideMenu = $('#side-menu');
@@ -338,14 +511,14 @@
                         })
                         .on('mouseenter', () => sideMenu.removeClass('-translate-x-full'))
                         .appendTo('body');
-    
-                    sideMenu.on('mouseleave', () => sideMenu.addClass('-translate-x-full'));
+        
+                    sideMenu.on('mouseleave', () => $(this).addClass('-translate-x-full'));
                 }
-    
+        
                 function initializeTabs() {
                     const tabButtons = document.querySelectorAll('.tab-button');
                     const tabContents = document.querySelectorAll('.tab-content');
-    
+        
                     tabButtons.forEach((button, index) => {
                         button.addEventListener('click', () => {
                             tabButtons.forEach(btn => btn.classList.remove('active', 'border-green-600', 'text-green-600'));
@@ -356,13 +529,13 @@
                     });
                     tabButtons[0].click();
                 }
-    
+        
                 function calculateTotal() {
                     const quantite = parseFloat($('#quantite').val()) || 0;
                     const prixFournis = parseFloat($('#prix_fournis').val()) || 0;
                     $('#prix_total').val((quantite * prixFournis).toFixed(2));
                 }
-    
+        
                 function loadProducts() {
                     $.ajax({
                         url: 'get_products.php',
@@ -380,7 +553,7 @@
                         error: xhr => console.error('Error loading products:', xhr)
                     });
                 }
-    
+        
                 function loadSuppliers() {
                     $.ajax({
                         url: 'get_suppliers.php',
@@ -398,7 +571,7 @@
                         error: xhr => console.error('Error loading suppliers:', xhr)
                     });
                 }
-    
+        
                 function loadEntries() {
                     $.ajax({
                         url: 'commande_get_liste.php',
@@ -407,13 +580,13 @@
                         success: function(response) {
                             const tbody = $('tbody');
                             tbody.empty();
-    
+        
                             if (response.status === 'success' && Array.isArray(response.donnees)) {
                                 response.donnees.forEach(entry => {
                                     const prixFournis = parseFloat(entry.prix_fournis || 0).toFixed(2);
                                     const prixUnitaire = parseFloat(entry.prix_unitaire || 0).toFixed(2);
                                     const prixTotal = parseFloat(entry.prix_total || 0).toFixed(2);
-    
+        
                                     tbody.append(`
                                         <tr class="bg-white hover:bg-gray-50" 
                                             data-id="${entry.id_commande}" 
@@ -445,22 +618,22 @@
                         }
                     });
                 }
-    
+        
                 function handleModalEvents() {
                     const modal = $('#modalAjouterEntree');
                     const today = new Date().toISOString().split('T')[0];
-    
+        
                     $('#btnAjouterEntree').on('click', function() {
                         modal.removeClass('hidden').css('display', 'flex');
                         $('#modalTitle').text('Ajouter un Produit');
                         clearModalFields(today);
                     });
-    
+        
                     $('#closeModal, #closeAjouterCommande').on('click', () => {
                         modal.addClass('hidden').css('display', 'none');
                         clearModalFields(today);
                     });
-    
+        
                     modal.on('click', function(e) {
                         if (e.target === this) {
                             modal.addClass('hidden').css('display', 'none');
@@ -468,14 +641,13 @@
                         }
                     });
                 }
-    
-                // Dans le script, remplacez la fonction handleFormSubmission :
+        
                 function handleFormSubmission() {
                     $('#btn_enregitrer_nouveau').on('click', function(e) {
                         e.preventDefault();
-                        
+                        const code = $('#code').val();
                         const formData = {
-                            id_commande: $('#code').val(),
+                            code,
                             id_produit: $('#id_produit').val(),
                             id_fournisseur: $('#id_fournisseur').val(),
                             quantite: $('#quantite').val(),
@@ -486,73 +658,48 @@
                             date_expiration: $('#date_expiration').val()
                         };
         
-                        // Debug log
-                        console.log('Envoi des données:', formData);
-                        
-                        const url = formData.id_commande ? 'commande_modifier.php' : 'commande_nouveau.php';
-                        
                         $.ajax({
-                            url: url,
+                            url: code ? 'commande_modifier.php' : 'commande_nouveau.php',
                             type: 'POST',
                             data: formData,
                             dataType: 'json',
                             success: function(response) {
-                                console.log('Réponse serveur:', response);
                                 if (response.status === 'success') {
                                     $('#modalAjouterEntree').addClass('hidden').css('display', 'none');
                                     loadEntries();
-                                    clearModalFields(new Date().toISOString().split('T')[0]);
-                                    alert(formData.id_commande ? 'Entrée modifiée avec succès!' : 'Entrée ajoutée avec succès!');
+                                    alert(code ? 'Entrée modifiée avec succès!' : 'Entrée ajoutée avec succès!');
                                 } else {
                                     alert("Erreur: " + (response.message || "Une erreur est survenue"));
                                 }
                             },
-                            error: function(xhr, status, error) {
-                                console.error('Détails de l\'erreur:', {
-                                    xhr: xhr,
-                                    status: status,
-                                    error: error,
-                                    responseText: xhr.responseText
-                                });
-                                try {
-                                    const response = JSON.parse(xhr.responseText);
-                                    alert("Erreur: " + (response.message || "Une erreur inattendue est survenue"));
-                                } catch(e) {
-                                    alert("Erreur lors de l'opération. Vérifiez la console pour plus de détails.");
-                                }
+                            error: xhr => {
+                                console.error('Error:', xhr);
+                                alert("Erreur lors de l'opération.");
                             }
                         });
                     });
                 }
-    
-                // Remplacez la fonction de gestion du clic sur btnModifier
+        
                 $(document).on('click', '.btnModifier', function() {
                     const row = $(this).closest('tr');
                     const cells = row.find('td');
                     
-                    // Debug log
-                    console.log('Données de la ligne à modifier:', {
-                        id_commande: row.data('id'),
-                        id_produit: row.data('product-id'),
-                        id_fournisseur: row.data('supplier-id')
-                    });
-                    
-                    // Remplissage du formulaire
                     $('#code').val(row.data('id'));
                     $('#id_produit').val(row.data('product-id'));
                     $('#id_fournisseur').val(row.data('supplier-id'));
+                    $('#prix_fournis').val(cells.eq(2).text().trim().replace(/[^\d.,]/g, ''));
+                    $('#prix_unitaire').val(cells.eq(3).text().trim().replace(/[^\d.,]/g, ''));
                     $('#quantite').val(cells.eq(4).text().trim());
-                    $('#prix_fournis').val(parseFloat(cells.eq(2).text().replace(/[^\d.,]/g, '')));
-                    $('#prix_unitaire').val(parseFloat(cells.eq(3).text().replace(/[^\d.,]/g, '')));
+                    $('#prix_total').val(cells.eq(5).text().trim().replace(/[^\d.,]/g, ''));
                     $('#date_ajout').val(cells.eq(6).text().trim());
                     $('#date_expiration').val(cells.eq(7).text().trim());
-                    
+        
                     calculateTotal();
                     $('#tabGeneral').click();
-                    $('#modalTitle').text('Modifier une Entrée');
+                    $('#modalTitle').text('Modifier un Produit');
                     $('#modalAjouterEntree').removeClass('hidden').css('display', 'flex');
                 });
-    
+        
                 $(document).on('click', '.btnSupprimer', function() {
                     if (confirm('Êtes-vous sûr de vouloir supprimer cette entrée?')) {
                         const id = $(this).closest('tr').data('id');
@@ -576,109 +723,15 @@
                         });
                     }
                 });
-    
+        
                 function clearModalFields(today) {
                     $('#code, #id_produit, #id_fournisseur, #quantite, #prix_fournis, #prix_unitaire, #prix_total').val('');
                     $('#date_ajout').val(today);
                     $('#date_expiration').val('');
                 }
-    
+        
                 $('#quantite, #prix_fournis').on('input', calculateTotal);
-    
-                // Ajouter cette fonction après les autres fonctions JavaScript existantes :
-                function handlePrint() {
-                    $.ajax({
-                        url: 'commande_get_liste.php',
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function(response) {
-                            if (response.status === 'success' && Array.isArray(response.donnees)) {
-                                // Créer une nouvelle fenêtre pour l'impression
-                                const printWindow = window.open('', '_blank');
-                                
-                                // Construire le contenu HTML à imprimer
-                                let printContent = `
-                                    <!DOCTYPE html>
-                                    <html>
-                                    <head>
-                                        <title>Liste des Commandes</title>
-                                        <style>
-                                            body { font-family: Arial, sans-serif; }
-                                            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                                            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                                            th { background-color: #047857; color: white; }
-                                            .header { text-align: center; margin-bottom: 20px; }
-                                            .date { text-align: right; margin-bottom: 20px; }
-                                            .total { margin-top: 20px; text-align: right; }
-                                        </style>
-                                    </head>
-                                    <body>
-                                        <div class="header">
-                                            <h1>Pharmacie de Cession</h1>
-                                            <h2>Liste des Commandes</h2>
-                                        </div>
-                                        <div class="date">Date d'impression: ${new Date().toLocaleDateString()}</div>
-                                        <table>
-                                            <thead>
-                                                <tr>
-                                                    <th>Produit</th>
-                                                    <th>Prix Achat</th>
-                                                    <th>Prix Vente</th>
-                                                    <th>Quantité</th>
-                                                    <th>Prix Total</th>
-                                                    <th>Date d'Ajout</th>
-                                                    <th>Date d'Expiration</th>
-                                                    <th>Fournisseur</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>`;
-                
-                                // Ajouter les lignes de données
-                                response.donnees.forEach(entry => {
-                                    printContent += `
-                                        <tr>
-                                            <td>${entry.nom || ''}</td>
-                                            <td>${parseFloat(entry.prix_fournis || 0).toFixed(2)} F CFA</td>
-                                            <td>${parseFloat(entry.prix_unitaire || 0).toFixed(2)} F CFA</td>
-                                            <td>${entry.quantite || ''}</td>
-                                            <td>${parseFloat(entry.prix_total || 0).toFixed(2)} F CFA</td>
-                                            <td>${entry.date_ajout || ''}</td>
-                                            <td>${entry.date_expiration || ''}</td>
-                                            <td>${entry.nom_fournisseurs || ''}</td>
-                                        </tr>`;
-                                });
-                
-                                // Ajouter les totaux et fermer le HTML
-                                printContent += `
-                                            </tbody>
-                                        </table>
-                                        <div class="total">
-                                            <p><strong>Nombre total de commandes:</strong> ${response.statistiques.nombre_commandes}</p>
-                                            <p><strong>Quantité totale:</strong> ${response.statistiques.quantite_totale}</p>
-                                            <p><strong>Montant total:</strong> ${response.statistiques.montant_total} F CFA</p>
-                                        </div>
-                                    </body>
-                                    </html>`;
-                
-                                // Écrire le contenu dans la nouvelle fenêtre
-                                printWindow.document.write(printContent);
-                                printWindow.document.close();
-                
-                                // Lancer l'impression après le chargement de la page
-                                printWindow.onload = function() {
-                                    printWindow.print();
-                                };
-                            } else {
-                                alert('Aucune donnée à imprimer');
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('Erreur:', error);
-                            alert('Erreur lors de la récupération des données pour l\'impression');
-                        }
-                    });
-                }
-    
+        
                 // Initialize everything
                 initializeSideMenu();
                 initializeTabs();
@@ -687,71 +740,311 @@
                 loadProducts();
                 loadSuppliers();
                 loadEntries();
-    
-                // Gestionnaire du bouton d'impression
-                $('.bg-gray-500.text-white').on('click', handlePrint);
-
-                // Ajouter dans la section JavaScript :
-                $(document).on('click', '.bg-green-600.text-white', function() {
-                    const searchTerm = $('input[placeholder="Produit"]').val();
-                    const startDate = $('input[type="date"]:first').val();
-                    const endDate = $('input[type="date"]:last').val();
-                
-                    $.ajax({
-                        url: 'commande_rechercher.php',
-                        type: 'POST',
-                        data: {
-                            search: searchTerm,
-                            date_debut: startDate,
-                            date_fin: endDate
-                        },
-                        dataType: 'json',
-                        success: function(response) {
-                            const tbody = $('tbody');
-                            tbody.empty();
-                
-                            if (response.status === 'success' && response.donnees && response.donnees.length > 0) {
-                                response.donnees.forEach(entry => {
-                                    const row = `
-                                        <tr class="bg-white hover:bg-gray-50" 
-                                            data-id="${entry.id_commande}" 
-                                            data-product-id="${entry.id_produit}" 
-                                            data-supplier-id="${entry.id_fournisseur}">
-                                            <td hidden>${entry.code || ''}</td>
-                                            <td>${entry.nom || ''}</td>
-                                            <td>${parseFloat(entry.prix_fournis || 0).toFixed(2)} F CFA</td>
-                                            <td>${parseFloat(entry.prix_unitaire || 0).toFixed(2)} F CFA</td>
-                                            <td>${entry.quantite || ''}</td>
-                                            <td>${parseFloat(entry.prix_total || 0).toFixed(2)} F CFA</td>
-                                            <td>${entry.date_ajout || ''}</td>
-                                            <td>${entry.date_expiration || ''}</td>
-                                            <td>${entry.nom_fournisseurs || ''}</td>
-                                            <td>
-                                                <button class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 btnModifier">Modifier</button>
-                                                <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 btnSupprimer">Supprimer</button>
-                                            </td>
-                                        </tr>
-                                    `;
-                                    tbody.append(row);
-                                });
-                            } else {
-                                tbody.append('<tr><td colspan="10" class="text-center py-4">Aucun résultat trouvé</td></tr>');
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('Erreur:', error);
-                            $('tbody').html(`
-                                <tr>
-                                    <td colspan="10" class="text-center text-red-600 py-4">
-                                        Erreur lors de la recherche : ${error}
-                                    </td>
-                                </tr>
-                            `);
-                        }
-                    });
-                });
             });
         });
+function handleModalEvents() {
+    const modalAjouter = $('#modalAjouterEntree');
+    const modalModifier = $('#modalModifierEntree');
+    const today = new Date().toISOString().split('T')[0];
+
+    // Ouvrir le modal d'ajout
+    $('#btnAjouterEntree').on('click', function() {
+        modalAjouter.removeClass('hidden').css('display', 'flex');
+        $('#modalTitleAjout').text('Ajouter un Produit');
+        clearModalFields(today);
+    });
+
+    // Ouvrir le modal de modification
+    $(document).on('click', '.btnModifier', function() {
+        const row = $(this).closest('tr');
+        const cells = row.find('td');
+
+        // Remplir les champs du formulaire avec les données de la ligne sélectionnée
+        $('#code').val(row.data('id'));
+        $('#id_produit').val(row.data('product-id'));
+        $('#id_fournisseur').val(row.data('supplier-id'));
+        $('#prix_fournis').val(cells.eq(2).text().trim().replace(/[^\d.,]/g, ''));
+        $('#prix_unitaire').val(cells.eq(3).text().trim().replace(/[^\d.,]/g, ''));
+        $('#quantite').val(cells.eq(4).text().trim());
+        $('#prix_total').val(cells.eq(5).text().trim().replace(/[^\d.,]/g, ''));
+        $('#date_ajout').val(cells.eq(6).text().trim());
+        $('#date_expiration').val(cells.eq(7).text().trim());
+
+        calculateTotal();
+        $('#tabGeneral').click();
+        $('#modalTitleModifier').text('Modifier un Produit');
+        modalModifier.removeClass('hidden').css('display', 'flex');
+    });
+
+    // Fermer les modals
+    $('#closeModal, #closeAjouterCommande').on('click', () => {
+        modalAjouter.addClass('hidden').css('display', 'none');
+        modalModifier.addClass('hidden').css('display', 'none');
+        clearModalFields(today);
+    });
+
+    // Fermer les modals en cliquant à l'extérieur
+    modalAjouter.on('click', function(e) {
+        if (e.target === this) {
+            modalAjouter.addClass('hidden').css('display', 'none');
+            clearModalFields(today);
+        }
+    });
+
+    modalModifier.on('click', function(e) {
+        if (e.target === this) {
+            modalModifier.addClass('hidden').css('display', 'none');
+            clearModalFields(today);
+        }
+    });
+}
+
+function handleFormSubmission() {
+    // Gestion de la soumission du formulaire pour les deux modals
+    $('#btn_enregitrer_nouveau, #btnAjouterListe').on('click', function(e) {
+        e.preventDefault();
+
+        const code = $('#code').val(); // Si code est présent, c'est une modification
+        const formData = {
+            code,
+            id_produit: $('#id_produit').val(),
+            id_fournisseur: $('#id_fournisseur').val(),
+            quantite: $('#quantite').val(),
+            prix_fournis: $('#prix_fournis').val(),
+            prix_unitaire: $('#prix_unitaire').val(),
+            prix_total: $('#prix_total').val(),
+            date_ajout: $('#date_ajout').val(),
+            date_expiration: $('#date_expiration').val()
+        };
+
+        $.ajax({
+            url: code ? 'commande_modifier.php' : 'commande_nouveau.php', // Choix de l'URL en fonction de l'action
+            type: 'POST',
+            data: formData,
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success') {
+                    // Fermer les modals
+                    $('#modalAjouterEntree').addClass('hidden').css('display', 'none');
+                    $('#modalModifierEntree').addClass('hidden').css('display', 'none');
+
+                    // Recharger les données
+                    loadEntries();
+
+                    // Afficher un message de succès
+                    alert(code ? 'Entrée modifiée avec succès!' : 'Entrée ajoutée avec succès!');
+                } else {
+                    alert("Erreur: " + (response.message || "Une erreur est survenue"));
+                }
+            },
+            error: function(xhr) {
+                console.error('Error:', xhr);
+                alert("Erreur lors de l'opération.");
+            }
+        });
+    });
+}
+
+function clearModalFields(today) {
+    // Réinitialiser les champs du formulaire
+    $('#code').val('');
+    $('#id_produit').val('');
+    $('#id_fournisseur').val('');
+    $('#quantite').val('');
+    $('#prix_fournis').val('');
+    $('#prix_unitaire').val('');
+    $('#prix_total').val('');
+    $('#date_ajout').val(today);
+    $('#date_expiration').val('');
+}
+
+function calculateTotal() {
+    // Calculer le prix total en fonction de la quantité et du prix unitaire
+    const quantite = parseFloat($('#quantite').val()) || 0;
+    const prixUnitaire = parseFloat($('#prix_unitaire').val()) || 0;
+    const prixTotal = quantite * prixUnitaire;
+    $('#prix_total').val(prixTotal.toFixed(2));
+}
+
+// Initialisation des événements
+$(document).ready(function() {
+    handleModalEvents();
+    handleFormSubmission();
+
+    // Calculer le prix total lorsque la quantité ou le prix unitaire change
+    $('#quantite, #prix_unitaire').on('input', calculateTotal);
+});
+document.addEventListener('DOMContentLoaded', function () {
+    // Récupérer les éléments du DOM
+    const modalAjouterEntree = document.getElementById('modalAjouterEntree');
+    const btnAjouterEntree = document.getElementById('btnAjouterEntree'); // Bouton pour ouvrir le modal
+    const closeAjouterCommande = document.getElementById('closeAjouterCommande');
+    const closeModalAjout = document.getElementById('closeModalAjout');
+    const btnAjouterListe = document.getElementById('btnAjouterListe');
+    const commandesTableBody = document.getElementById('commandesTableBody');
+    const btnEnregistrerTout = document.getElementById('btnEnregistrerTout');
+
+    // Variables pour stocker les commandes temporaires
+    let commandesTemporaires = [];
+
+    // Ouvrir le modal
+    if (btnAjouterEntree) {
+        btnAjouterEntree.addEventListener('click', function () {
+            modalAjouterEntree.style.display = 'flex';
+        });
+    }
+
+    // Fermer le modal
+    if (closeAjouterCommande) {
+        closeAjouterCommande.addEventListener('click', function () {
+            modalAjouterEntree.style.display = 'none';
+        });
+    }
+
+    if (closeModalAjout) {
+        closeModalAjout.addEventListener('click', function () {
+            modalAjouterEntree.style.display = 'none';
+        });
+    }
+
+    // Fermer le modal en cliquant à l'extérieur
+    window.addEventListener('click', function (event) {
+        if (event.target === modalAjouterEntree) {
+            modalAjouterEntree.style.display = 'none';
+        }
+    });
+
+    // Ajouter une commande à la liste temporaire
+    if (btnAjouterListe) {
+        btnAjouterListe.addEventListener('click', function () {
+            // Récupérer les valeurs du formulaire
+            const produit = document.getElementById('id_produit').value;
+            const fournisseur = document.getElementById('id_fournisseur').value;
+            const quantite = document.getElementById('quantite').value;
+            const prixFournis = document.getElementById('prix_fournis').value;
+            const prixUnitaire = document.getElementById('prix_unitaire').value;
+            const prixTotal = document.getElementById('prix_total').value;
+            const dateAjout = document.getElementById('date_ajout').value;
+            const dateExpiration = document.getElementById('date_expiration').value;
+
+            // Vérifier que tous les champs sont remplis
+            if (!produit || !fournisseur || !quantite || !prixFournis || !prixUnitaire || !prixTotal || !dateAjout || !dateExpiration) {
+                alert('Veuillez remplir tous les champs.');
+                return;
+            }
+
+            // Ajouter la commande à la liste temporaire
+            const nouvelleCommande = {
+                produit,
+                fournisseur,
+                quantite,
+                prixFournis,
+                prixUnitaire,
+                prixTotal,
+                dateAjout,
+                dateExpiration
+            };
+            commandesTemporaires.push(nouvelleCommande);
+
+            // Mettre à jour le tableau des commandes temporaires
+            afficherCommandesTemporaires();
+
+            // Activer le bouton "Enregistrer toutes les commandes"
+            btnEnregistrerTout.disabled = false;
+
+            // Réinitialiser le formulaire
+            document.getElementById('formAjoutProduit').reset();
+        });
+    }
+
+    // Afficher les commandes temporaires dans le tableau
+    function afficherCommandesTemporaires() {
+        commandesTableBody.innerHTML = ''; // Vider le tableau
+
+        commandesTemporaires.forEach((commande, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="border p-2">${commande.produit}</td>
+                <td class="border p-2">${commande.fournisseur}</td>
+                <td class="border p-2">${commande.quantite}</td>
+                <td class="border p-2">${commande.prixFournis}</td>
+                <td class="border p-2">${commande.prixUnitaire}</td>
+                <td class="border p-2">${commande.prixTotal}</td>
+                <td class="border p-2">${commande.dateAjout}</td>
+                <td class="border p-2">${commande.dateExpiration}</td>
+                <td class="border p-2">
+                    <button class="text-red-500 hover:text-red-700" onclick="supprimerCommande(${index})">
+                        <i data-lucide="trash-2" class="w-5 h-5"></i>
+                    </button>
+                </td>
+            `;
+            commandesTableBody.appendChild(row);
+        });
+
+        // Initialiser les icônes Lucide
+        lucide.createIcons();
+    }
+
+    // Supprimer une commande de la liste temporaire
+    window.supprimerCommande = function (index) {
+        commandesTemporaires.splice(index, 1); // Supprimer la commande
+        afficherCommandesTemporaires(); // Mettre à jour le tableau
+
+        // Désactiver le bouton "Enregistrer toutes les commandes" si la liste est vide
+        if (commandesTemporaires.length === 0) {
+            btnEnregistrerTout.disabled = true;
+        }
+    };
+
+    // Enregistrer toutes les commandes
+    if (btnEnregistrerTout) {
+        btnEnregistrerTout.addEventListener('click', function () {
+            // Envoyer les commandes au serveur via AJAX
+            fetch('enregistrer_commandes.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(commandesTemporaires)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('Commandes enregistrées avec succès !');
+                        commandesTemporaires = []; // Vider la liste temporaire
+                        afficherCommandesTemporaires(); // Mettre à jour le tableau
+                        btnEnregistrerTout.disabled = true; // Désactiver le bouton
+                        modalAjouterEntree.style.display = 'none'; // Fermer le modal
+                    } else {
+                        alert('Erreur lors de l\'enregistrement des commandes.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Une erreur est survenue.');
+                });
+        });
+    }
+
+    // Calculer le prix total automatiquement
+    const quantiteInput = document.getElementById('quantite');
+    const prixUnitaireInput = document.getElementById('prix_unitaire');
+    const prixTotalInput = document.getElementById('prix_total');
+
+    if (quantiteInput && prixUnitaireInput && prixTotalInput) {
+        quantiteInput.addEventListener('input', calculerPrixTotal);
+        prixUnitaireInput.addEventListener('input', calculerPrixTotal);
+    }
+
+    function calculerPrixTotal() {
+        const quantite = parseFloat(quantiteInput.value) || 0;
+        const prixUnitaire = parseFloat(prixUnitaireInput.value) || 0;
+        const prixTotal = quantite * prixUnitaire;
+        prixTotalInput.value = prixTotal.toFixed(2);
+    }
+});
     </script>
 </body>
 </html>
+
+  

@@ -1,18 +1,9 @@
 <?php
-// commande_modifier.php
 header('Content-Type: application/json');
 
 try {
     // Log des données reçues
     error_log("Données reçues : " . print_r($_POST, true));
-
-    // Validation des données requises
-    $required_fields = ['id_commande', 'id_produit', 'id_fournisseur', 'quantite', 'prix_unitaire'];
-    foreach ($required_fields as $field) {
-        if (!isset($_POST[$field]) || empty($_POST[$field])) {
-            throw new Exception("Le champ {$field} est requis");
-        }
-    }
 
     // Connexion à la base de données
     $pdo = new PDO(
@@ -25,26 +16,27 @@ try {
         ]
     );
 
-    // Préparation des données sans prix_total
-    $data = [
-        ':id_commande' => $_POST['id_commande'],
-        ':id_produit' => $_POST['id_produit'],
-        ':id_fournisseur' => $_POST['id_fournisseur'],
-        ':quantite' => $_POST['quantite'],
-        ':prix_fournis' => $_POST['prix_fournis'],
-        ':prix_unitaire' => $_POST['prix_unitaire'],
-        ':date_ajout' => $_POST['date_ajout'],
-        ':date_expiration' => $_POST['date_expiration']
-    ];
-
-    // Vérification si la commande existe
-    $check = $pdo->prepare("SELECT id_commande FROM t_commandes WHERE id_commande = ?");
-    $check->execute([$_POST['id_commande']]);
-    if (!$check->fetch()) {
-        throw new Exception("La commande n'existe pas");
+    // Validation des données
+    if (!isset($_POST['id_commande']) || empty($_POST['id_commande'])) {
+        throw new Exception("L'ID de la commande est requis");
     }
 
-    // Mise à jour sans prix_total
+    // Préparation des données
+    $data = [
+        ':id_commande' => $_POST['id_commande'],
+        ':id_produit' => $_POST['id_produit'] ?? null,
+        ':id_fournisseur' => $_POST['id_fournisseur'] ?? null,
+        ':quantite' => $_POST['quantite'] ?? 0,
+        ':prix_fournis' => $_POST['prix_fournis'] ?? 0,
+        ':prix_unitaire' => $_POST['prix_unitaire'] ?? 0,
+        ':date_ajout' => $_POST['date_ajout'] ?? date('Y-m-d'),
+        ':date_expiration' => $_POST['date_expiration'] ?? null
+    ];
+
+    // Début de la transaction
+    $pdo->beginTransaction();
+
+    // Mise à jour de la commande
     $sql = "UPDATE t_commandes SET 
             id_produit = :id_produit,
             id_fournisseur = :id_fournisseur,
@@ -58,7 +50,27 @@ try {
     $stmt = $pdo->prepare($sql);
     $result = $stmt->execute($data);
 
-    if ($result && $stmt->rowCount() > 0) {
+    if ($result) {
+        // Mise à jour du stock
+        $updateStock = $pdo->prepare("
+            UPDATE t_stock 
+            SET quantite = :quantite,
+                prix_unitaire = :prix_unitaire,
+                date_ajout = :date_ajout,
+                date_expiration = :date_expiration
+            WHERE id_commandes = :id_commande
+        ");
+        
+        $updateStock->execute([
+            ':quantite' => $data[':quantite'],
+            ':prix_unitaire' => $data[':prix_unitaire'],
+            ':date_ajout' => $data[':date_ajout'],
+            ':date_expiration' => $data[':date_expiration'],
+            ':id_commande' => $data[':id_commande']
+        ]);
+
+        $pdo->commit();
+        
         echo json_encode([
             'status' => 'success',
             'message' => 'Commande modifiée avec succès!',
@@ -69,6 +81,9 @@ try {
     }
 
 } catch (PDOException $e) {
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
     error_log("Erreur PDO : " . $e->getMessage());
     http_response_code(500);
     echo json_encode([
@@ -76,6 +91,9 @@ try {
         'message' => 'Erreur de base de données: ' . $e->getMessage()
     ]);
 } catch (Exception $e) {
+    if (isset($pdo) && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
     error_log("Erreur : " . $e->getMessage());
     http_response_code(400);
     echo json_encode([
