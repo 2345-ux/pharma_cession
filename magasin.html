@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacie de Cession - Magasins</title>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script src="assets\js\lucide@04680.min.js"></script>
+    <link href="assets\css\tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to bottom right, #f9fafb, #dbeafe);
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-green-600 to-emerald-600 text-white py-6">
+        <h1 class="text-3xl font-bold text-center">Pharmacie de Cession - Gestion des Magasins</h1>
+    </header>
+
+    <div class="container">
+        <div id="side-menu" class="fixed top-0 left-0 h-full bg-white shadow-lg transform -translate-x-full transition-transform duration-300 ease-in-out z-50 w-64 hover:opacity-100 group">
+            <div class="absolute top-0 right-0 m-4 cursor-pointer hover:text-red-500">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </div>
+            <nav class="p-6 pt-16">
+                <h2 class="text-2xl font-bold text-green-600 mb-6">Menu</h2>
+                <ul class="space-y-4">
+                    <li><a href="index.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="home" class="w-5 h-5 mr-3"></i>Accueil</a></li>
+                    <li><a href="stock2.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="package" class="w-5 h-5 mr-3"></i>Stock</a></li>
+                    <li><a href="commande.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="shopping-cart" class="w-5 h-5 mr-3"></i>Commandes</a></li>
+                    <li><a href="sorties.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="log-out" class="w-5 h-5 mr-3"></i>Sorties</a></li>
+                    <li><a href="produit.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="box" class="w-5 h-5 mr-3"></i>Produits</a></li>
+                    <li><a href="categorie.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="layers" class="w-5 h-5 mr-3"></i>Catégories</a></li>
+                    <li><a href="fournisseurs.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                        <i data-lucide="truck" class="w-5 h-5 mr-3"></i>Fournisseurs</a></li>
+                    <li><a href="magasin.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                            <i data-lucide="store" class="w-5 h-5 mr-3"></i>Magasin</a></li>
+                </ul>
+            </nav>
+        </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-16"> <!-- Augmenté le padding-top (py-16) -->
+        <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8"> <!-- Réduit max-w-4xl et augmenté padding -->
+            <!-- Title and Add Button -->
+            <div class="flex justify-between items-center mb-8"> <!-- Augmenté margin-bottom -->
+                <h2 class="text-2xl font-semibold text-green-700">Liste des Magasins</h2>
+                <button id="btnAjouterMagasin" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2">
+                    <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                    Ajouter un Magasin
+                </button>
+            </div>
+
+            <!-- Table Container avec bordure et arrondi -->
+            <div class="border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-green-600">
+                            <th hidden class="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">ID</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">Nom du Magasin</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider w-1/4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="magasinsTableBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Les données seront insérées ici -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modalAjouterMagasin" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl w-96 p-6 relative">
+            <button id="closeModal" class="absolute top-4 right-4 text-gray-500 hover:text-red-500">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            
+            <h2 class="text-xl font-semibold text-gray-800 mb-6" id="modalTitle">Ajouter un Magasin</h2>
+            
+            <form id="formMagasin" class="space-y-4">
+                <input type="hidden" id="code">
+                
+                <div class="space-y-2">
+                    <label for="nom" class="block text-sm font-medium text-gray-700">Nom du magasin</label>
+                    <input type="text" id="nom" required
+                        class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+                </div>
+
+                <button type="submit" id="btnSauvegarder" 
+                    class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 
+                           focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 
+                           transition-colors duration-200">
+                    Enregistrer
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-white"></div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize Lucide icons
+            lucide.createIcons();
+
+            // Initialize side menu
+            initializeSideMenu();
+
+            // Load initial data
+            loadMagasins();
+
+            // Modal handlers
+            $('#btnAjouterMagasin').click(function() {
+                openModal('add');
+            });
+
+            $('#closeModal').click(closeModal);
+
+            // Form submission
+            $('#formMagasin').submit(function(e) {
+                e.preventDefault();
+                saveMagasin();
+            });
+
+            // Edit and Delete handlers
+            $(document).on('click', '.btnModifier', function() {
+                const row = $(this).closest('tr');
+                const data = {
+                    code: row.find('td:eq(0)').text(),
+                    nom: row.find('td:eq(1)').text(),
+                    emplacement: row.find('td:eq(2)').text()
+                };
+                openModal('edit', data);
+            });
+
+            $(document).on('click', '.btnSupprimer', function() {
+                if (confirm('Êtes-vous sûr de vouloir supprimer ce magasin ?')) {
+                    const code = $(this).closest('tr').find('td:first').text();
+                    deleteMagasin(code);
+                }
+            });
+        });
+
+        function initializeSideMenu() {
+            const sideMenu = $('#side-menu');
+            $('<div>')
+                .css({
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    width: '50px',
+                    zIndex: 40,
+                })
+                .on('mouseenter', () => sideMenu.removeClass('-translate-x-full'))
+                .appendTo('body');
+
+            sideMenu.on('mouseleave', () => sideMenu.addClass('-translate-x-full'));
+        }
+
+        function openModal(mode, data = null) {
+            const modal = $('#modalAjouterMagasin');
+            $('#modalTitle').text(mode === 'add' ? 'Ajouter un Magasin' : 'Modifier le Magasin');
+            $('#btnSauvegarder').text(mode === 'add' ? 'Ajouter' : 'Modifier');
+
+            if (mode === 'edit' && data) {
+                $('#code').val(data.code);
+                $('#nom').val(data.nom);
+                $('#emplacement').val(data.emplacement);
+            } else {
+                $('#formMagasin')[0].reset();
+                $('#code').val('');
+            }
+
+            modal.removeClass('hidden').addClass('flex');
+        }
+
+        function closeModal() {
+            $('#modalAjouterMagasin').removeClass('flex').addClass('hidden');
+            $('#formMagasin')[0].reset();
+        }
+
+        function loadMagasins() {
+            $('#loadingIndicator').removeClass('hidden').addClass('flex');
+            $.ajax({
+                url: 'magasin_get_liste.php',
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    console.log('Réponse complète:', response); // Debug
+                    const tbody = $('#magasinsTableBody');
+                    tbody.empty();
+
+                    if (response.status === 'success' && Array.isArray(response.data) && response.data.length > 0) {
+                        response.data.forEach(magasin => {
+                            console.log('Magasin:', magasin); // Debug
+                            tbody.append(`
+                                <tr class="hover:bg-gray-50">
+                                    <td hidden class="px-6 py-4 whitespace-nowrap">${magasin.id || ''}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">${magasin.nom || ''}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap flex space-x-2">
+                                        <button class="btnModifier bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg">
+                                            <i data-lucide="edit" class="w-4 h-4"></i>
+                                        </button>
+                                        <button class="btnSupprimer bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg">
+                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                        lucide.createIcons();
+                    } else {
+                        tbody.append(`
+                            <tr><td colspan="3" class="text-center py-4">Aucun magasin trouvé</td></tr>
+                        `);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Erreur AJAX:', {
+                        xhr: xhr.responseText,
+                        status: status,
+                        error: error
+                    });
+                    alert('Erreur lors du chargement : ' + error);
+                },
+                complete: function() {
+                    $('#loadingIndicator').removeClass('flex').addClass('hidden');
+                }
+            });
+        }
+
+        function saveMagasin() {
+            const data = {
+                id: $('#code').val(),
+                nom: $('#nom').val()
+            };
+
+            const url = data.id ? 'magasin_modifier.php' : 'magasin_nouveau.php';
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: data,
+                dataType: 'json',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        closeModal();
+                        loadMagasins();
+                        alert(data.id ? 'Magasin modifié avec succès!' : 'Magasin ajouté avec succès!');
+                    } else {
+                        alert('Erreur: ' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('Erreur lors de l\'opération');
+                }
+            });
+        }
+
+        function deleteMagasin(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce magasin ?')) {
+                $.ajax({
+                    url: 'magasin_supprimer.php',
+                    type: 'POST',
+                    data: { id: id },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            loadMagasins();
+                            alert('Magasin supprimé avec succès!');
+                        } else {
+                            alert('Erreur: ' + response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('Erreur lors de la suppression');
+                    }
+                });
+            }
+        }
+
+        // Event handlers
+        $('#formMagasin').on('submit', function(e) {
+            e.preventDefault();
+            saveMagasin();
+        });
+
+        $(document).on('click', '.btnModifier', function() {
+            const row = $(this).closest('tr');
+            openModal('edit', {
+                id: row.find('td:eq(0)').text(),
+                nom: row.find('td:eq(1)').text()
+            });
+        });
+
+        $(document).on('click', '.btnSupprimer', function() {
+            const id = $(this).closest('tr').find('td:first').text();
+            deleteMagasin(id);
+        });
+
+        // Initial load
+        loadMagasins();
+    </script>
+</body>
+</html>

@@ -12,8 +12,18 @@ try {
 
 
 
-    $stmt = $pdo->prepare("SELECT t_produits.code, t_produits.nom, t_produits.seuil_produit, t_categories.nom as nom_cat, categorie FROM t_produits, t_categories
-WHERE t_produits.categorie = t_categories.code;");
+    $stmt = $pdo->prepare("SELECT 
+    t_produits.id,
+    t_produits.code, 
+    t_produits.nom, 
+    seuil_produit, 
+    t_categories.nom AS nom_categories
+FROM 
+    t_produits
+JOIN 
+    t_categories ON t_produits.categorie = t_categories.code
+ORDER BY 
+   t_produits.id;");
 
     $stmt->execute([]);
     // Récupérer les résultats

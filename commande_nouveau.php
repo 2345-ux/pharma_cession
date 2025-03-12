@@ -100,7 +100,7 @@ try {
     echo json_encode([
         'status' => 'success',
         'message' => 'Commande créée avec succès',
-        'data' => ['id' => $id_commande, 'code' => $code]
+        //'data' => ['id' => $id_commande, 'code' => $code]
     ]);
 
 } catch (PDOException $e) {

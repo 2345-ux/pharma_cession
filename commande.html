@@ -188,6 +188,8 @@
                         <i data-lucide="layers" class="w-5 h-5 mr-3"></i>Catégories</a></li>
                     <li><a href="fournisseurs.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
                         <i data-lucide="truck" class="w-5 h-5 mr-3"></i>Fournisseurs</a></li>
+                    <li><a href="magasin.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                            <i data-lucide="store" class="w-5 h-5 mr-3"></i>Magasin</a></li>
                 </ul>
             </nav>
         </div>
@@ -261,7 +263,7 @@
                 <form id="FormajoutProduit" class="space-y-4">
                     <!-- General Information Tab -->
                     <div id="generalTab" class="tab-content">
-                        <input type="text" id="code" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
+                        <input hidden type="text" id="code" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                         <div class="space-y-2">
                             <label for="id_produit" class="block text-sm font-medium">Produit:</label>
                             <div class="relative">
@@ -320,6 +322,28 @@
             </div>
         </div>
     </div>
+
+    <!-- Ajouter un indicateur de chargement -->
+<div id="loadingIndicator" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="flex flex-col items-center">
+        <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-32 w-32 mb-4"></div>
+        <h2 class="text-xl font-semibold text-white">Chargement...</h2>
+        <p class="text-white">Veuillez patienter</p>
+    </div>
+</div>
+
+<style>
+    .loader {
+        border-top-color: #3498db;
+        animation: spin 1s infinite linear;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             lucide.createIcons();
@@ -408,11 +432,13 @@
                             const tbody = $('tbody');
                             tbody.empty();
     
-                            if (response.status === 'success' && Array.isArray(response.donnees)) {
+                            if (response.status === 'success' && Array.isArray(response.donnees) && response.donnees.length > 0) {
+                                let totalMontant = 0;
                                 response.donnees.forEach(entry => {
                                     const prixFournis = parseFloat(entry.prix_fournis || 0).toFixed(2);
                                     const prixUnitaire = parseFloat(entry.prix_unitaire || 0).toFixed(2);
                                     const prixTotal = parseFloat(entry.prix_total || 0).toFixed(2);
+                                    totalMontant += parseFloat(entry.prix_total || 0);
     
                                     tbody.append(`
                                         <tr class="bg-white hover:bg-gray-50" 
@@ -435,13 +461,48 @@
                                         </tr>
                                     `);
                                 });
+    
+                                // Ajouter la ligne de total
+                                tbody.append(`
+                                    <tr class="bg-gray-100 font-bold">
+                                        <td colspan="4" class="border px-4 py-2 text-right">Total</td>
+                                        <td colspan="2" class="border px-4 py-2">${totalMontant.toFixed(2)} F CFA</td>
+                                        <td colspan="4"></td>
+                                    </tr>
+                                `);
                             } else {
-                                tbody.append('<tr><td colspan="9" class="text-center py-4">Aucune entrée trouvée.</td></tr>');
+                                // Nouveau message d'erreur stylisé
+                                tbody.append(`
+                                    <tr>
+                                        <td colspan="10" class="text-center py-8">
+                                            <div class="flex flex-col items-center justify-center text-gray-500">
+                                                <i data-lucide="alert-circle" class="w-16 h-16 mb-4"></i>
+                                                <p class="text-xl font-semibold mb-2">Aucune commande trouvée</p>
+                                                <p class="text-sm">Veuillez ajouter une nouvelle commande en utilisant le bouton "Ajouter un Produit"</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `);
                             }
+                            // Réinitialiser les icônes Lucide après l'ajout du contenu
+                            lucide.createIcons();
                         },
-                        error: xhr => {
-                            console.error('Error loading entries:', xhr);
-                            alert("Erreur lors du chargement des entrées.");
+                        error: function(xhr, status, error) {
+                            const tbody = $('tbody');
+                            tbody.empty();
+                            tbody.append(`
+                                <tr>
+                                    <td colspan="10" class="text-center py-8">
+                                        <div class="flex flex-col items-center justify-center text-red-500">
+                                            <i data-lucide="alert-triangle" class="w-16 h-16 mb-4"></i>
+                                            <p class="text-xl font-semibold mb-2">Erreur lors du chargement</p>
+                                            <p class="text-sm">Impossible de récupérer les commandes. Veuillez réessayer plus tard.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `);
+                            lucide.createIcons();
+                            console.error('Erreur:', error);
                         }
                     });
                 }
@@ -490,7 +551,7 @@
                         console.log('Envoi des données:', formData);
                         
                         const url = formData.id_commande ? 'commande_modifier.php' : 'commande_nouveau.php';
-                        
+                        console.log('URL:', url);
                         $.ajax({
                             url: url,
                             type: 'POST',
@@ -585,100 +646,6 @@
     
                 $('#quantite, #prix_fournis').on('input', calculateTotal);
     
-                // Ajouter cette fonction après les autres fonctions JavaScript existantes :
-                function handlePrint() {
-                    $.ajax({
-                        url: 'commande_get_liste.php',
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function(response) {
-                            if (response.status === 'success' && Array.isArray(response.donnees)) {
-                                // Créer une nouvelle fenêtre pour l'impression
-                                const printWindow = window.open('', '_blank');
-                                
-                                // Construire le contenu HTML à imprimer
-                                let printContent = `
-                                    <!DOCTYPE html>
-                                    <html>
-                                    <head>
-                                        <title>Liste des Commandes</title>
-                                        <style>
-                                            body { font-family: Arial, sans-serif; }
-                                            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                                            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                                            th { background-color: #047857; color: white; }
-                                            .header { text-align: center; margin-bottom: 20px; }
-                                            .date { text-align: right; margin-bottom: 20px; }
-                                            .total { margin-top: 20px; text-align: right; }
-                                        </style>
-                                    </head>
-                                    <body>
-                                        <div class="header">
-                                            <h1>Pharmacie de Cession</h1>
-                                            <h2>Liste des Commandes</h2>
-                                        </div>
-                                        <div class="date">Date d'impression: ${new Date().toLocaleDateString()}</div>
-                                        <table>
-                                            <thead>
-                                                <tr>
-                                                    <th>Produit</th>
-                                                    <th>Prix Achat</th>
-                                                    <th>Prix Vente</th>
-                                                    <th>Quantité</th>
-                                                    <th>Prix Total</th>
-                                                    <th>Date d'Ajout</th>
-                                                    <th>Date d'Expiration</th>
-                                                    <th>Fournisseur</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>`;
-                
-                                // Ajouter les lignes de données
-                                response.donnees.forEach(entry => {
-                                    printContent += `
-                                        <tr>
-                                            <td>${entry.nom || ''}</td>
-                                            <td>${parseFloat(entry.prix_fournis || 0).toFixed(2)} F CFA</td>
-                                            <td>${parseFloat(entry.prix_unitaire || 0).toFixed(2)} F CFA</td>
-                                            <td>${entry.quantite || ''}</td>
-                                            <td>${parseFloat(entry.prix_total || 0).toFixed(2)} F CFA</td>
-                                            <td>${entry.date_ajout || ''}</td>
-                                            <td>${entry.date_expiration || ''}</td>
-                                            <td>${entry.nom_fournisseurs || ''}</td>
-                                        </tr>`;
-                                });
-                
-                                // Ajouter les totaux et fermer le HTML
-                                printContent += `
-                                            </tbody>
-                                        </table>
-                                        <div class="total">
-                                            <p><strong>Nombre total de commandes:</strong> ${response.statistiques.nombre_commandes}</p>
-                                            <p><strong>Quantité totale:</strong> ${response.statistiques.quantite_totale}</p>
-                                            <p><strong>Montant total:</strong> ${response.statistiques.montant_total} F CFA</p>
-                                        </div>
-                                    </body>
-                                    </html>`;
-                
-                                // Écrire le contenu dans la nouvelle fenêtre
-                                printWindow.document.write(printContent);
-                                printWindow.document.close();
-                
-                                // Lancer l'impression après le chargement de la page
-                                printWindow.onload = function() {
-                                    printWindow.print();
-                                };
-                            } else {
-                                alert('Aucune donnée à imprimer');
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('Erreur:', error);
-                            alert('Erreur lors de la récupération des données pour l\'impression');
-                        }
-                    });
-                }
-    
                 // Initialize everything
                 initializeSideMenu();
                 initializeTabs();
@@ -687,69 +654,6 @@
                 loadProducts();
                 loadSuppliers();
                 loadEntries();
-    
-                // Gestionnaire du bouton d'impression
-                $('.bg-gray-500.text-white').on('click', handlePrint);
-
-                // Ajouter dans la section JavaScript :
-                $(document).on('click', '.bg-green-600.text-white', function() {
-                    const searchTerm = $('input[placeholder="Produit"]').val();
-                    const startDate = $('input[type="date"]:first').val();
-                    const endDate = $('input[type="date"]:last').val();
-                
-                    $.ajax({
-                        url: 'commande_rechercher.php',
-                        type: 'POST',
-                        data: {
-                            search: searchTerm,
-                            date_debut: startDate,
-                            date_fin: endDate
-                        },
-                        dataType: 'json',
-                        success: function(response) {
-                            const tbody = $('tbody');
-                            tbody.empty();
-                
-                            if (response.status === 'success' && response.donnees && response.donnees.length > 0) {
-                                response.donnees.forEach(entry => {
-                                    const row = `
-                                        <tr class="bg-white hover:bg-gray-50" 
-                                            data-id="${entry.id_commande}" 
-                                            data-product-id="${entry.id_produit}" 
-                                            data-supplier-id="${entry.id_fournisseur}">
-                                            <td hidden>${entry.code || ''}</td>
-                                            <td>${entry.nom || ''}</td>
-                                            <td>${parseFloat(entry.prix_fournis || 0).toFixed(2)} F CFA</td>
-                                            <td>${parseFloat(entry.prix_unitaire || 0).toFixed(2)} F CFA</td>
-                                            <td>${entry.quantite || ''}</td>
-                                            <td>${parseFloat(entry.prix_total || 0).toFixed(2)} F CFA</td>
-                                            <td>${entry.date_ajout || ''}</td>
-                                            <td>${entry.date_expiration || ''}</td>
-                                            <td>${entry.nom_fournisseurs || ''}</td>
-                                            <td>
-                                                <button class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 btnModifier">Modifier</button>
-                                                <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 btnSupprimer">Supprimer</button>
-                                            </td>
-                                        </tr>
-                                    `;
-                                    tbody.append(row);
-                                });
-                            } else {
-                                tbody.append('<tr><td colspan="10" class="text-center py-4">Aucun résultat trouvé</td></tr>');
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('Erreur:', error);
-                            $('tbody').html(`
-                                <tr>
-                                    <td colspan="10" class="text-center text-red-600 py-4">
-                                        Erreur lors de la recherche : ${error}
-                                    </td>
-                                </tr>
-                            `);
-                        }
-                    });
-                });
             });
         });
     </script>

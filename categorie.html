@@ -54,6 +54,8 @@
                         <i data-lucide="layers" class="mr-2"></i>Catégories</a></li>
                     <li><a href="fournisseurs.html" class="flex items-center text-gray-700 hover:text-green-600">
                         <i data-lucide="truck" class="mr-2"></i>Fournisseurs</a></li>
+                   <li><a href="magasin.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                       <i data-lucide="store" class="w-5 h-5 mr-3"></i>Magasin</a></li>
                 </ul>
             </nav>
         </div>
@@ -105,7 +107,7 @@
                 </button>
             </div>
             <form id="formAjouterCategorie">
-                <input type="text" id="code" class="w-full p-2 border rounded mb-4 ">
+                <input hidden type="text" id="code" class="w-full p-2 border rounded mb-4 ">
                 <input type="text" id="nom" placeholder="Nom de la catégorie" required 
                     class="w-full p-2 border rounded mb-4">
                 <button type="submit" id="btnAjouterCategorie" 
@@ -116,6 +118,27 @@
             <div id="message" class="mt-4"></div>
         </div>
     </div>
+
+    <!-- Ajouter un indicateur de chargement -->
+<div id="loadingIndicator" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="flex flex-col items-center">
+        <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-32 w-32 mb-4"></div>
+        <h2 class="text-xl font-semibold text-white">Chargement...</h2>
+        <p class="text-white">Veuillez patienter</p>
+    </div>
+</div>
+
+<style>
+    .loader {
+        border-top-color: #3498db;
+        animation: spin 1s infinite linear;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
 
     <script>
     $(document).ready(function() {
@@ -232,30 +255,88 @@
                 type: 'GET',
                 dataType: 'json',
                 success: function(response) {
-                    $('tbody').empty();
+                    const tbody = $('tbody');
+                    tbody.empty();
                     
-                    if (response.donnees.length > 0) {
+                    if (response.donnees && response.donnees.length > 0) {
                         response.donnees.forEach(function(categorie) {
-                            var row = '<tr class="hover:bg-gray-50">' +
-                                '<td class="border p-2 hidden">' + (categorie.code || '') + '</td>' +
-                                '<td class="border p-2">' + (categorie.nom || '') + '</td>' +
-                                '<td class="border p-2 text-center">' +
-                                '<button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded mr-2 btnModifier">Modifier</button> ' +
-                                '<button class="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-2 rounded btnSupprimer">Supprimer</button>' +
-                                '</td></tr>';
-                            $('tbody').append(row);
+                            const row = `
+                                <tr class="hover:bg-gray-50">
+                                    <td class="border p-2 hidden">${categorie.code || ''}</td>
+                                    <td class="border p-2">${categorie.nom || ''}</td>
+                                    <td class="border p-2 text-center">
+                                        <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded mr-2 btnModifier">Modifier</button>
+                                        <button class="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-2 rounded btnSupprimer">Supprimer</button>
+                                    </td>
+                                </tr>
+                            `;
+                            tbody.append(row);
                         });
                     } else {
-                        $('tbody').append('<tr><td colspan="3" class="text-center p-4">Aucune catégorie trouvée.</td></tr>');
+                        // Message stylisé pour aucune catégorie trouvée
+                        tbody.append(`
+                            <tr>
+                                <td colspan="3" class="p-8">
+                                    <div class="flex flex-col items-center justify-center space-y-4">
+                                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                                            <i data-lucide="folder-x" class="w-8 h-8 text-gray-400"></i>
+                                        </div>
+                                        <div class="text-center">
+                                            <h3 class="text-lg font-medium text-gray-900">Aucune catégorie trouvée</h3>
+                                            <p class="mt-1 text-sm text-gray-500">
+                                                Commencez par ajouter une nouvelle catégorie
+                                            </p>
+                                            <button onclick="$('#btnOuvrirModalAjouterCategorie').click()" 
+                                                    class="mt-4 inline-flex items-center px-4 py-2 border border-transparent 
+                                                           rounded-md shadow-sm text-sm font-medium text-white bg-green-600 
+                                                           hover:bg-green-700 focus:outline-none focus:ring-2 
+                                                           focus:ring-offset-2 focus:ring-green-500">
+                                                <i data-lucide="plus-circle" class="w-4 h-4 mr-2"></i>
+                                                Ajouter une catégorie
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        `);
                     }
+                    // Réinitialiser les icônes Lucide
+                    lucide.createIcons();
                 },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    var errorMessage = jqXHR.responseText + textStatus;
-                    $('tbody').append('<tr><td colspan="3" class="text-center p-4 text-red-500">Erreur lors de la récupération des categories: ' + errorMessage + '</td></tr>');
+                error: function(xhr, status, error) {
+                    const tbody = $('tbody');
+                    tbody.empty();
+                    tbody.append(`
+                        <tr>
+                            <td colspan="3" class="p-8">
+                                <div class="flex flex-col items-center justify-center space-y-4">
+                                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+                                        <i data-lucide="alert-triangle" class="w-8 h-8 text-red-400"></i>
+                                    </div>
+                                    <div class="text-center">
+                                        <h3 class="text-lg font-medium text-red-900">Erreur de chargement</h3>
+                                        <p class="mt-1 text-sm text-red-500">
+                                            Impossible de récupérer la liste des catégories
+                                        </p>
+                                        <button onclick="getListe()" 
+                                                class="mt-4 inline-flex items-center px-4 py-2 border border-transparent 
+                                                       rounded-md shadow-sm text-sm font-medium text-white bg-red-600 
+                                                       hover:bg-red-700 focus:outline-none focus:ring-2 
+                                                       focus:ring-offset-2 focus:ring-red-500">
+                                            <i data-lucide="refresh-cw" class="w-4 h-4 mr-2"></i>
+                                            Réessayer
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    `);
+                    lucide.createIcons();
+                    console.error('Erreur:', error);
                 }
             });
         }
-        
+
         // Charger les catégories au chargement de la page
         getListe();
 

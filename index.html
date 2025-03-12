@@ -45,6 +45,8 @@
                         <i data-lucide="layers" class="w-5 h-5 mr-3"></i>Catégories</a></li>
                     <li><a href="fournisseurs.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
                         <i data-lucide="truck" class="w-5 h-5 mr-3"></i>Fournisseurs</a></li>
+                    <li><a href="magasin.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                            <i data-lucide="store" class="w-5 h-5 mr-3"></i>Magasin</a></li>
                 </ul>
             </nav>
         </div>
@@ -110,13 +112,13 @@
                 <div>
                     <h3 class="text-xl font-semibold mb-4">Alertes Produits</h3>
                     <ul>
-                        <li class="flex justify-between py-2 border-b">
+                        <li class="flex justify-between py-2 border-b cursor-pointer">
                             <span>Péremption dans 3 mois</span>
-                            <span class="font-bold text-yellow-600">5 Produits</span>
+                            <span id="produits-peremption" class="font-bold text-yellow-600">Chargement...</span>
                         </li>
-                        <li class="flex justify-between py-2">
+                        <li class="flex justify-between py-2 cursor-pointer">
                             <span>Produits en rupture</span>
-                            <span class="font-bold text-red-600">3 Produits</span>
+                            <span id="produits-rupture" class="font-bold text-red-600">Chargement...</span>
                         </li>
                     </ul>
                 </div>
@@ -136,6 +138,29 @@
                     </div>
                 </div>
             </div>
+            <div hidden class="bg-white rounded-xl shadow-lg p-6 flex flex-col justify-between">
+                <div>
+                    <h3 hidden class="text-xl font-semibold mb-4 flex items-center">
+                        <i data-lucide="file-code" class="w-6 h-6 mr-2 text-indigo-500"></i>
+                        État du Système
+                    </h3>
+                    <div hidden id="php-status" class="space-y-3">
+                        <div class="animate-pulse">Chargement des statuts...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="detailsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl w-96 p-6 max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold" id="modalTitle"></h3>
+                <button class="text-gray-500 hover:text-red-500" onclick="closeDetailsModal()">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div id="modalContent" class="space-y-3"></div>
         </div>
     </div>
 
@@ -162,6 +187,51 @@
             // Close menu when mouse leaves menu area
             sideMenu.on('mouseleave', function() {
                 $(this).addClass('-translate-x-full');
+            });
+
+            // Ajouter dans le $(document).ready()
+            $.ajax({
+                url: 'get_count_produits_rupture.php',
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        $('#produits-rupture').text(response.count + ' Produits');
+                    } else {
+                        $('#produits-rupture').text('Erreur');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('#produits-rupture').text('Erreur');
+                    console.error('Erreur:', error);
+                }
+            });
+
+            $.ajax({
+                url: 'get_produits_peremption.php',
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        $('#produits-peremption').text(response.count + ' Produits');
+                        
+                        if (response.count > 0) {
+                            // Créer une liste des produits en péremption
+                            const produitsList = response.data.map(produit => 
+                                `${produit.nom} (${produit.jours_restants} jours restants)`
+                            ).join('\n');
+                            
+                            // Mettre à jour le tooltip ou une liste détaillée si nécessaire
+                            $('#produits-peremption').attr('title', produitsList);
+                        }
+                    } else {
+                        $('#produits-peremption').text('0 Produit');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('#produits-peremption').text('Erreur');
+                    console.error('Erreur:', error);
+                }
             });
         });
         // Initialize Lucide icons
@@ -236,6 +306,171 @@
                 }
             });
         });
+        $.ajax({
+    url: 'get_produits_rupture.php',
+    type: 'GET',
+    dataType: 'json',
+    success: function(response) {
+        if (response.status === 'success') {
+            if (response.count > 0) {
+                // Traiter les produits en rupture
+                response.data.forEach(produit => {
+                    console.log(`${produit.nom}: ${produit.quantite}/${produit.seuil_produit}`);
+                });
+            } else {
+                console.log('Aucun produit en rupture de stock');
+            }
+        }
+    },
+    error: function(xhr, status, error) {
+        console.error('Erreur:', error);
+    }
+});
+$.ajax({
+    url: 'get_count_produits_peremption.php',
+    type: 'GET',
+    dataType: 'json',
+    success: function(response) {
+        if (response.status === 'success') {
+            $('#produits-peremption').text(response.count + ' Produits');
+        } else {
+            $('#produits-peremption').text('Erreur');
+        }
+    },
+    error: function(xhr, status, error) {
+        $('#produits-peremption').text('Erreur');
+        console.error('Erreur:', error);
+    }
+});
+
+    // Fonction pour vérifier l'état des scripts PHP
+    function checkPhpStatus() {
+        const files = [
+            'get_produits_rupture.php',
+            'get_produits_peremption.php',
+            'get_count_produits_rupture.php',
+            'get_count_produits_peremption.php',
+            'acceuil_get_montant_total.php',
+            'acceuil_get_benifices.php'
+        ];
+
+        const statusContainer = $('#php-status');
+        statusContainer.empty();
+
+        files.forEach(file => {
+            $.ajax({
+                url: file,
+                type: 'HEAD',
+                success: function() {
+                    statusContainer.append(`
+                        <div class="flex items-center justify-between p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all">
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                                <span class="text-sm font-medium">${file}</span>
+                            </div>
+                            <span class="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">Actif</span>
+                        </div>
+                    `);
+                },
+                error: function() {
+                    statusContainer.append(`
+                        <div class="flex items-center justify-between p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all">
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
+                                <span class="text-sm font-medium">${file}</span>
+                            </div>
+                            <span class="text-xs text-red-600 bg-red-100 px-2 py-1 rounded-full">Inactif</span>
+                        </div>
+                    `);
+                }
+            });
+        });
+    }
+
+    // Exécuter la vérification au chargement et toutes les 30 secondes
+    checkPhpStatus();
+    setInterval(checkPhpStatus, 30000);
+
+    // Ajouter ces nouvelles fonctions
+    function showDetailsModal(type) {
+        const modal = $('#detailsModal');
+        const title = $('#modalTitle');
+        const content = $('#modalContent');
+        
+        modal.removeClass('hidden').addClass('flex');
+        content.html('<div class="animate-pulse">Chargement...</div>');
+        
+        if (type === 'peremption') {
+            title.text('Produits en péremption');
+            $.ajax({
+                url: 'get_produits_peremption.php',
+                type: 'GET',
+                success: function(response) {
+                    if (response.status === 'success' && response.data.length > 0) {
+                        const html = response.data.map(produit => `
+                            <div class="p-3 bg-yellow-50 rounded-lg">
+                                <div class="font-medium text-yellow-800">${produit.nom}</div>
+                                <div class="text-sm text-yellow-600">
+                                    <span class="font-medium">Quantité:</span> ${produit.quantite}
+                                    <br>
+                                    <span class="font-medium">Expire dans:</span> ${produit.jours_restants} jours
+                                    <br>
+                                    <span class="font-medium">Date d'expiration:</span> ${produit.date_expiration}
+                                </div>
+                            </div>
+                        `).join('');
+                        content.html(html);
+                    } else {
+                        content.html('<p class="text-gray-500 text-center">Aucun produit en péremption</p>');
+                    }
+                },
+                error: function() {
+                    content.html('<p class="text-red-500 text-center">Erreur lors du chargement</p>');
+                }
+            });
+        } else if (type === 'rupture') {
+            title.text('Produits en rupture');
+            $.ajax({
+                url: 'get_produits_rupture.php',
+                type: 'GET',
+                success: function(response) {
+                    if (response.status === 'success' && response.data.length > 0) {
+                        const html = response.data.map(produit => `
+                            <div class="p-3 bg-red-50 rounded-lg">
+                                <div class="font-medium text-red-800">${produit.nom}</div>
+                                <div class="text-sm text-red-600">
+                                    <span class="font-medium">Quantité actuelle:</span> ${produit.quantite}
+                                    <br>
+                                    <span class="font-medium">Seuil d'alerte:</span> ${produit.seuil_produit}
+                                </div>
+                            </div>
+                        `).join('');
+                        content.html(html);
+                    } else {
+                        content.html('<p class="text-gray-500 text-center">Aucun produit en rupture</p>');
+                    }
+                },
+                error: function() {
+                    content.html('<p class="text-red-500 text-center">Erreur lors du chargement</p>');
+                }
+            });
+        }
+    }
+
+    function closeDetailsModal() {
+        $('#detailsModal').removeClass('flex').addClass('hidden');
+    }
+
+    // Modifier les spans pour ajouter les événements click
+    $('#produits-peremption').parent().addClass('cursor-pointer').on('click', () => showDetailsModal('peremption'));
+    $('#produits-rupture').parent().addClass('cursor-pointer').on('click', () => showDetailsModal('rupture'));
+
+    // Fermer le modal en cliquant à l'extérieur
+    $('#detailsModal').on('click', function(e) {
+        if (e.target === this) {
+            closeDetailsModal();
+        }
+    });
     </script>
 </body>
 </html>

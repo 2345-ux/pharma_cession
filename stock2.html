@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pharmacie de Cession</title>
-    <script src="assets/js/lucide@04680.min.js"></script>
+    <script src="assets\js\chart.j@4.js"></script>
+    <script src="assets\js\lucide@04680.min.js"></script>
+    <link href="assets\css\tailwind.min.css" rel="stylesheet">
+    <link href="assets\css\all.min.css" rel="stylesheet">
     <script src="js/jquery-3.6.0.min.js"></script>
     <style>
         :root {
@@ -265,6 +268,8 @@
                         <i data-lucide="truck"></i>Fournisseurs
                     </a>
                 </li>
+             <li><a href="magasin.html" class="text-gray-700 hover:text-green-600 transition-colors flex items-center">
+                    <i data-lucide="store" class="w-5 h-5 mr-3"></i>Magasin</a></li>
             </ul>
         </nav>
     </div>
@@ -325,6 +330,27 @@
         </div>
     </div>
 
+    <!-- Ajouter un indicateur de chargement -->
+<div id="loadingIndicator" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="flex flex-col items-center">
+        <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-32 w-32 mb-4"></div>
+        <h2 class="text-xl font-semibold text-white">Chargement...</h2>
+        <p class="text-white">Veuillez patienter</p>
+    </div>
+</div>
+
+<style>
+    .loader {
+        border-top-color: #3498db;
+        animation: spin 1s infinite linear;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
     <script>
         // Initialize Lucide icons
         lucide.createIcons();
@@ -351,7 +377,9 @@
                     tbody.empty();
 
                     if (response.status === 'success' && Array.isArray(response.donnees) && response.donnees.length > 0) {
+                        let totalMontant = 0;
                         response.donnees.forEach(function (produit) {
+                            totalMontant += parseFloat(produit.valeur_totale || 0);
                             const row = `
                                 <tr>
                                     <td class="border px-4 py-2">${produit.nom || ''}</td>
@@ -373,18 +401,80 @@
                             `;
                             tbody.append(row);
                         });
+
+                        // Ajouter la ligne de total
+                        tbody.append(`
+                            <tr class="bg-gray-100 font-bold">
+                                <td colspan="3" class="border px-4 py-2 text-right">Total</td>
+                                <td class="border px-4 py-2">${totalMontant.toFixed(2)} F CFA</td>
+                                <td colspan="4"></td>
+                            </tr>
+                        `);
                     } else {
-                        tbody.append('<tr><td colspan="8" class="text-center">Aucun produit en stock trouvé.</td></tr>');
+                        // Message stylisé et centré pour aucun produit trouvé
+                        tbody.append(`
+                            <tr>
+                                <td colspan="8" class="p-0">
+                                    <div class="flex items-center justify-center min-h-[400px] w-full">
+                                        <div class="text-center max-w-md mx-auto p-6">
+                                            <div class="w-20 h-20 bg-gray-100 rounded-full mx-auto mb-6 flex items-center justify-center">
+                                                <i data-lucide="package-x" class="w-10 h-10 text-gray-400"></i>
+                                            </div>
+                                            <h3 class="text-xl font-medium text-gray-900 mb-3">
+                                                Aucun produit en stock
+                                            </h3>
+                                            <p class="text-gray-500 mb-6">
+                                                Le stock est actuellement vide. Veuillez ajouter des produits via les commandes.
+                                            </p>
+                                            <a href="commande.html" 
+                                               class="mt-4 inline-flex items-center px-4 py-2 border border-transparent 
+                                                           rounded-md shadow-sm text-sm font-medium text-white bg-green-600 
+                                                           hover:bg-green-700 focus:outline-none focus:ring-2 
+                                                           focus:ring-offset-2 focus:ring-green-500">
+                                                <i data-lucide="plus-circle" class="w-4 h-4 mr-2"></i>
+                                                Ajouter une commande
+                                            </a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        `);
                     }
+                    // Réinitialiser les icônes Lucide
+                    lucide.createIcons();
                 },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    $('#tableBody').append(`
+                error: function (xhr, status, error) {
+                    const tbody = $('#tableBody');
+                    tbody.empty();
+                    tbody.append(`
                         <tr>
-                            <td colspan="8" class="text-center text-red-600">
-                                Erreur lors de la récupération des produits en stock : ${textStatus} - ${errorThrown}
+                            <td colspan="8" class="p-0">
+                                <div class="flex items-center justify-center min-h-[400px] w-full">
+                                    <div class="text-center max-w-md mx-auto p-6">
+                                        <div class="w-20 h-20 bg-red-100 rounded-full mx-auto mb-6 flex items-center justify-center">
+                                            <i data-lucide="alert-triangle" class="w-10 h-10 text-red-400"></i>
+                                        </div>
+                                        <h3 class="text-xl font-medium text-red-900 mb-3">
+                                            Erreur de chargement
+                                        </h3>
+                                        <p class="text-red-500 mb-6">
+                                            Impossible de récupérer le stock. Veuillez réessayer plus tard.
+                                        </p>
+                                        <button onclick="getListeProduits()" 
+                                                class="inline-flex items-center px-4 py-2 border border-transparent 
+                                                       rounded-md shadow-sm text-sm font-medium text-white bg-red-600 
+                                                       hover:bg-red-700 focus:outline-none focus:ring-2 
+                                                       focus:ring-offset-2 focus:ring-red-500 transition-all">
+                                            <i data-lucide="refresh-cw" class="w-5 h-5 mr-2"></i>
+                                            Réessayer
+                                        </button>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     `);
+                    lucide.createIcons();
+                    console.error('Erreur:', error);
                 }
             });
         }
@@ -410,133 +500,6 @@
                 row.style.display = matchesSearch && matchesDate ? '' : 'none';
             });
         });
-
-        // Fonction d'impression
-        function handlePrint() {
-            $.ajax({
-                url: 'stock_get_liste.php',
-                type: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    if (response.status === 'success' && Array.isArray(response.donnees)) {
-                        const printWindow = window.open('', '_blank');
-                        
-                        let printContent = `
-                            <!DOCTYPE html>
-                            <html>
-                            <head>
-                                <title>État du Stock - Pharmacie de Cession</title>
-                                <style>
-                                    body { 
-                                        font-family: Arial, sans-serif; 
-                                        margin: 20px;
-                                        line-height: 1.6;
-                                    }
-                                    table { 
-                                        width: 100%; 
-                                        border-collapse: collapse; 
-                                        margin-top: 20px;
-                                        margin-bottom: 20px;
-                                    }
-                                    th, td { 
-                                        border: 1px solid #ddd; 
-                                        padding: 12px 8px; 
-                                        text-align: left; 
-                                    }
-                                    th { 
-                                        background-color: #047857; 
-                                        color: white;
-                                        font-weight: bold;
-                                    }
-                                    tr:nth-child(even) { background-color: #f9fafb; }
-                                    .header { 
-                                        text-align: center; 
-                                        margin-bottom: 30px;
-                                        padding-bottom: 20px;
-                                        border-bottom: 2px solid #047857;
-                                    }
-                                    .date { 
-                                        text-align: right;
-                                        margin-bottom: 20px;
-                                        color: #666;
-                                    }
-                                    .footer {
-                                        margin-top: 30px;
-                                        text-align: right;
-                                        border-top: 2px solid #047857;
-                                        padding-top: 20px;
-                                    }
-                                </style>
-                            </head>
-                            <body>
-                                <div class="header">
-                                    <h1>Pharmacie de Cession</h1>
-                                    <h2>État du Stock</h2>
-                                </div>
-                                <div class="date">Date d'impression: ${new Date().toLocaleDateString()}</div>
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Produit</th>
-                                            <th>Prix Unitaire</th>
-                                            <th>Quantité</th>
-                                            <th>Valeur Totale</th>
-                                            <th>Date d'Expiration</th>
-                                            <th>Date d'Ajout</th>
-                                            <th>Fournisseur</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>`;
-
-                        let totalQuantite = 0;
-                        let totalValeur = 0;
-
-                        response.donnees.forEach(item => {
-                            const valeurTotale = parseFloat(item.quantite || 0) * parseFloat(item.prix_unitaire || 0);
-                            totalQuantite += parseInt(item.quantite || 0);
-                            totalValeur += valeurTotale;
-
-                            printContent += `
-                                <tr>
-                                    <td>${item.nom_produit || ''}</td>
-                                    <td>${parseFloat(item.prix_unitaire || 0).toFixed(2)} F CFA</td>
-                                    <td>${item.quantite || '0'}</td>
-                                    <td>${valeurTotale.toFixed(2)} F CFA</td>
-                                    <td>${item.date_expiration || ''}</td>
-                                    <td>${item.date_ajout || ''}</td>
-                                    <td>${item.nom_fournisseur || ''}</td>
-                                </tr>`;
-                        });
-
-                        printContent += `
-                                    </tbody>
-                                </table>
-                                <div class="footer">
-                                    <p><strong>Quantité totale en stock:</strong> ${totalQuantite}</p>
-                                    <p><strong>Valeur totale du stock:</strong> ${totalValeur.toFixed(2)} F CFA</p>
-                                </div>
-                            </body>
-                            </html>`;
-
-                        printWindow.document.write(printContent);
-                        printWindow.document.close();
-
-                        printWindow.onload = function() {
-                            printWindow.print();
-                        };
-                    } else {
-                        alert('Aucune donnée à imprimer');
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Erreur:', error);
-                    alert('Erreur lors de la récupération des données pour l\'impression');
-                }
-            });
-        }
-
-        // Ajouter l'événement sur le bouton d'impression
-        $('.btn-secondary').on('click', handlePrint);
     </script>
 </body>
 </html>
