@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pharmacie de Cession - Magasins</title>
     <script src="js/jquery-3.6.0.min.js"></script>
+    <script src="assets\js\chart.j@4.js"></script>
     <script src="assets\js\lucide@04680.min.js"></script>
     <link href="assets\css\tailwind.min.css" rel="stylesheet">
+    <link href="assets\css\all.min.css" rel="stylesheet">
     <style>
         body {
             background: linear-gradient(to bottom right, #f9fafb, #dbeafe);
@@ -96,7 +98,7 @@
                         class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600">
                 </div>
 
-                <button type="submit" id="btnSauvegarder" 
+                <button type="button" id="btnSauvegarder" 
                     class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 
                            focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 
                            transition-colors duration-200">
@@ -129,27 +131,64 @@
 
             $('#closeModal').click(closeModal);
 
-            // Form submission
-            $('#formMagasin').submit(function(e) {
-                e.preventDefault();
-                saveMagasin();
+            // Un seul gestionnaire pour btnSauvegarder
+            $('#btnSauvegarder').on('click', function() {
+                console.log('Bouton cliqué'); // Debug
+                
+                const data = {
+                    id: $('#code').val(),
+                    nom: $('#nom').val()
+                };
+
+                console.log('Données à envoyer:', data); // Debug
+
+                const url = data.id ? 'magasin_modifier.php' : 'magasin_nouveau.php';
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: data,
+                    dataType: 'json',
+                    beforeSend: function() {
+                        $('#loadingIndicator').removeClass('hidden').addClass('flex');
+                    },
+                    success: function(response) {
+                        console.log('Réponse:', response); // Debug
+                        if (response.status === 'success') {
+                            closeModal();
+                            loadMagasins();
+                        } else {
+                            alert('Erreur: ' + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Erreur AJAX:', {
+                            xhr: xhr.responseText,
+                            status: status,
+                            error: error
+                        });
+                        alert('Erreur lors de l\'opération');
+                    },
+                    complete: function() {
+                        $('#loadingIndicator').removeClass('flex').addClass('hidden');
+                    }
+                });
             });
 
-            // Edit and Delete handlers
+            // Un seul gestionnaire pour btnModifier et btnSupprimer
             $(document).on('click', '.btnModifier', function() {
                 const row = $(this).closest('tr');
-                const data = {
-                    code: row.find('td:eq(0)').text(),
-                    nom: row.find('td:eq(1)').text(),
-                    emplacement: row.find('td:eq(2)').text()
-                };
-                openModal('edit', data);
+                openModal('edit', {
+                    id: row.find('td:eq(0)').text(),
+                    nom: row.find('td:eq(1)').text()
+                });
             });
 
             $(document).on('click', '.btnSupprimer', function() {
+                const row = $(this).closest('tr');
+                const id = row.find('td:first').text(); // Récupère l'ID du magasin
                 if (confirm('Êtes-vous sûr de vouloir supprimer ce magasin ?')) {
-                    const code = $(this).closest('tr').find('td:first').text();
-                    deleteMagasin(code);
+                    deleteMagasin(id);
                 }
             });
         });
@@ -243,77 +282,32 @@
             });
         }
 
-        function saveMagasin() {
-            const data = {
-                id: $('#code').val(),
-                nom: $('#nom').val()
-            };
-
-            const url = data.id ? 'magasin_modifier.php' : 'magasin_nouveau.php';
-
+        function deleteMagasin(id) {
+            console.log('ID à supprimer:', id); // Debug log
             $.ajax({
-                url: url,
+                url: 'magasin_supprimer.php',
                 type: 'POST',
-                data: data,
+                data: { id: id },
                 dataType: 'json',
                 success: function(response) {
+                    console.log('Réponse serveur:', response); // Debug log
                     if (response.status === 'success') {
-                        closeModal();
                         loadMagasins();
-                        alert(data.id ? 'Magasin modifié avec succès!' : 'Magasin ajouté avec succès!');
+                        alert('Magasin supprimé avec succès!');
                     } else {
                         alert('Erreur: ' + response.message);
                     }
                 },
-                error: function() {
-                    alert('Erreur lors de l\'opération');
+                error: function(xhr, status, error) {
+                    console.error('Détails erreur:', {
+                        xhr: xhr.responseText,
+                        status: status,
+                        error: error
+                    });
+                    alert('Erreur lors de la suppression : ' + error);
                 }
             });
         }
-
-        function deleteMagasin(id) {
-            if (confirm('Êtes-vous sûr de vouloir supprimer ce magasin ?')) {
-                $.ajax({
-                    url: 'magasin_supprimer.php',
-                    type: 'POST',
-                    data: { id: id },
-                    dataType: 'json',
-                    success: function(response) {
-                        if (response.status === 'success') {
-                            loadMagasins();
-                            alert('Magasin supprimé avec succès!');
-                        } else {
-                            alert('Erreur: ' + response.message);
-                        }
-                    },
-                    error: function() {
-                        alert('Erreur lors de la suppression');
-                    }
-                });
-            }
-        }
-
-        // Event handlers
-        $('#formMagasin').on('submit', function(e) {
-            e.preventDefault();
-            saveMagasin();
-        });
-
-        $(document).on('click', '.btnModifier', function() {
-            const row = $(this).closest('tr');
-            openModal('edit', {
-                id: row.find('td:eq(0)').text(),
-                nom: row.find('td:eq(1)').text()
-            });
-        });
-
-        $(document).on('click', '.btnSupprimer', function() {
-            const id = $(this).closest('tr').find('td:first').text();
-            deleteMagasin(id);
-        });
-
-        // Initial load
-        loadMagasins();
     </script>
 </body>
 </html>
